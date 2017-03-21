@@ -1,4 +1,4 @@
-package com.example.navigator;
+package cn.vicey.navigator;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -24,6 +24,6 @@ public class ExampleInstrumentedTest
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.navigator", appContext.getPackageName());
+        assertEquals("cn.vicey.navigator", appContext.getPackageName());
     }
 }

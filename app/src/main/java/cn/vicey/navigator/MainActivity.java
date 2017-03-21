@@ -1,4 +1,4 @@
-package com.example.navigator;
+package cn.vicey.navigator;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;

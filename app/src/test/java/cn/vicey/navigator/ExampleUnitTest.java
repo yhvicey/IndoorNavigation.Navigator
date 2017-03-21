@@ -1,4 +1,4 @@
-package com.example.navigator;
+package cn.vicey.navigator;
 
 import org.junit.Test;
 
