@@ -1,4 +1,4 @@
-package cn.vicey.navigator;
+package cn.vicey.navigator.Activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import cn.vicey.navigator.R;
 
 public class MainActivity
         extends AppCompatActivity
