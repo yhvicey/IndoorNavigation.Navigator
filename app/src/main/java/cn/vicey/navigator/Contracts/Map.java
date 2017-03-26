@@ -8,7 +8,6 @@ import java.util.List;
 public class Map
 {
     private List<Floor> mFloors = null;
-    private String mVersion = null;
 
     /**
      * Initialize new instance of class Map.
