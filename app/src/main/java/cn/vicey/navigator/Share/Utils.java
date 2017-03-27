@@ -3,16 +3,38 @@ package cn.vicey.navigator.Share;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Utils
+public final class Utils
 {
-    private final static String DATE_PATTERN = "yyyy-MM-dd";
-    private final static String TIME_PATTERN = "HH:mm:ss";
+    private static final String LOGGER_TAG = "Utils";
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String TIME_PATTERN = "HH:mm:ss";
 
-    private final static long mStartTime = new Date().getTime();
+    public static final int ERR_SUCCEED = 0;
+    public static final int ERR_EXCEPTION = -1;
+
+    private static final long mStartTime = new Date().getTime();
 
     private Utils()
     {
         // no-op
+    }
+
+    public static void exit()
+    {
+        Logger.saveToFile();
+        System.exit(ERR_SUCCEED);
+    }
+
+    public static void exitWithError()
+    {
+        exitWithError(ERR_EXCEPTION);
+    }
+
+    public static void exitWithError(int errorCode)
+    {
+        Logger.error(LOGGER_TAG, "Utils.exitWithError(int errorCode) has been called. Error code: " + errorCode);
+        Logger.saveToFile();
+        System.exit(errorCode);
     }
 
     /**
