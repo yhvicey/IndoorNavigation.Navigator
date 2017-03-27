@@ -9,32 +9,17 @@ public final class Utils
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String TIME_PATTERN = "HH:mm:ss";
 
-    public static final int ERR_SUCCEED = 0;
-    public static final int ERR_EXCEPTION = -1;
+    private static long mStartTime = 0;
 
-    private static final long mStartTime = new Date().getTime();
+    public static boolean initialize()
+    {
+        mStartTime = new Date().getTime();
+        return true;
+    }
 
     private Utils()
     {
         // no-op
-    }
-
-    public static void exit()
-    {
-        Logger.saveToFile();
-        System.exit(ERR_SUCCEED);
-    }
-
-    public static void exitWithError()
-    {
-        exitWithError(ERR_EXCEPTION);
-    }
-
-    public static void exitWithError(int errorCode)
-    {
-        Logger.error(LOGGER_TAG, "Utils.exitWithError(int errorCode) has been called. Error code: " + errorCode);
-        Logger.saveToFile();
-        System.exit(errorCode);
     }
 
     /**

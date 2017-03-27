@@ -1,65 +1,94 @@
 package cn.vicey.navigator;
 
 import android.app.Application;
-import android.os.Environment;
+import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Share.Logger;
-
-import java.io.File;
+import cn.vicey.navigator.Share.Utils;
 
 public class Navigator
         extends Application
 {
     private static final String LOGGER_TAG = "Navigator";
-    private static final String DATA_DIR = "/Navigator/";
+    public static final int ERR_SUCCEED = 0;
+    public static final int ERR_UNEXPECTED_ACTION = -1;
+    public static final int ERR_INIT = -2;
 
-    private static String mDataDirFullPath = Environment.getExternalStorageDirectory() + DATA_DIR;
-
-    private static boolean mInitialized = false;
+    private static String mFilesDir = null;
 
     public boolean initialize()
     {
-        synchronized (this)
+        try
         {
-            if (mInitialized) return true;
-            try
-            {
-                boolean initialized = true;
-
-                // TODO: put global initialization code here.
-                File appDataDir = new File(mDataDirFullPath);
-                if (!(appDataDir.exists() || appDataDir.mkdir()))
-                {
-                    Logger.error(LOGGER_TAG, "Failed to create data folder.");
-                    initialized &= false;
-                }
-
-                return initialized;
-            }
-            catch (Throwable t)
-            {
-                Logger.error(LOGGER_TAG, "Failed to initialize the app.");
-                t.printStackTrace();
-                Logger.saveToFile();
-                System.exit(-1);
-                return false;
-            }
+            mFilesDir = getFilesDir().getAbsolutePath();
+            return true;
         }
+        catch (Throwable t)
+        {
+            t.printStackTrace();
+            return false;
+        }
+    }
+
+    public static void exit()
+    {
+        Logger.flush();
+        System.exit(ERR_SUCCEED);
+    }
+
+    public static void exitWithError()
+    {
+        exitWithError(ERR_UNEXPECTED_ACTION);
+    }
+
+    public static void exitWithError(int errorCode)
+    {
+        Logger.error(LOGGER_TAG, "Utils.exitWithError(int errorCode) has been called. Error code: " + errorCode);
+        Logger.flush();
+        System.exit(errorCode);
+    }
+
+    public static String getFilesDirPath()
+    {
+        return mFilesDir;
     }
 
     @Override
     public void onCreate()
     {
-        super.onCreate();
-        mInitialized = initialize();
-    }
+        try
+        {
+            // Initialize files dir, which is important for other classes.
+            if (!initialize())
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Navigator.");
+                exitWithError(ERR_INIT);
+            }
+            // Initialize Utils to get start time.
+            if (!Utils.initialize())
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Utils.");
+                exitWithError(ERR_INIT);
+            }
+            if (!Logger.initialize())
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Logger.");
+                exitWithError(ERR_INIT);
+            }
+            if (!MapManager.initialize())
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize MapManager.");
+                exitWithError(ERR_INIT);
+            }
 
-    public static String getDataDirFullPath()
-    {
-        return mDataDirFullPath;
-    }
+            // TODO: put global initialization code below.
 
-    public static boolean getInitialized()
-    {
-        return mInitialized;
+            Logger.info(LOGGER_TAG, "Finished initialization. Current time: " + Utils.getCurrentDateTimeString());
+            super.onCreate();
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to initialize the app.", t);
+            exitWithError();
+        }
     }
 }

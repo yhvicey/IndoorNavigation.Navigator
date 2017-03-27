@@ -6,10 +6,6 @@ import cn.vicey.navigator.Navigator;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Logger class.
@@ -17,58 +13,42 @@ import java.util.TimerTask;
 public class Logger
 {
     private static final String LOGGER_TAG = "Logger";
+    private static final String LOG_DIR = "/logs/";
+    private static final String LOG_ENCODING = "utf-8";
     private static final String LOG_TEMPLATE = "[%s][%d][%s] %s";
     private static final String DEBUG_HEADER = "DEBUG";
     private static final String INFO_HEADER = "INFO";
     private static final String ERROR_HEADER = "ERROR";
-    private static final String LOG_DIR = "/logs/";
     private static final String NEW_LINE = "\n";
-    private static final int SAVE_INTERNAL = 1000;
 
-    private static String mLogDirFullPath = Navigator.getDataDirFullPath() + LOG_DIR;
-    private static String mLogFileFullPath = mLogDirFullPath + "Navigator.log";
-    private static final List<String> mBuffer = new ArrayList<>();
-    private static final Timer mAutoSaver = new Timer();
-    private static final TimerTask mAutoSaveTask = new TimerTask()
-    {
-        @Override
-        public void run()
-        {
-            saveToFile();
-        }
-    };
+    private static FileOutputStream mLogFile = null;
 
-    private static boolean mFileLogEnabled = false;
-
-    static
-    {
-        initialize();
-    }
-
-    private static void initialize()
+    public static boolean initialize()
     {
         try
         {
-            File logDir = new File(mLogDirFullPath);
-            File logFile = new File(mLogFileFullPath);
+            String logDirPath = Navigator.getFilesDirPath() + LOG_DIR;
+            String logFilePath = logDirPath + "Navigator.log";
+            File logDir = new File(logDirPath);
             if (!(logDir.exists() || logDir.mkdir()))
             {
                 error(LOGGER_TAG, "Failed to create log dir. File log disabled.");
-                mFileLogEnabled = false;
+                return false;
             }
+            File logFile = new File(logFilePath);
             if (!(logFile.exists() || logFile.createNewFile()))
             {
                 error(LOGGER_TAG, "Failed to create log file. File log disabled.");
-                mFileLogEnabled = false;
+                return false;
             }
-            mFileLogEnabled = true;
+            mLogFile = new FileOutputStream(logFile);
             info(LOGGER_TAG, "File log enabled.");
-            mAutoSaver.schedule(mAutoSaveTask, 0, SAVE_INTERNAL);
+            return true;
         }
         catch (Throwable t)
         {
-            error(LOGGER_TAG, "Failed to create log file.");
-            t.printStackTrace();
+            error(LOGGER_TAG, "Failed to create log file.", t);
+            return false;
         }
     }
 
@@ -77,30 +57,31 @@ public class Logger
         // no-op
     }
 
-    public static void saveToFile()
+    private static void write(String message)
     {
-        if (!mFileLogEnabled) return;
+        if (mLogFile == null) return;
         try
         {
-            synchronized (mBuffer)
-            {
-                StringBuilder sb = new StringBuilder(mBuffer.size());
-                for (String str : mBuffer)
-                {
-                    sb.append(str + "\n");
-                }
-
-                FileOutputStream out = new FileOutputStream(mLogFileFullPath, true);
-                out.write(sb.toString().getBytes("utf-8"));
-                out.close();
-
-                mBuffer.clear();
-            }
+            mLogFile.write(message.getBytes(LOG_ENCODING));
         }
         catch (Throwable t)
         {
-            error(LOGGER_TAG, "Failed to save log record.");
-            t.printStackTrace();
+            mLogFile = null;
+            error(LOGGER_TAG, "Failed to write to file. File log disabled.", t);
+        }
+    }
+
+    public static void flush()
+    {
+        if (mLogFile == null) return;
+        try
+        {
+            mLogFile.flush();
+        }
+        catch (Throwable t)
+        {
+            mLogFile = null;
+            error(LOGGER_TAG, "Failed to flush logger. File log disabled.", t);
         }
     }
 
@@ -124,18 +105,15 @@ public class Logger
      */
     public static void debug(String tag, String message, Throwable t)
     {
-        String msg = String.format(LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message);
-        StringBuilder sb = new StringBuilder(2);
-        sb.append(msg).append(NEW_LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message)).append(NEW_LINE);
         if (t != null)
         {
             sb.append(t).append(NEW_LINE);
         }
-        Log.d(tag, sb.toString());
-        if (mFileLogEnabled)
-        {
-            mBuffer.add(sb.toString());
-        }
+        String msg = sb.toString();
+        Log.d(tag, msg);
+        write(msg);
     }
 
     /**
@@ -158,18 +136,15 @@ public class Logger
      */
     public static void info(String tag, String message, Throwable t)
     {
-        String msg = String.format(LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message);
-        StringBuilder sb = new StringBuilder(2);
-        sb.append(msg).append(NEW_LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message)).append(NEW_LINE);
         if (t != null)
         {
             sb.append(t).append(NEW_LINE);
         }
-        Log.i(tag, sb.toString());
-        if (mFileLogEnabled)
-        {
-            mBuffer.add(sb.toString());
-        }
+        String msg = sb.toString();
+        Log.i(tag, msg);
+        write(msg);
     }
 
     /**
@@ -192,17 +167,14 @@ public class Logger
      */
     public static void error(String tag, String message, Throwable t)
     {
-        String msg = String.format(LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message);
-        StringBuilder sb = new StringBuilder(2);
-        sb.append(msg).append(NEW_LINE);
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message)).append(NEW_LINE);
         if (t != null)
         {
             sb.append(t).append(NEW_LINE);
         }
-        Log.e(tag, sb.toString());
-        if (mFileLogEnabled)
-        {
-            mBuffer.add(sb.toString());
-        }
+        String msg = sb.toString();
+        Log.e(tag, msg);
+        write(msg);
     }
 }

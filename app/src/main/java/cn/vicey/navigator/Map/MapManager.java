@@ -13,28 +13,23 @@ public class MapManager
 
     private static String mMapDirFullPath = null;
 
-    static
-    {
-        initialize();
-    }
-
-    private static void initialize()
+    public static boolean initialize()
     {
         try
         {
-            if (!Navigator.getInitialized())
-            {
-                Logger.error(LOGGER_TAG, "Failed to initialize map manager. Navigator hasn't been initialized yet.");
-                return;
-            }
-            mMapDirFullPath = Navigator.getDataDirFullPath() + MAP_DIR;
+            mMapDirFullPath = Navigator.getFilesDirPath() + MAP_DIR;
             File mapDir = new File(mMapDirFullPath);
-            if (!mapDir.exists()) mapDir.mkdir();
+            if (!(mapDir.exists() || mapDir.mkdir()))
+            {
+                Logger.error(LOGGER_TAG, "Failed to initialize map manager. Can not initialize map directory.");
+                return false;
+            }
+            return true;
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Can not initialize map directory.");
-            t.printStackTrace();
+            Logger.error(LOGGER_TAG, "Failed to initialize map manager. Can not initialize map directory.", t);
+            return false;
         }
     }
 
