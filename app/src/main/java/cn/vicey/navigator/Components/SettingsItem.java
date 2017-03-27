@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Activities;
+package cn.vicey.navigator.Components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -34,7 +34,7 @@ public class SettingsItem
         CharSequence text = typedArray.getText(R.styleable.SettingsItem_text);
         if (text != null) setText(text);
         boolean checked = typedArray.getBoolean(R.styleable.SettingsItem_checked, false);
-        setCheckd(checked);
+        setChecked(checked);
         typedArray.recycle();
     }
 
@@ -49,7 +49,7 @@ public class SettingsItem
         CharSequence text = typedArray.getText(R.styleable.SettingsItem_text);
         if (text != null) setText(text);
         boolean checked = typedArray.getBoolean(R.styleable.SettingsItem_checked, false);
-        setCheckd(checked);
+        setChecked(checked);
         typedArray.recycle();
     }
 
@@ -63,7 +63,7 @@ public class SettingsItem
         return mTextView.getText();
     }
 
-    public void setCheckd(boolean value)
+    public void setChecked(boolean value)
     {
         mCheckBox.setChecked(value);
     }

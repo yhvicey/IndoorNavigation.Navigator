@@ -1,85 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/settings_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="top">
-    <cn.vicey.navigator.Activities.SettingsItem
+    <cn.vicey.navigator.Components.SettingsItem
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            text="Settings 1"/>
-    <cn.vicey.navigator.Activities.SettingsItem
-            android:layout_width="match_parent"
-            android:layout_height="50dp"/>
-    <LinearLayout
+            app:text="Settings 1"/>
+    <cn.vicey.navigator.Components.SettingsItem
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:gravity="start">
-        <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:gravity="start|center"
-                android:text="Settings 2"/>
-        <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <LinearLayout
+            app:text="Settings 2"/>
+    <cn.vicey.navigator.Components.SettingsItem
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:gravity="start">
-        <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:gravity="start|center"
-                android:text="Settings 3"/>
-        <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <LinearLayout
+            app:text="Settings 3"/>
+    <cn.vicey.navigator.Components.SettingsItem
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:gravity="start">
-        <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:gravity="start|center"
-                android:text="Settings 4"/>
-        <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>
-    <LinearLayout
+            app:text="Settings 4"/>
+    <cn.vicey.navigator.Components.SettingsItem
             android:layout_width="match_parent"
             android:layout_height="50dp"
-            android:orientation="horizontal"
-            android:gravity="start">
-        <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:paddingStart="@dimen/activity_horizontal_margin"
-                android:paddingEnd="@dimen/activity_horizontal_margin"
-                android:gravity="start|center"
-                android:text="Settings 5"/>
-        <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
-    </LinearLayout>
+            app:text="Settings 5"/>
 
 </LinearLayout>
