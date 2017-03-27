@@ -6,4 +6,6 @@
     <string name="navigate">导航</string>
     <string name="settings">设置</string>
     <string name="tags">标签</string>
+    <string name="placeholder_username"><![CDATA[<用户名>]]></string>
+    <string name="placeholder_user_info"><![CDATA[<用户信息>]]></string>
 </resources>

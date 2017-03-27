@@ -6,4 +6,6 @@
     <string name="navigate">Navigate</string>
     <string name="settings">Settings</string>
     <string name="tags">Tags</string>
+    <string name="placeholder_username"><![CDATA[<Username>]]></string>
+    <string name="placeholder_user_info"><![CDATA[<User info>]]></string>
 </resources>
