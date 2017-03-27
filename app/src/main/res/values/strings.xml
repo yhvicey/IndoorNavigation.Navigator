@@ -1,8 +1,9 @@
 <resources>
-    <string name="app_name">Navigator</string>
-
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
+    <string name="app_name">室内导航</string>
+    <string name="maps">地图</string>
+    <string name="navigation_drawer_open">开启抽屉菜单</string>
+    <string name="navigation_drawer_close">关闭抽屉菜单</string>
+    <string name="navigate">导航</string>
+    <string name="settings">设置</string>
+    <string name="tags">标签</string>
 </resources>
