@@ -12,44 +12,38 @@ import cn.vicey.navigator.R;
 public class SettingsItem
         extends LinearLayout
 {
-    private TextView mTextView = null;
     private CheckBox mCheckBox = null;
+    private TextView mTextView = null;
 
     public SettingsItem(Context context)
     {
-        super(context);
-        LayoutInflater.from(context).inflate(R.layout.settings_item, this, true);
-        mTextView = (TextView) findViewById(R.id.si_textView);
-        mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);
+        this(context, null, 0);
     }
 
     public SettingsItem(Context context, AttributeSet attrs)
     {
-        super(context, attrs);
-        LayoutInflater.from(context).inflate(R.layout.settings_item, this, true);
-        mTextView = (TextView) findViewById(R.id.si_textView);
-        mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);
-
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SettingsItem);
-        CharSequence text = typedArray.getText(R.styleable.SettingsItem_text);
-        if (text != null) setText(text);
-        boolean checked = typedArray.getBoolean(R.styleable.SettingsItem_checked, false);
-        setChecked(checked);
-        typedArray.recycle();
+        this(context, attrs, 0);
     }
 
     public SettingsItem(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
-        LayoutInflater.from(context).inflate(R.layout.settings_item, this, true);
-        mTextView = (TextView) findViewById(R.id.si_textView);
-        mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);
+        initialize(attrs, defStyle);
+    }
 
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.SettingsItem);
-        CharSequence text = typedArray.getText(R.styleable.SettingsItem_text);
-        if (text != null) setText(text);
-        boolean checked = typedArray.getBoolean(R.styleable.SettingsItem_checked, false);
+    private void initialize(AttributeSet attrs, int defStyle)
+    {
+        LayoutInflater.from(getContext()).inflate(R.layout.settings_item, this, true);
+        mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);
+        mTextView = (TextView) findViewById(R.id.si_textView);
+
+        if (attrs == null) return;
+
+        final TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Navigator_SettingsItem, defStyle, 0);
+        boolean checked = typedArray.getBoolean(R.styleable.Navigator_SettingsItem_checked, false);
         setChecked(checked);
+        CharSequence text = typedArray.getText(R.styleable.Navigator_SettingsItem_text);
+        if (text != null) setText(text);
         typedArray.recycle();
     }
 
