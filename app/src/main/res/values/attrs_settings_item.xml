@@ -1,6 +1,0 @@
-<resources>
-    <declare-styleable name="SettingsItem">
-        <attr name="text" format="string"/>
-        <attr name="checked" format="boolean"/>
-    </declare-styleable>
-</resources>
