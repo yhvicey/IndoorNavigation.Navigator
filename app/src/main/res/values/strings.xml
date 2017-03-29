@@ -1,11 +1,8 @@
 <resources>
     <string name="app_name">室内导航</string>
+    <string name="menu_title">菜单</string>
     <string name="maps">地图</string>
-    <string name="navigation_drawer_open">开启抽屉菜单</string>
-    <string name="navigation_drawer_close">关闭抽屉菜单</string>
     <string name="navigate">导航</string>
     <string name="settings">设置</string>
     <string name="tags">标签</string>
-    <string name="placeholder_username"><![CDATA[<用户名>]]></string>
-    <string name="placeholder_user_info"><![CDATA[<用户信息>]]></string>
 </resources>
