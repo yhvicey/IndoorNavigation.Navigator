@@ -5,6 +5,7 @@
         <attr name="icon" format="reference"/>
         <attr name="text" format="string"/>
         <attr name="title" format="string"/>
+        <attr name="highlighted" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="Navigator.SettingsItem" parent="Navigator">
@@ -15,6 +16,7 @@
     <declare-styleable name="Navigator.MenuItem" parent="Navigator">
         <attr name="text"/>
         <attr name="icon"/>
+        <attr name="highlighted"/>
     </declare-styleable>
 
     <declare-styleable name="Navigator.Toolbar" parent="Navigator">

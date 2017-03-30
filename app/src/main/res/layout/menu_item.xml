@@ -19,5 +19,5 @@
             android:layout_height="match_parent"
             android:layout_marginStart="@dimen/menu_item_horizontal_margin"
             android:gravity="start|center"
-            android:textSize="20sp"/>
+            android:textSize="@dimen/menu_item_font_size"/>
 </LinearLayout>
