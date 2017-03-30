@@ -11,4 +11,22 @@
     </style>
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
+    <style name="Settings">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/middle_item_height</item>
+        <item name="android:gravity">start|center</item>
+    </style>
+
+    <style name="Settings.Header">
+        <item name="android:paddingStart">@dimen/small_padding</item>
+        <item name="android:paddingEnd">@dimen/small_padding</item>
+        <item name="android:textSize">@dimen/middle_font_size</item>
+    </style>
+
+    <style name="Settings.Item">
+        <item name="android:paddingStart">@dimen/middle_padding</item>
+        <item name="android:paddingEnd">@dimen/middle_padding</item>
+        <item name="android:textSize">@dimen/small_font_size</item>
+    </style>
 </resources>

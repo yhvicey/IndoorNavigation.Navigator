@@ -1,31 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/settings_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:gravity="top">
-    <cn.vicey.navigator.Components.SettingsItem
+        android:layout_height="match_parent">
+    <LinearLayout
+            android:id="@+id/settings_view"
             android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:text="Settings 1"/>
-    <cn.vicey.navigator.Components.SettingsItem
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:text="Settings 2"/>
-    <cn.vicey.navigator.Components.SettingsItem
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:text="Settings 3"/>
-    <cn.vicey.navigator.Components.SettingsItem
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:text="Settings 4"/>
-    <cn.vicey.navigator.Components.SettingsItem
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            app:text="Settings 5"/>
-
-</LinearLayout>
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="top">
+        <TextView
+                style="@style/Settings.Header"
+                android:text="@string/general"/>
+        <cn.vicey.navigator.Components.SettingsItem
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/middle_item_height"
+                app:text="Settings 1"/>
+    </LinearLayout>
+</ScrollView>
