@@ -3,6 +3,7 @@ package cn.vicey.navigator;
 import android.app.Application;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Share.TypefaceManager;
 import cn.vicey.navigator.Share.Utils;
 
 public class Navigator
@@ -57,6 +58,8 @@ public class Navigator
     {
         try
         {
+            // TODO: put global initialization code below.
+
             // Initialize files dir, which is important for other classes.
             if (!initialize())
             {
@@ -79,8 +82,11 @@ public class Navigator
                 Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize MapManager.");
                 exitWithError(ERR_INIT);
             }
-
-            // TODO: put global initialization code below.
+            if (!TypefaceManager.initialize(getAssets()))
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize TypefaceManager.");
+                exitWithError(ERR_INIT);
+            }
 
             Logger.info(LOGGER_TAG, "Finished initialization. Current time: " + Utils.getCurrentDateTimeString());
             super.onCreate();
