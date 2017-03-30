@@ -33,7 +33,7 @@ public class SettingsItem
 
     private void initialize(AttributeSet attrs, int defStyle)
     {
-        LayoutInflater.from(getContext()).inflate(R.layout.settings_item, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.cmpt_settings_item, this, true);
         mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);
         mTextView = (TextView) findViewById(R.id.si_textView);
 

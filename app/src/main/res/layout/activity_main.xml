@@ -16,7 +16,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/toolbar"
-                app:icon="@drawable/ic_menu_vertical"/>
+                app:icon="@drawable/ic_menu_vertical"
+                app:title="@string/navigate"/>
 
         <ViewFlipper
                 xmlns:android="http://schemas.android.com/apk/res/android"
@@ -32,10 +33,10 @@
                 app:layout_behavior="@string/appbar_scrolling_view_behavior"
                 tools:context="cn.vicey.navigator.Activities.MainActivity">
 
-            <include layout="@layout/navigate_view"/>
-            <include layout="@layout/maps_view"/>
-            <include layout="@layout/tags_view"/>
-            <include layout="@layout/settings_view"/>
+            <include layout="@layout/view_navigate"/>
+            <include layout="@layout/view_maps"/>
+            <include layout="@layout/view_tags"/>
+            <include layout="@layout/view_settings"/>
 
         </ViewFlipper>
 

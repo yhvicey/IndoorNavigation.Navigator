@@ -36,7 +36,7 @@ public class MenuItem
 
     private void initialize(AttributeSet attrs, int defStyle)
     {
-        LayoutInflater.from(getContext()).inflate(R.layout.menu_item, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.cmpt_menu_item, this, true);
         mImageView = (ImageView) findViewById(R.id.mi_icon);
         mTextView = (TextView) findViewById(R.id.mi_text);
         mTextView.setTypeface(TypefaceManager.getCanaroExtraBold());

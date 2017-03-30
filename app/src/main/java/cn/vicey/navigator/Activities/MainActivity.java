@@ -2,7 +2,6 @@ package cn.vicey.navigator.Activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -45,7 +44,7 @@ public class MainActivity
 
     private GuillotineAnimation mGuillotineAnimation;
     private List<MenuItem> mMenuItems;
-    private Toolbar mToolbar;
+    private cn.vicey.navigator.Components.Toolbar mToolbar;
     private ViewFlipper mViewFlipper;
 
     //endregion
@@ -160,25 +159,25 @@ public class MainActivity
             case VIEW_NAVIGATE:
             {
                 mViewFlipper.setDisplayedChild(VIEW_NAVIGATE);
-                mToolbar.setTitle(R.string.navigate);
+                mToolbar.setTitleText(R.string.navigate);
                 break;
             }
             case VIEW_MAPS:
             {
                 mViewFlipper.setDisplayedChild(VIEW_MAPS);
-                mToolbar.setTitle(R.string.maps);
+                mToolbar.setTitleText(R.string.maps);
                 break;
             }
             case VIEW_TAGS:
             {
                 mViewFlipper.setDisplayedChild(VIEW_TAGS);
-                mToolbar.setTitle(R.string.tags);
+                mToolbar.setTitleText(R.string.tags);
                 break;
             }
             case VIEW_SETTINGS:
             {
                 mViewFlipper.setDisplayedChild(VIEW_SETTINGS);
-                mToolbar.setTitle(R.string.settings);
+                mToolbar.setTitleText(R.string.settings);
                 break;
             }
         }
@@ -197,7 +196,7 @@ public class MainActivity
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_main);
 
-            mToolbar = (Toolbar) findViewById(R.id.toolbar);
+            mToolbar = (cn.vicey.navigator.Components.Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
 
             mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);

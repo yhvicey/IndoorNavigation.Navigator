@@ -33,7 +33,7 @@ public class Toolbar
 
     private void initialize(AttributeSet attrs, int defStyle)
     {
-        LayoutInflater.from(getContext()).inflate(R.layout.toolbar, this, true);
+        LayoutInflater.from(getContext()).inflate(R.layout.cmpt_toolbar, this, true);
         mImageView = (ImageView) findViewById(R.id.t_menu_icon);
         mTextView = (TextView) findViewById(R.id.t_title);
 
