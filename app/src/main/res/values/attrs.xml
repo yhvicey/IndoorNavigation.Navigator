@@ -23,4 +23,7 @@
         <attr name="title"/>
         <attr name="icon"/>
     </declare-styleable>
+
+    <declare-styleable name="Navigator.MapView">
+    </declare-styleable>
 </resources>
