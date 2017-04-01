@@ -23,7 +23,7 @@ public final class Utils
     private static final String TIME_PATTERN = "HH:mm:ss";
 
     public static final String NEW_LINE = System.getProperty("line.separator");
-    public static final String FILE_ENCODING = "utf-8";
+    public static final String FILE_ENCODING = "utf-16";
 
     private static long mStartTime = 0;
 

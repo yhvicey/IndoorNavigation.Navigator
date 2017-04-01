@@ -25,7 +25,6 @@ import java.util.List;
 public class MapParser
 {
     private static final String LOGGER_TAG = "MapParser";
-    private static final String MAP_FILE_ENCODING = "utf-8";
     private static final String SUPPORT_VERSIONS = "1.0";
     private static final String ATTR_VERSION = "Version";
     private static final String ATTR_SCALE = "Scale";
@@ -154,7 +153,7 @@ public class MapParser
             List<Link> links = new ArrayList<>();
 
             XmlPullParser parser = Xml.newPullParser();
-            parser.setInput(stream, MAP_FILE_ENCODING);
+            parser.setInput(stream, Utils.FILE_ENCODING);
             int event = parser.getEventType();
             while (event != XmlPullParser.END_DOCUMENT)
             {

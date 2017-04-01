@@ -14,12 +14,10 @@ public class Logger
 {
     private static final String LOGGER_TAG = "Logger";
     private static final String LOG_DIR = "/logs/";
-    private static final String LOG_ENCODING = "utf-8";
     private static final String LOG_TEMPLATE = "[%s][%d][%s] %s";
     private static final String DEBUG_HEADER = "DEBUG";
     private static final String INFO_HEADER = "INFO";
     private static final String ERROR_HEADER = "ERROR";
-    private static final String NEW_LINE = "\n";
 
     private static FileOutputStream mLogFile = null;
 
@@ -62,7 +60,7 @@ public class Logger
         if (mLogFile == null) return;
         try
         {
-            mLogFile.write(message.getBytes(LOG_ENCODING));
+            mLogFile.write(message.getBytes(Utils.FILE_ENCODING));
         }
         catch (Throwable t)
         {
@@ -106,10 +104,11 @@ public class Logger
     public static void debug(String tag, String message, Throwable t)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message)).append(NEW_LINE);
+        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message))
+          .append(Utils.NEW_LINE);
         if (t != null)
         {
-            sb.append(t).append(NEW_LINE);
+            sb.append(t).append(Utils.NEW_LINE);
         }
         String msg = sb.toString();
         Log.d(tag, msg);
@@ -137,10 +136,11 @@ public class Logger
     public static void info(String tag, String message, Throwable t)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message)).append(NEW_LINE);
+        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message))
+          .append(Utils.NEW_LINE);
         if (t != null)
         {
-            sb.append(t).append(NEW_LINE);
+            sb.append(t).append(Utils.NEW_LINE);
         }
         String msg = sb.toString();
         Log.i(tag, msg);
@@ -168,10 +168,11 @@ public class Logger
     public static void error(String tag, String message, Throwable t)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message)).append(NEW_LINE);
+        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message))
+          .append(Utils.NEW_LINE);
         if (t != null)
         {
-            sb.append(t).append(NEW_LINE);
+            sb.append(t).append(Utils.NEW_LINE);
         }
         String msg = sb.toString();
         Log.e(tag, msg);
