@@ -10,16 +10,19 @@ public class Navigator
         extends Application
 {
     private static final String LOGGER_TAG = "Navigator";
+
     public static final int ERR_SUCCEED = 0;
     public static final int ERR_UNEXPECTED_ACTION = -1;
     public static final int ERR_INIT = -2;
 
-    private static String mFilesDir = null;
+    private static String mCacheDir;
+    private static String mFilesDir;
 
     public boolean initialize()
     {
         try
         {
+            mCacheDir = getCacheDir().getAbsolutePath();
             mFilesDir = getFilesDir().getAbsolutePath();
             return true;
         }
@@ -46,6 +49,11 @@ public class Navigator
         Logger.error(LOGGER_TAG, "Utils.exitWithError(int errorCode) has been called. Error code: " + errorCode);
         Logger.flush();
         System.exit(errorCode);
+    }
+
+    public static String getCacheDirPath()
+    {
+        return mCacheDir;
     }
 
     public static String getFilesDirPath()
