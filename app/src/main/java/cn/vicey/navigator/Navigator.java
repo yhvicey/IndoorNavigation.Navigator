@@ -88,7 +88,7 @@ public class Navigator
                 exitWithError(ERR_INIT);
             }
 
-            Logger.info(LOGGER_TAG, "Finished initialization. Current time: " + Utils.getCurrentDateTimeString());
+            Logger.info(LOGGER_TAG, "Finished initialization. Application start.");
             super.onCreate();
         }
         catch (Throwable t)
