@@ -98,8 +98,11 @@ public class MainActivity
     //region Variables
 
     private Map mCurrentMap = null;
+    private int mClickCount;
     private int mCurrentView = VIEW_NAVIGATE;
     private boolean mIsMenuOpened = false;
+    private boolean mIsDebugModeEnabled;
+    private Date mLastClickTime;
 
     //endregion
 
@@ -250,25 +253,23 @@ public class MainActivity
     {
         @Override
         public void onClick(View view)
+    public void onEnableDebugModeClick(View view)
+    {
+        if (view.getId() != R.id.sv_general_header) return;
+        if (mLastClickTime == null || new Date().getTime() - mLastClickTime.getTime() > 2 * 1000)
         {
-            switch (view.getId())
+            mLastClickTime = new Date();
+            mClickCount = 0;
+        }
+        else
+        {
+            if (mClickCount > 5 || ++mClickCount >= 5)
             {
-                case R.id.menu_navigate:
-                {
-                    switchView(VIEW_NAVIGATE);
-                    break;
-                }
-                case R.id.menu_maps:
-                {
-                    switchView(VIEW_MAPS);
-                    break;
-                }
-                case R.id.menu_tags:
-                {
-                    switchView(VIEW_TAGS);
-                    break;
-                }
-                case R.id.menu_settings:
+                mIsDebugModeEnabled = true;
+                alert(getString(R.string.debug_mode_enabled));
+            }
+        }
+    }
                 {
                     switchView(VIEW_SETTINGS);
                     break;

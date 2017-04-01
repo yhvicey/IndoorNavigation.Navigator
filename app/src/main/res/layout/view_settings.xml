@@ -11,8 +11,10 @@
             android:orientation="vertical"
             android:gravity="top">
         <TextView
+                android:id="@+id/sv_general_header"
                 style="@style/Settings.Header"
-                android:text="@string/general"/>
+                android:text="@string/general"
+                android:onClick="onEnableDebugModeClick"/>
         <cn.vicey.navigator.Components.SettingsItem
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/middle_item_height"
