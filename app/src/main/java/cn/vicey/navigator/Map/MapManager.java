@@ -7,6 +7,8 @@ import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MapManager
 {
@@ -40,6 +42,12 @@ public class MapManager
         // no-op
     }
 
+    public static boolean deleteMap(@NonNull String mapName)
+    {
+        File map = new File(mMapDirFullPath + mapName);
+        return !map.exists() || map.delete();
+    }
+
     public static void downloadMap(@NonNull String urlString, @NonNull String mapName, @NonNull Utils.DownloadCallback callback)
     {
         Utils.downloadFile(urlString, mMapDirFullPath + mapName, callback);
@@ -53,5 +61,24 @@ public class MapManager
     public static Map loadMap(@NonNull String mapName)
     {
         return MapParser.parse(new File(mMapDirFullPath + mapName));
+    }
+
+    public static boolean renameMap(@NonNull String mapName, @NonNull String newMapName)
+    {
+        if (!hasMap(mapName)) return false;
+        if (hasMap(newMapName)) return false;
+        File map = new File(mMapDirFullPath + mapName);
+        return map.renameTo(new File(mMapDirFullPath + newMapName));
+    }
+
+    public static List<String> getAllMaps()
+    {
+        File mapDir = new File(mMapDirFullPath);
+        List<String> maps = new ArrayList<>();
+        for (File file : mapDir.listFiles())
+        {
+            if (file.isFile()) maps.add(file.getName());
+        }
+        return maps;
     }
 }
