@@ -53,7 +53,7 @@ public class MapParser
         // no-op
     }
 
-    private static NodeBase generateNode(@NonNull final XmlPullParser parser, double scaleFactor)
+    private static NodeBase generateNode(final @NonNull XmlPullParser parser, double scaleFactor)
     {
         String type = parser.getAttributeValue(null, ATTR_TYPE);
         if (Utils.isStringEmpty(type, true))
@@ -121,7 +121,7 @@ public class MapParser
         }
     }
 
-    private static Link generateLink(@NonNull final XmlPullParser parser)
+    private static Link generateLink(final @NonNull XmlPullParser parser)
     {
         try
         {
@@ -142,7 +142,7 @@ public class MapParser
      * @param stream Input stream to parse.
      * @return Parsed map file.
      */
-    private static Map parseStream(@NonNull InputStream stream)
+    private static Map parseStream(final @NonNull InputStream stream)
     {
         try
         {
@@ -305,12 +305,7 @@ public class MapParser
         }
     }
 
-    public static Map parse(@NonNull String filePath)
-    {
-        return parse(new File(filePath));
-    }
-
-    public static Map parse(@NonNull File file)
+    public static Map parse(final @NonNull File file)
     {
         try
         {
