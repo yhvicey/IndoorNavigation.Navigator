@@ -48,13 +48,12 @@ public class MapParser
     private static final String DEFAULT_MAP_NAME = "Untitled";
     private static int STANDARD_SCALE = 100000; // <pixel> * STANDARD_SCALE = <real centimeter>
 
-
     private MapParser()
     {
         // no-op
     }
 
-    private static NodeBase generateNode(@NonNull final XmlPullParser parser, int scaleFactor)
+    private static NodeBase generateNode(@NonNull final XmlPullParser parser, double scaleFactor)
     {
         String type = parser.getAttributeValue(null, ATTR_TYPE);
         if (Utils.isStringEmpty(type, true))
@@ -148,7 +147,7 @@ public class MapParser
         try
         {
             boolean isParsingFloor = false;
-            int scaleFactor = 1;
+            double scaleFactor = 1;
             String mapName = DEFAULT_MAP_NAME;
             List<Floor> floors = new ArrayList<>();
             List<NodeBase> nodes = new ArrayList<>();
