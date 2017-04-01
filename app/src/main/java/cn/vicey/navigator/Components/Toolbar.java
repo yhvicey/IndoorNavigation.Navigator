@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.TextView;
 import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.TypefaceManager;
 
 public class Toolbar
         extends android.support.v7.widget.Toolbar
@@ -36,6 +37,7 @@ public class Toolbar
         LayoutInflater.from(getContext()).inflate(R.layout.cmpt_toolbar, this, true);
         mImageView = (ImageView) findViewById(R.id.t_menu_icon);
         mTextView = (TextView) findViewById(R.id.t_title);
+        mTextView.setTypeface(TypefaceManager.getCanaroExtraBold());
 
         if (attrs == null) return;
 
