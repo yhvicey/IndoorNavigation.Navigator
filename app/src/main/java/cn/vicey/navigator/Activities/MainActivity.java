@@ -583,9 +583,8 @@ public class MainActivity
         }
         else
         {
-            Logger.info(LOGGER_TAG, "Exit application.");
-            Logger.flush();
             super.onBackPressed();
+            Navigator.exit();
         }
     }
 

@@ -35,6 +35,7 @@ public class Navigator
 
     public static void exit()
     {
+        Logger.info(LOGGER_TAG, "Exit application.");
         Logger.flush();
         System.exit(ERR_SUCCEED);
     }
