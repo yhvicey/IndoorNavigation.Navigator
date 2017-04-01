@@ -1,8 +1,10 @@
 package cn.vicey.navigator.Map;
 
+import android.support.annotation.NonNull;
 import cn.vicey.navigator.Contracts.Map;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Share.Utils;
 
 import java.io.File;
 
@@ -38,7 +40,17 @@ public class MapManager
         // no-op
     }
 
-    public static Map loadMap(String mapName)
+    public static void downloadMap(@NonNull String urlString, @NonNull String mapName, @NonNull Utils.DownloadCallback callback)
+    {
+        Utils.downloadFile(urlString, mMapDirFullPath + mapName, callback);
+    }
+
+    public static boolean hasMap(@NonNull String mapName)
+    {
+        return new File(mMapDirFullPath + mapName).exists();
+    }
+
+    public static Map loadMap(@NonNull String mapName)
     {
         return MapParser.parse(new File(mMapDirFullPath + mapName));
     }
