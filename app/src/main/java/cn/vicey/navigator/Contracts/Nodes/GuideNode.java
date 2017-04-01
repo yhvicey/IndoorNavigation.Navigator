@@ -1,13 +1,15 @@
 package cn.vicey.navigator.Contracts.Nodes;
 
 
+import android.support.annotation.NonNull;
+
 /**
  * Guide node.
  */
 public class GuideNode
         extends NodeBase
 {
-    private String mName = null;
+    private String mName;
 
     /**
      * Initial new instance of class GuideNode.
@@ -27,7 +29,7 @@ public class GuideNode
      * @param y    Y position of the node.
      * @param name Name of the node.
      */
-    public GuideNode(double x, double y, String name)
+    public GuideNode(double x, double y, @NonNull String name)
     {
         super(x, y);
         mName = name;

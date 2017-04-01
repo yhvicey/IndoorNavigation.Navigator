@@ -1,12 +1,21 @@
 package cn.vicey.navigator.Contracts.Nodes;
 
+import android.support.annotation.NonNull;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 /**
  * Base class of nodes.
  */
 public abstract class NodeBase
 {
-    private double mX = 0;
-    private double mY = 0;
+    private List<NodeBase> mAdjacentNodes;
+    private HashMap<NodeBase, Double> mDistanceTable;
+    private String mTag;
+    private double mX;
+    private double mY;
 
     /**
      * Initialize new instance of class NodeBase.
@@ -16,8 +25,36 @@ public abstract class NodeBase
      */
     protected NodeBase(double x, double y)
     {
+        mTag = null;
         mX = x;
         mY = y;
+    }
+
+    public void addAdjacentNode(@NonNull final NodeBase node)
+    {
+        if (mAdjacentNodes == null) mAdjacentNodes = new ArrayList<>();
+        if (mAdjacentNodes.contains(node)) return;
+        getDistance(node);
+        mAdjacentNodes.add(node);
+    }
+
+    public List<NodeBase> getAdjacentNodes()
+    {
+        return mAdjacentNodes;
+    }
+
+    public double getDistance(@NonNull final NodeBase other)
+    {
+        if (mDistanceTable == null) mDistanceTable = new HashMap<>();
+        if (mDistanceTable.containsKey(other)) return mDistanceTable.get(other);
+        double distance = Math.sqrt(Math.pow(mX - other.mX, 2) + Math.pow(mY - other.mY, 2));
+        mDistanceTable.put(other, distance);
+        return distance;
+    }
+
+    public String getTag()
+    {
+        return mTag;
     }
 
     /**
@@ -45,6 +82,11 @@ public abstract class NodeBase
     public double getY()
     {
         return mY;
+    }
+
+    public void setTag(@NonNull String tag)
+    {
+        mTag = tag;
     }
 
     /**

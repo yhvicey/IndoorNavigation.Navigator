@@ -11,12 +11,12 @@ public enum NodeType
     WALL_NODE,
 
     /**
-     * Guide node.
+     * Entry node.
      */
-    GUIDE_NODE,
+    ENTRY_NODE,
 
     /**
-     * Tag node.
+     * Guide node.
      */
-    TAG_NODE
+    GUIDE_NODE
 }

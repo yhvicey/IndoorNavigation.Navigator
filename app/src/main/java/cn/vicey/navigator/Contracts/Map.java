@@ -1,5 +1,7 @@
 package cn.vicey.navigator.Contracts;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 
 /**
@@ -7,16 +9,28 @@ import java.util.List;
  */
 public class Map
 {
-    private List<Floor> mFloors = null;
+    private List<Floor> mFloors;
+    private String mName;
 
     /**
      * Initialize new instance of class Map.
      *
      * @param floors Map's floors.
      */
-    public Map(List<Floor> floors)
+    public Map(@NonNull String name, @NonNull List<Floor> floors)
     {
         mFloors = floors;
+        mName = name;
+    }
+
+    public Floor getFloor(int floor)
+    {
+        return mFloors.get(floor);
+    }
+
+    public int getFloorCount()
+    {
+        return mFloors.size();
     }
 
     /**
@@ -29,6 +43,11 @@ public class Map
         return mFloors;
     }
 
+    public String getName()
+    {
+        return mName;
+    }
+
     /**
      * Gets map's version.
      *
@@ -37,5 +56,10 @@ public class Map
     public String getVersion()
     {
         return "1.0";
+    }
+
+    public void setName(@NonNull String value)
+    {
+        mName = value;
     }
 }
