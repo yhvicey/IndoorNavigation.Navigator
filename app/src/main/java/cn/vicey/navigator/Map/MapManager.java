@@ -42,28 +42,29 @@ public class MapManager
         // no-op
     }
 
-    public static boolean deleteMap(@NonNull String mapName)
+    public static boolean deleteMap(final @NonNull String mapName)
     {
         File map = new File(mMapDirFullPath + mapName);
         return !map.exists() || map.delete();
     }
 
-    public static void downloadMap(@NonNull String urlString, @NonNull String mapName, @NonNull Utils.DownloadCallback callback)
+    public static boolean saveMap(final @NonNull String srcPath, boolean overwrite)
     {
-        Utils.downloadFile(urlString, mMapDirFullPath + mapName, callback);
+        String fileName = new File(srcPath).getName();
+        return Utils.copyFile(new File(srcPath), new File(mMapDirFullPath + fileName), overwrite);
     }
 
-    public static boolean hasMap(@NonNull String mapName)
+    public static boolean hasMap(final @NonNull String mapName)
     {
         return new File(mMapDirFullPath + mapName).exists();
     }
 
-    public static Map loadMap(@NonNull String mapName)
+    public static Map loadMap(final @NonNull String mapName)
     {
         return MapParser.parse(new File(mMapDirFullPath + mapName));
     }
 
-    public static boolean renameMap(@NonNull String mapName, @NonNull String newMapName)
+    public static boolean renameMap(final @NonNull String mapName, final @NonNull String newMapName)
     {
         if (!hasMap(mapName)) return false;
         if (hasMap(newMapName)) return false;
@@ -80,5 +81,10 @@ public class MapManager
             if (file.isFile()) maps.add(file.getName());
         }
         return maps;
+    }
+
+    public static String getAvailableDefaultName()
+    {
+        return Utils.getAvailableDefaultName(new File(mMapDirFullPath), ".inmap");
     }
 }
