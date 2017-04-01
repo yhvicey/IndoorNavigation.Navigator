@@ -9,7 +9,6 @@
     <string name="manage">管理</string>
     <string name="rename">重命名</string>
     <string name="delete">删除</string>
-    <string name="new_file">新文件</string>
     <string name="confirm">确定</string>
     <string name="cancel">取消</string>
     <string name="alert">警告</string>
@@ -19,6 +18,13 @@
     <string name="rename_failed">重命名失败</string>
     <string name="delete_succeed">删除成功</string>
     <string name="delete_failed">删除失败</string>
-    <string name="confirm_to_delete">是否要删除该文件？</string>
+    <string name="download_succeed">下载成功</string>
+    <string name="download_failed">下载失败</string>
     <string name="load">加载</string>
+    <string name="load_from_disk">从本地加载</string>
+    <string name="load_from_net">从网络加载</string>
+
+    <string name="confirm_to_delete">是否要删除该文件？</string>
+    <string name="debug_mode_notification">再点击 %d 次以开启开发者模式</string>
+    <string name="debug_mode_enabled">开发者模式已开启</string>
 </resources>

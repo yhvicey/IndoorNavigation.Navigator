@@ -9,7 +9,6 @@
     <string name="manage">Manage</string>
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
-    <string name="new_file">New file</string>
     <string name="confirm">Confirm</string>
     <string name="cancel">Cancel</string>
     <string name="alert">Alert</string>
@@ -19,6 +18,13 @@
     <string name="rename_failed">Rename failed</string>
     <string name="delete_succeed">Delete succeed</string>
     <string name="delete_failed">Delete failed</string>
-    <string name="confirm_to_delete">Are you sure about deleting this file?</string>
+    <string name="download_succeed">Download succeed</string>
+    <string name="download_failed">Download failed</string>
     <string name="load">Load</string>
+    <string name="load_from_disk">Load from disk</string>
+    <string name="load_from_net">Load from net</string>
+
+    <string name="confirm_to_delete">Are you sure about deleting this file?</string>
+    <string name="debug_mode_notification">%d more clicks to enable debug mode</string>
+    <string name="debug_mode_enabled">Debug mode already enabled</string>
 </resources>
