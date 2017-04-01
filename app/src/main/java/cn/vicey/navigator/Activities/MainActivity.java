@@ -251,31 +251,26 @@ public class MainActivity
         @Override
         public void onClick(View view)
         {
-            if (view instanceof MenuItem)
-            {
-                flushMainMenu();
-                ((MenuItem) view).setHighlighted(true);
-            }
             switch (view.getId())
             {
                 case R.id.menu_navigate:
                 {
-                    mCurrentView = VIEW_NAVIGATE;
+                    switchView(VIEW_NAVIGATE);
                     break;
                 }
                 case R.id.menu_maps:
                 {
-                    mCurrentView = VIEW_MAPS;
+                    switchView(VIEW_MAPS);
                     break;
                 }
                 case R.id.menu_tags:
                 {
-                    mCurrentView = VIEW_TAGS;
+                    switchView(VIEW_TAGS);
                     break;
                 }
                 case R.id.menu_settings:
                 {
-                    mCurrentView = VIEW_SETTINGS;
+                    switchView(VIEW_SETTINGS);
                     break;
                 }
             }
@@ -431,9 +426,10 @@ public class MainActivity
 
     private void flushMainMenu()
     {
+        int index = 0;
         for (MenuItem item : mMenuItems)
         {
-            item.setHighlighted(false);
+            item.setHighlighted(index++ == mCurrentView);
         }
     }
 
@@ -475,6 +471,7 @@ public class MainActivity
     {
         if (mCurrentView >= mViewFlipper.getChildCount()) mCurrentView = VIEW_NAVIGATE;
         if (mViewFlipper.getDisplayedChild() != mCurrentView) mViewFlipper.setDisplayedChild(mCurrentView);
+        flushMainMenu();
         switch (mCurrentView)
         {
             case VIEW_NAVIGATE:
