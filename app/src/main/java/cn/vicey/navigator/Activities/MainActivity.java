@@ -22,6 +22,7 @@ import com.yalantis.guillotine.animation.GuillotineAnimation;
 import com.yalantis.guillotine.interfaces.GuillotineListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class MainActivity
@@ -97,11 +98,11 @@ public class MainActivity
 
     //region Variables
 
-    private Map mCurrentMap = null;
     private int mClickCount;
+    private Map mCurrentMap;
     private int mCurrentView = VIEW_NAVIGATE;
-    private boolean mIsMenuOpened = false;
     private boolean mIsDebugModeEnabled;
+    private boolean mIsMenuOpened;
     private Date mLastClickTime;
 
     //endregion
@@ -110,27 +111,17 @@ public class MainActivity
 
     private GuillotineAnimation mGuillotineAnimation;
     private LinearLayout mMainMenu;
-    private List<MenuItem> mMenuItems;
     private cn.vicey.navigator.Components.Toolbar mToolbar;
     private ViewFlipper mViewFlipper;
     private MapView mNavigateView;
-    private ListView mMapsView;
-    private ListViewAdapter<String> mMapsViewAdapter;
+    private RelativeLayout mMapsView;
+    private ListViewAdapter<String> mMapsListViewAdapter;
     private LinearLayout mTagsView;
     private LinearLayout mSettingsView;
 
     //endregion
 
     //region Callback variables
-
-    private View.OnClickListener mDefaultOnClickListener = new View.OnClickListener()
-    {
-        @Override
-        public void onClick(View view)
-        {
-
-        }
-    };
 
     private GuillotineListener mGuillotineListener = new GuillotineListener()
     {
@@ -182,7 +173,11 @@ public class MainActivity
                         //region Rename
                         case 1:
                         {
+                            if (textView == null) return;
+                            final String mapName = textView.getText().toString();
                             final EditText editor = new EditText(MainActivity.this);
+                            editor.setText(mapName);
+                            editor.selectAll();
                             DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
                             {
                                 @Override
@@ -193,8 +188,6 @@ public class MainActivity
                                     {
                                         case AlertDialog.BUTTON_POSITIVE:
                                         {
-                                            if (textView == null) return;
-                                            String mapName = textView.getText().toString();
                                             String newMapName = editor.getText().toString();
                                             if (MapManager.renameMap(mapName, newMapName))
                                                 alert(getString(R.string.rename_succeed));
@@ -204,7 +197,7 @@ public class MainActivity
                                     }
                                 }
                             };
-                            new AlertDialog.Builder(MainActivity.this).setTitle(R.string.new_file)
+                            new AlertDialog.Builder(MainActivity.this).setTitle(R.string.rename)
                                                                       .setView(editor)
                                                                       .setPositiveButton(R.string.confirm, listener)
                                                                       .setNegativeButton(R.string.cancel, listener)
@@ -249,10 +242,15 @@ public class MainActivity
         }
     };
 
-    private View.OnClickListener mMenuItemOnClickListener = new View.OnClickListener()
+    //endregion
+
+    //region Callback functions
+
+    public void onClick(View view)
     {
-        @Override
-        public void onClick(View view)
+
+    }
+
     public void onEnableDebugModeClick(View view)
     {
         if (view.getId() != R.id.sv_general_header) return;
@@ -270,15 +268,97 @@ public class MainActivity
             }
         }
     }
-                {
-                    switchView(VIEW_SETTINGS);
-                    break;
-                }
+
+    public void onLoadButtonClick(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.mv_load_from_disk:
+            {
+
+                break;
             }
-            flushViews();
-            mGuillotineAnimation.close();
+            case R.id.mv_load_from_net:
+            {
+                final EditText editor = new EditText(MainActivity.this);
+                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+                {
+                    @Override
+                    public void onClick(DialogInterface childDialogInterface, int i)
+                    {
+                        childDialogInterface.dismiss();
+                        switch (i)
+                        {
+                            case AlertDialog.BUTTON_POSITIVE:
+                            {
+                                String url = editor.getText().toString();
+                                Utils.downloadFile(url, new Utils.DownloadCallback()
+                                {
+                                    @Override
+                                    public void onDownloadSucceed(@NonNull String filePath)
+                                    {
+                                        if (MapManager.saveMap(filePath, true))
+                                        {
+                                            alert(getString(R.string.download_succeed));
+                                            invoke(new Runnable()
+                                            {
+                                                @Override
+                                                public void run()
+                                                {
+                                                    flushMapsView();
+                                                }
+                                            });
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onDownloadFailed()
+                                    {
+                                        alert(getString(R.string.download_failed));
+                                    }
+                                });
+                            }
+                        }
+                    }
+                };
+                new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_net)
+                                                          .setView(editor)
+                                                          .setPositiveButton(R.string.confirm, listener)
+                                                          .setNegativeButton(R.string.cancel, listener)
+                                                          .show();
+                break;
+            }
         }
-    };
+    }
+
+    public void onMenuItemClick(View view)
+    {
+        switch (view.getId())
+        {
+            case R.id.menu_navigate:
+            {
+                switchView(VIEW_NAVIGATE);
+                break;
+            }
+            case R.id.menu_maps:
+            {
+                switchView(VIEW_MAPS);
+                break;
+            }
+            case R.id.menu_tags:
+            {
+                switchView(VIEW_TAGS);
+                break;
+            }
+            case R.id.menu_settings:
+            {
+                switchView(VIEW_SETTINGS);
+                break;
+            }
+        }
+        flushViews();
+        mGuillotineAnimation.close();
+    }
 
     //endregion
 
@@ -289,7 +369,7 @@ public class MainActivity
         try
         {
             mMainMenu = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.menu_main, null);
-            mMapsView = (ListView) findViewById(R.id.maps_view);
+            mMapsView = (RelativeLayout) findViewById(R.id.maps_view);
             mNavigateView = (MapView) findViewById(R.id.navigate_view);
             mTagsView = (LinearLayout) findViewById(R.id.tags_view);
             mToolbar = (cn.vicey.navigator.Components.Toolbar) findViewById(R.id.toolbar);
@@ -325,16 +405,6 @@ public class MainActivity
     {
         try
         {
-            mMainMenu.setOnClickListener(mDefaultOnClickListener);
-            mMenuItems = new ArrayList<>();
-            int count = mMainMenu.getChildCount();
-            for (int i = 0; i < count; i++)
-            {
-                View childView = mMainMenu.getChildAt(i);
-                if (!(childView instanceof MenuItem)) continue;
-                childView.setOnClickListener(mMenuItemOnClickListener);
-                mMenuItems.add((MenuItem) childView);
-            }
             FrameLayout rootView = (FrameLayout) findViewById(R.id.root);
             rootView.addView(mMainMenu);
         }
@@ -349,9 +419,10 @@ public class MainActivity
     {
         try
         {
-            mMapsViewAdapter = new ListViewAdapter<>(this, new ArrayList<String>());
-            mMapsView.setOnItemClickListener(mMapsViewOnItemClickListener);
-            mMapsView.setAdapter(mMapsViewAdapter);
+            mMapsListViewAdapter = new ListViewAdapter<>(this, new ArrayList<String>());
+            ListView mapsListView = (ListView) mMapsView.findViewById(R.id.mv_list_view);
+            mapsListView.setOnItemClickListener(mMapsViewOnItemClickListener);
+            mapsListView.setAdapter(mMapsListViewAdapter);
         }
         catch (Throwable t)
         {
@@ -427,10 +498,13 @@ public class MainActivity
 
     private void flushMainMenu()
     {
+        int count = mMainMenu.getChildCount();
         int index = 0;
-        for (MenuItem item : mMenuItems)
+        for (int i = 0; i < count; i++)
         {
-            item.setHighlighted(index++ == mCurrentView);
+            View childView = mMainMenu.getChildAt(i);
+            if (!(childView instanceof MenuItem)) continue;
+            ((MenuItem) childView).setHighlighted(index++ == mCurrentView);
         }
     }
 
@@ -449,13 +523,13 @@ public class MainActivity
     private void flushMapsView()
     {
         mToolbar.setTitleText(R.string.maps);
-        mMapsViewAdapter.clear();
+        mMapsListViewAdapter.clear();
         List<String> maps = MapManager.getAllMaps();
         for (String map : maps)
         {
-            mMapsViewAdapter.addItem(map);
+            mMapsListViewAdapter.addItem(map);
         }
-        mMapsViewAdapter.notifyDataSetChanged();
+        mMapsListViewAdapter.notifyDataSetChanged();
     }
 
     private void flushTagsView()
@@ -508,14 +582,26 @@ public class MainActivity
         flushViews();
     }
 
-    private void alert(@NonNull String message)
+    private void invoke(final Runnable runnable)
+    {
+        runOnUiThread(runnable);
+    }
+
+    private void alert(final @NonNull String message)
     {
         alert(message, Toast.LENGTH_SHORT);
     }
 
-    private void alert(@NonNull String message, int duration)
+    private void alert(final @NonNull String message, final int duration)
     {
-        Toast.makeText(this, message, duration).show();
+        invoke(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Toast.makeText(MainActivity.this, message, duration).show();
+            }
+        });
     }
 
     //endregion
@@ -541,23 +627,6 @@ public class MainActivity
             initSettingsView();
             initViewFlipper();
 
-
-            if (!MapManager.hasMap("iot_b.inmap"))
-            {
-                MapManager.downloadMap("http://www.vicey.cn/iot_b.inmap", "iot_b.inmap", new Utils.DownloadCallback()
-                {
-                    @Override
-                    public void onDownloadFinished(boolean succeed)
-                    {
-                        if (!succeed) return;
-                        mCurrentMap = MapManager.loadMap("iot_b.inmap");
-                    }
-                });
-            }
-            else
-            {
-                mCurrentMap = MapManager.loadMap("iot_b.inmap");
-            }
             flushViews();
         }
         catch (Throwable t)
