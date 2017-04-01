@@ -6,4 +6,19 @@
     <string name="settings">设置</string>
     <string name="tags">标签</string>
     <string name="general">通用</string>
+    <string name="manage">管理</string>
+    <string name="rename">重命名</string>
+    <string name="delete">删除</string>
+    <string name="new_file">新文件</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+    <string name="alert">警告</string>
+    <string name="load_succeed">加载成功</string>
+    <string name="load_failed">加载失败</string>
+    <string name="rename_succeed">重命名成功</string>
+    <string name="rename_failed">重命名失败</string>
+    <string name="delete_succeed">删除成功</string>
+    <string name="delete_failed">删除失败</string>
+    <string name="confirm_to_delete">是否要删除该文件？</string>
+    <string name="load">加载</string>
 </resources>
