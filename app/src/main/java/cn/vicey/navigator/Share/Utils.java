@@ -25,14 +25,6 @@ public final class Utils
     public static final String NEW_LINE = System.getProperty("line.separator");
     public static final String FILE_ENCODING = "utf-16";
 
-    private static long mStartTime = 0;
-
-    public static boolean initialize()
-    {
-        mStartTime = new Date().getTime();
-        return true;
-    }
-
     private Utils()
     {
         // no-op
@@ -210,6 +202,6 @@ public final class Utils
      */
     public static long getElapsedTime()
     {
-        return new Date().getTime() - mStartTime;
+        return new Date().getTime() - Navigator.getStartTime();
     }
 }

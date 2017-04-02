@@ -4,7 +4,8 @@ import android.app.Application;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.TypefaceManager;
-import cn.vicey.navigator.Share.Utils;
+
+import java.util.Date;
 
 public class Navigator
         extends Application
@@ -17,6 +18,8 @@ public class Navigator
 
     private static String mCacheDir;
     private static String mFilesDir;
+    private static long mStartTime;
+
 
     public boolean initialize()
     {
@@ -24,6 +27,7 @@ public class Navigator
         {
             mCacheDir = getCacheDir().getAbsolutePath();
             mFilesDir = getFilesDir().getAbsolutePath();
+            mStartTime = new Date().getTime();
             return true;
         }
         catch (Throwable t)
@@ -62,6 +66,11 @@ public class Navigator
         return mFilesDir;
     }
 
+    public static long getStartTime()
+    {
+        return mStartTime;
+    }
+
     @Override
     public void onCreate()
     {
@@ -73,12 +82,6 @@ public class Navigator
             if (!initialize())
             {
                 Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Navigator.");
-                exitWithError(ERR_INIT);
-            }
-            // Initialize Utils to get start time.
-            if (!Utils.initialize())
-            {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Utils.");
                 exitWithError(ERR_INIT);
             }
             if (!Logger.initialize())
