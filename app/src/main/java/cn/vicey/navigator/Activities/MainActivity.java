@@ -46,11 +46,13 @@ public class MainActivity
         public void addItem(T item)
         {
             mItems.add(item);
+            notifyDataSetChanged();
         }
 
         public void clear()
         {
             mItems.clear();
+            notifyDataSetChanged();
         }
 
         @Override
@@ -560,7 +562,6 @@ public class MainActivity
         {
             mMapsListViewAdapter.addItem(map);
         }
-        mMapsListViewAdapter.notifyDataSetChanged();
     }
 
     private void flushTagsView()
