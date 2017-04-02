@@ -3,6 +3,7 @@ package cn.vicey.navigator.Activities;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -92,6 +93,7 @@ public class MainActivity
     private static final int VIEW_MAPS = 1;
     private static final int VIEW_TAGS = 2;
     private static final int VIEW_SETTINGS = 3;
+    private static final int VIEW_LOG = 4;
     private static final long RIPPLE_DURATION = 250;
 
     //endregion
@@ -110,6 +112,7 @@ public class MainActivity
     //region UI variables
 
     private GuillotineAnimation mGuillotineAnimation;
+    private ScrollView mLogView;
     private LinearLayout mMainMenu;
     private cn.vicey.navigator.Components.Toolbar mToolbar;
     private ViewFlipper mViewFlipper;
@@ -361,6 +364,12 @@ public class MainActivity
         mGuillotineAnimation.close();
     }
 
+    public void onShowLogClick(View view)
+    {
+        if (view.getId() != R.id.sv_debug_show_log) return;
+        switchView(VIEW_LOG);
+    }
+
     //endregion
 
     //region Initialize functions
@@ -369,6 +378,7 @@ public class MainActivity
     {
         try
         {
+            mLogView = (ScrollView) findViewById(R.id.log_view);
             mMainMenu = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.menu_main, null);
             mMapsView = (RelativeLayout) findViewById(R.id.maps_view);
             mNavigateView = (MapView) findViewById(R.id.navigate_view);
@@ -398,6 +408,19 @@ public class MainActivity
         catch (Throwable t)
         {
             Logger.error(LOGGER_TAG, "Failed to initialize guillotine animation.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+        }
+    }
+
+    private void initLogView()
+    {
+        try
+        {
+
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to initialize log view.", t);
             Navigator.exitWithError(Navigator.ERR_INIT);
         }
     }
@@ -497,6 +520,13 @@ public class MainActivity
 
     //region Flush functions
 
+    private void flushLogView()
+    {
+        mToolbar.setTitleText(getString(R.string.log));
+        TextView textView = (TextView) mLogView.findViewById(R.id.lv_text_view);
+        textView.setText(Logger.getLogContent());
+    }
+
     private void flushMainMenu()
     {
         int count = mMainMenu.getChildCount();
@@ -572,6 +602,11 @@ public class MainActivity
                 flushSettingsView();
                 break;
             }
+            case VIEW_LOG:
+            {
+                flushLogView();
+                break;
+            }
         }
     }
 
@@ -622,6 +657,7 @@ public class MainActivity
             initViews();
 
             initGuillotineAnimation();
+            initLogView();
             initMainMenu();
             initMapsView();
             initNavigateView();
