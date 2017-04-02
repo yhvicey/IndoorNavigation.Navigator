@@ -48,10 +48,11 @@ public class MapManager
         return !map.exists() || map.delete();
     }
 
-    public static boolean saveMap(final @NonNull String srcPath, boolean overwrite)
+    public static boolean saveMap(final @NonNull File src, boolean overwrite)
     {
-        String fileName = new File(srcPath).getName();
-        return Utils.copyFile(new File(srcPath), new File(mMapDirFullPath + fileName), overwrite);
+        if (!MapParser.validate(src)) return false;
+        String fileName = src.getName();
+        return Utils.copyFile(src, new File(mMapDirFullPath + fileName), overwrite);
     }
 
     public static boolean hasMap(final @NonNull String mapName)
@@ -83,7 +84,8 @@ public class MapManager
         List<String> maps = new ArrayList<>();
         for (File file : mapDir.listFiles())
         {
-            if (file.isFile()) maps.add(file.getName());
+            if (validateMap(file.getName())) maps.add(file.getName());
+            else deleteMap(file.getName());
         }
         return maps;
     }

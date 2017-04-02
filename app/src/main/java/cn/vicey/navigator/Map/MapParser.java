@@ -309,7 +309,7 @@ public class MapParser
         try
         {
             Logger.info(LOGGER_TAG, "Start parsing file: " + file.getPath());
-            if (!file.exists())
+            if (!file.exists() || !file.isFile())
             {
                 Logger.error(LOGGER_TAG, "Can't find map file. File path: " + file.getPath());
                 return null;
