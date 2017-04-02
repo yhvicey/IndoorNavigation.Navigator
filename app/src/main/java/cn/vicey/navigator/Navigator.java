@@ -18,7 +18,7 @@ public class Navigator
 
     private static String mCacheDir;
     private static String mFilesDir;
-    private static long mStartTime;
+    private static long mStartTime = new Date().getTime();
 
 
     public boolean initialize()
@@ -27,7 +27,6 @@ public class Navigator
         {
             mCacheDir = getCacheDir().getAbsolutePath();
             mFilesDir = getFilesDir().getAbsolutePath();
-            mStartTime = new Date().getTime();
             return true;
         }
         catch (Throwable t)
@@ -76,31 +75,33 @@ public class Navigator
     {
         try
         {
+            Logger.info(LOGGER_TAG, "Started app initialization.");
+
             // TODO: put global initialization code below.
 
             // Initialize files dir, which is important for other classes.
             if (!initialize())
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Navigator.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize Navigator.");
                 exitWithError(ERR_INIT);
             }
             if (!Logger.initialize())
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize Logger.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize Logger.");
                 exitWithError(ERR_INIT);
             }
             if (!MapManager.initialize())
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize MapManager.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize MapManager.");
                 exitWithError(ERR_INIT);
             }
             if (!TypefaceManager.initialize(getAssets()))
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Cannot initialize TypefaceManager.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize TypefaceManager.");
                 exitWithError(ERR_INIT);
             }
 
-            Logger.info(LOGGER_TAG, "Finished initialization. Application start.");
+            Logger.info(LOGGER_TAG, "Finished app initialization. Application start.");
             super.onCreate();
         }
         catch (Throwable t)
