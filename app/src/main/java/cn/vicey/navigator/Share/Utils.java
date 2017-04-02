@@ -7,7 +7,9 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public final class Utils
@@ -196,6 +198,25 @@ public final class Utils
         return getCurrentDateString() + " " + getCurrentTimeString();
     }
 
+    public static List<String> getDirs(final @NonNull File dir)
+    {
+        if (!dir.isDirectory()) return null;
+        try
+        {
+            List<String> result = new ArrayList<>();
+            for (File file : dir.listFiles())
+            {
+                if (file.isDirectory()) result.add(file.getName());
+            }
+            return result;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to get all files under directory " + dir + ".", t);
+            return null;
+        }
+    }
+
     /**
      * Get elapsed time from application start.
      *
@@ -204,5 +225,43 @@ public final class Utils
     public static long getElapsedTime()
     {
         return new Date().getTime() - Navigator.getStartTime();
+    }
+
+    public static List<String> getEntries(final @NonNull File dir)
+    {
+        if (!dir.isDirectory()) return null;
+        try
+        {
+            List<String> result = new ArrayList<>();
+            for (File file : dir.listFiles())
+            {
+                result.add(file.getName());
+            }
+            return result;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to get all files under directory " + dir + ".", t);
+            return null;
+        }
+    }
+
+    public static List<String> getFiles(final @NonNull File dir)
+    {
+        if (!dir.isDirectory()) return null;
+        try
+        {
+            List<String> result = new ArrayList<>();
+            for (File file : dir.listFiles())
+            {
+                if (file.isFile()) result.add(file.getName());
+            }
+            return result;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to get all files under directory " + dir + ".", t);
+            return null;
+        }
     }
 }
