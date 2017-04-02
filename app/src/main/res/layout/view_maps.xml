@@ -6,17 +6,16 @@
         android:orientation="vertical">
     <ListView
             android:id="@+id/mv_list_view"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
+            android:orientation="vertical"
+            android:layout_above="@+id/mv_list_bottom">
     </ListView>
     <LinearLayout
             android:id="@+id/mv_list_bottom"
             android:layout_width="match_parent"
             android:layout_height="@dimen/middle_item_height"
             android:layout_alignParentBottom="true"
-            android:layout_above="@+id/mv_list_view"
             android:orientation="horizontal">
         <Button
                 android:id="@+id/mv_load_from_disk"
