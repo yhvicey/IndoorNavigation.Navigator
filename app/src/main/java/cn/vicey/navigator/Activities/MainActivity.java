@@ -26,6 +26,7 @@ import cn.vicey.navigator.Share.Utils;
 import com.yalantis.guillotine.animation.GuillotineAnimation;
 import com.yalantis.guillotine.interfaces.GuillotineListener;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -294,7 +295,59 @@ public class MainActivity
         {
             case R.id.mv_load_from_disk:
             {
+                if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
+                {
+                    requestPermission(REQ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+                    return;
+                }
+                final View fileChooser = LayoutInflater.from(this).inflate(R.layout.menu_file_chooser, null);
+                final TextView fileChooserHeader = (TextView) fileChooser.findViewById(R.id.fcm_header);
+                final ListView fileChooserFileListView = (ListView) fileChooser.findViewById(R.id.fcm_file_list_view);
 
+                File startDir = Environment.getExternalStorageState()
+                                           .equals(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory() : Environment
+                        .getDownloadCacheDirectory();
+                List<String> entries = Utils.getEntries(startDir);
+                if (entries == null)
+                {
+                    alert(getString(R.string.unknown_error));
+                    return;
+                }
+                entries.add(0, "..");
+                fileChooserHeader.setText(startDir.getAbsolutePath());
+
+                if (mFileListViewAdapter == null) mFileListViewAdapter = new ListViewAdapter<>(this, entries);
+                fileChooserFileListView.setAdapter(mFileListViewAdapter);
+                fileChooserFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+                {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+                    {
+                        final String currentDir = fileChooserHeader.getText().toString();
+                        final TextView textView = (TextView) view.findViewById(R.id.li_text_view);
+                        final String currentFile = textView.getText().toString();
+                        File file = currentFile.equals("..") ? new File(currentDir).getParentFile() : new File(currentDir + "/" + currentFile);
+                        if (file.isDirectory())
+                        {
+                            List<String> newEntries = Utils.getEntries(file);
+                            if (newEntries == null)
+                            {
+                                alert(getString(R.string.unknown_error));
+                                return;
+                            }
+                            newEntries.add(0, "..");
+                            fileChooserHeader.setText(file.getAbsolutePath());
+                        }
+                        else if (file.isFile())
+                        {
+                            if (MapManager.saveMap(file, true)) alert(getString(R.string.load_succeed));
+                            else alert(getString(R.string.load_failed));
+                        }
+                    }
+                });
+                new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_disk)
+                                                          .setView(fileChooser)
+                                                          .show();
                 break;
             }
             case R.id.mv_load_from_net:
