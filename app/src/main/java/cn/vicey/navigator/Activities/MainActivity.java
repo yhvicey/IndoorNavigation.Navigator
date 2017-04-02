@@ -1,10 +1,14 @@
 package cn.vicey.navigator.Activities;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -99,6 +103,7 @@ public class MainActivity
     private static final long SHORT_TOAST_DURATION = 2000;
     private static final long LONG_TOAST_DURATION = 3500;
     private static final long RIPPLE_DURATION = 250;
+    private static final int REQ_STORAGE = 1;
 
     //endregion
 
@@ -649,6 +654,11 @@ public class MainActivity
         });
     }
 
+    private boolean hasPermission(final @NonNull String permission)
+    {
+        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
     private void invoke(final Runnable runnable)
     {
         runOnUiThread(runnable);
@@ -659,6 +669,12 @@ public class MainActivity
         mCurrentView = viewIndex;
         flushViews();
     }
+
+    private void requestPermission(int requestCode, String permission)
+    {
+        ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
+    }
+
     //endregion
 
     //region System event callbacks
@@ -710,6 +726,32 @@ public class MainActivity
         {
             super.onBackPressed();
             Navigator.exit();
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults)
+    {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode)
+        {
+            case REQ_STORAGE:
+            {
+                if (grantResults.length != 0)
+                {
+                    int index = 0;
+                    for (String permission : permissions)
+                    {
+                        if (permission.equals(Manifest.permission_group.STORAGE))
+                        {
+                            if (grantResults[index] == PackageManager.PERMISSION_GRANTED) return;
+                            else break;
+                        }
+                        index++;
+                    }
+                }
+                alert(getString(R.string.no_permission));
+            }
         }
     }
 
