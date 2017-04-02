@@ -324,4 +324,36 @@ public class MapParser
             return null;
         }
     }
+
+    public static boolean validate(final @NonNull File file)
+    {
+        if (!file.exists() || !file.isFile()) return false;
+        try
+        {
+            Logger.info(LOGGER_TAG, "Validating map file " + file + ".");
+            XmlPullParser parser = Xml.newPullParser();
+            parser.setInput(new FileInputStream(file), Utils.FILE_ENCODING);
+            int event = parser.getEventType();
+            while (event != XmlPullParser.END_DOCUMENT)
+            {
+                switch (event)
+                {
+                    case XmlPullParser.START_TAG:
+                    {
+                        Logger.info(LOGGER_TAG, "Finished validating map file. Result is " + parser.getName()
+                                                                                                   .equals(ELEMENT_MAP) + ".");
+                        return parser.getName().equals(ELEMENT_MAP);
+                    }
+                }
+                event = parser.next();
+            }
+            Logger.info(LOGGER_TAG, "Invalid map file.");
+            return false;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to validate file.", t);
+            return false;
+        }
+    }
 }

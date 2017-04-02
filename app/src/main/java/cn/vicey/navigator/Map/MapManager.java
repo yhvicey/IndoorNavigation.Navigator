@@ -72,6 +72,11 @@ public class MapManager
         return map.renameTo(new File(mMapDirFullPath + newMapName));
     }
 
+    public static boolean validateMap(final @NonNull String mapName)
+    {
+        return MapParser.validate(new File(mMapDirFullPath + mapName));
+    }
+
     public static List<String> getAllMaps()
     {
         File mapDir = new File(mMapDirFullPath);
