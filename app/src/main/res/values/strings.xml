@@ -30,4 +30,6 @@
     <string name="confirm_to_delete">是否要删除该文件？</string>
     <string name="debug_mode_notification">再点击 %d 次以开启开发者模式</string>
     <string name="debug_mode_enabled">开发者模式已开启</string>
+    <string name="unknown_error">未知错误</string>
+    <string name="no_permission">没有所需的权限</string>
 </resources>

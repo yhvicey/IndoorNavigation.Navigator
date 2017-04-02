@@ -30,4 +30,6 @@
     <string name="debug_mode_enabled">Debug mode already enabled</string>
     <string name="show_log">Show log</string>
     <string name="log">Log</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="no_permission">No needed permissions</string>
 </resources>
