@@ -96,6 +96,8 @@ public class MainActivity
     private static final int VIEW_TAGS = 2;
     private static final int VIEW_SETTINGS = 3;
     private static final int VIEW_LOG = 4;
+    private static final long SHORT_TOAST_DURATION = 2000;
+    private static final long LONG_TOAST_DURATION = 3500;
     private static final long RIPPLE_DURATION = 250;
 
     //endregion
@@ -258,20 +260,25 @@ public class MainActivity
 
     public void onEnableDebugModeClick(View view)
     {
+        if (mIsDebugModeEnabled) return;
         if (view.getId() != R.id.sv_general_header) return;
         if (mLastClickTime == null || new Date().getTime() - mLastClickTime.getTime() > 2 * 1000)
         {
             mLastClickTime = new Date();
-            mClickCount = 0;
+            mClickCount = 1;
+            return;
         }
-        else
+        mClickCount++;
+        if (mClickCount > 5)
         {
-            if (mClickCount > 5 || ++mClickCount >= 5)
-            {
-                mIsDebugModeEnabled = true;
-                alert(getString(R.string.debug_mode_enabled));
-                flushSettingsView();
-            }
+            mIsDebugModeEnabled = true;
+            Logger.info(LOGGER_TAG, "Debug mode enabled");
+            alert(getString(R.string.debug_mode_enabled));
+            flushSettingsView();
+        }
+        else if (mClickCount > 3)
+        {
+            alert(String.format(getString(R.string.debug_mode_notification), 5 - mClickCount + 1), 300);
         }
     }
 
@@ -290,9 +297,9 @@ public class MainActivity
                 DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
                 {
                     @Override
-                    public void onClick(DialogInterface childDialogInterface, int i)
+                    public void onClick(DialogInterface dialogInterface, int i)
                     {
-                        childDialogInterface.dismiss();
+                        dialogInterface.dismiss();
                         switch (i)
                         {
                             case AlertDialog.BUTTON_POSITIVE:
@@ -303,7 +310,7 @@ public class MainActivity
                                     @Override
                                     public void onDownloadSucceed(@NonNull String filePath)
                                     {
-                                        if (MapManager.saveMap(filePath, true))
+                                        if (MapManager.saveMap(new File(filePath), true))
                                         {
                                             alert(getString(R.string.download_succeed));
                                             invoke(new Runnable()
@@ -615,10 +622,30 @@ public class MainActivity
 
     //region Functions
 
-    private void switchView(int viewIndex)
+    private void alert(final @NonNull String message)
     {
-        mCurrentView = viewIndex;
-        flushViews();
+        alert(message, LONG_TOAST_DURATION);
+    }
+
+    private void alert(final @NonNull String message, final long duration)
+    {
+        invoke(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                final Toast toast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
+                toast.show();
+                new Handler().postDelayed(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        toast.cancel();
+                    }
+                }, duration);
+            }
+        });
     }
 
     private void invoke(final Runnable runnable)
@@ -626,23 +653,11 @@ public class MainActivity
         runOnUiThread(runnable);
     }
 
-    private void alert(final @NonNull String message)
+    private void switchView(int viewIndex)
     {
-        alert(message, Toast.LENGTH_SHORT);
+        mCurrentView = viewIndex;
+        flushViews();
     }
-
-    private void alert(final @NonNull String message, final int duration)
-    {
-        invoke(new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                Toast.makeText(MainActivity.this, message, duration).show();
-            }
-        });
-    }
-
     //endregion
 
     //region System event callbacks
