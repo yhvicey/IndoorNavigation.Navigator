@@ -265,6 +265,7 @@ public class MainActivity
             {
                 mIsDebugModeEnabled = true;
                 alert(getString(R.string.debug_mode_enabled));
+                flushSettingsView();
             }
         }
     }
@@ -540,6 +541,8 @@ public class MainActivity
     private void flushSettingsView()
     {
         mToolbar.setTitleText(R.string.settings);
+        View debugView = mSettingsView.findViewById(R.id.sv_debug_view);
+        debugView.setVisibility(mIsDebugModeEnabled ? View.VISIBLE : View.INVISIBLE);
     }
 
     private void flushViews()

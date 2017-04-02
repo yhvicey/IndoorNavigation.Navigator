@@ -6,6 +6,7 @@
     <string name="settings">设置</string>
     <string name="tags">标签</string>
     <string name="general">通用</string>
+    <string name="debug">调试</string>
     <string name="manage">管理</string>
     <string name="rename">重命名</string>
     <string name="delete">删除</string>

@@ -10,14 +10,35 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="top">
-        <TextView
-                android:id="@+id/sv_general_header"
-                style="@style/Settings.Header"
-                android:text="@string/general"
-                android:onClick="onEnableDebugModeClick"/>
-        <cn.vicey.navigator.Components.SettingsItem
+        <LinearLayout
+                android:id="@+id/sv_general_view"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/middle_item_height"
-                app:text="Settings 1"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+            <TextView
+                    android:id="@+id/sv_general_header"
+                    style="@style/Settings.Header"
+                    android:text="@string/general"
+                    android:onClick="onEnableDebugModeClick"/>
+            <cn.vicey.navigator.Components.SettingsItem
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/middle_item_height"
+                    app:text="Settings 1"/>
+        </LinearLayout>
+        <LinearLayout
+                android:id="@+id/sv_debug_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="invisible">
+            <TextView
+                    android:id="@+id/sv_debug_header"
+                    style="@style/Settings.Header"
+                    android:text="@string/debug"/>
+            <cn.vicey.navigator.Components.SettingsItem
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/middle_item_height"
+                    app:text="Settings 1"/>
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>
