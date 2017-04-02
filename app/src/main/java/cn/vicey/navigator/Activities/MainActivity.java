@@ -115,16 +115,17 @@ public class MainActivity
 
     //region UI variables
 
+    private ListViewAdapter<String> mFileListViewAdapter;
     private GuillotineAnimation mGuillotineAnimation;
     private ScrollView mLogView;
     private LinearLayout mMainMenu;
-    private cn.vicey.navigator.Components.Toolbar mToolbar;
-    private ViewFlipper mViewFlipper;
-    private MapView mNavigateView;
     private RelativeLayout mMapsView;
     private ListViewAdapter<String> mMapsListViewAdapter;
-    private LinearLayout mTagsView;
+    private MapView mNavigateView;
     private LinearLayout mSettingsView;
+    private LinearLayout mTagsView;
+    private cn.vicey.navigator.Components.Toolbar mToolbar;
+    private ViewFlipper mViewFlipper;
 
     //endregion
 
@@ -391,9 +392,9 @@ public class MainActivity
             mMainMenu = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.menu_main, null);
             mMapsView = (RelativeLayout) findViewById(R.id.maps_view);
             mNavigateView = (MapView) findViewById(R.id.navigate_view);
+            mSettingsView = (LinearLayout) findViewById(R.id.settings_view);
             mTagsView = (LinearLayout) findViewById(R.id.tags_view);
             mToolbar = (cn.vicey.navigator.Components.Toolbar) findViewById(R.id.toolbar);
-            mSettingsView = (LinearLayout) findViewById(R.id.settings_view);
             mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
         }
         catch (Throwable t)
