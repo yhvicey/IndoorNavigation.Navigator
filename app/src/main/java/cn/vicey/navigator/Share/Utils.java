@@ -8,6 +8,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
 
 public final class Utils
 {
@@ -172,7 +173,7 @@ public final class Utils
      */
     public static String getCurrentDateString()
     {
-        return new SimpleDateFormat(DATE_PATTERN, Settings.getCurrentLocale()).format(new Date());
+        return new SimpleDateFormat(DATE_PATTERN, Locale.getDefault()).format(new Date());
     }
 
     /**
@@ -182,7 +183,7 @@ public final class Utils
      */
     public static String getCurrentTimeString()
     {
-        return new SimpleDateFormat(TIME_PATTERN, Settings.getCurrentLocale()).format(new Date());
+        return new SimpleDateFormat(TIME_PATTERN, Locale.getDefault()).format(new Date());
     }
 
     /**

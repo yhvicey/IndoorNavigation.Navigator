@@ -5,6 +5,7 @@ import android.util.Log;
 import cn.vicey.navigator.Navigator;
 
 import java.io.*;
+import java.util.Locale;
 
 /**
  * Logger class.
@@ -133,7 +134,7 @@ public class Logger
     public static void debug(String tag, String message, Throwable t)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message))
+        sb.append(String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message))
           .append(Utils.NEW_LINE);
         if (t != null)
         {
@@ -165,7 +166,7 @@ public class Logger
     public static void info(String tag, String message, Throwable t)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message))
+        sb.append(String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message))
           .append(Utils.NEW_LINE);
         if (t != null)
         {
@@ -197,7 +198,7 @@ public class Logger
     public static void error(String tag, String message, Throwable t)
     {
         StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Settings.getCurrentLocale(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message))
+        sb.append(String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message))
           .append(Utils.NEW_LINE);
         if (t != null)
         {
