@@ -299,7 +299,7 @@ public class MapParser
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to parse input stream.");
+            Logger.error(LOGGER_TAG, "Failed to parse input stream.", t);
             return null;
         }
     }
