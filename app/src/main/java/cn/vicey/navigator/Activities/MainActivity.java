@@ -15,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-import cn.vicey.navigator.Components.MapView;
 import cn.vicey.navigator.Components.MenuItem;
 import cn.vicey.navigator.Contracts.Map;
 import cn.vicey.navigator.Map.MapManager;
@@ -85,7 +84,7 @@ public class MainActivity
             {
                 view = mInflater.inflate(R.layout.cmpt_list_item, null);
             }
-            TextView textView = (TextView) view.findViewById(R.id.li_text_view);
+            TextView textView = (TextView) view.findViewById(R.id.list_item);
             textView.setText(mItems.get(i).toString());
             return view;
         }
@@ -127,7 +126,7 @@ public class MainActivity
     private LinearLayout mMainMenu;
     private RelativeLayout mMapsView;
     private ListViewAdapter<String> mMapsListViewAdapter;
-    private MapView mNavigateView;
+    private RelativeLayout mNavigateView;
     private LinearLayout mSettingsView;
     private LinearLayout mTagsView;
     private cn.vicey.navigator.Components.Toolbar mToolbar;
@@ -297,12 +296,13 @@ public class MainActivity
             {
                 if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
                 {
+                    alert(getString(R.string.no_permission));
                     requestPermission(REQ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
                     return;
                 }
-                final View fileChooser = LayoutInflater.from(this).inflate(R.layout.menu_file_chooser, null);
-                final TextView fileChooserHeader = (TextView) fileChooser.findViewById(R.id.fcm_header);
-                final ListView fileChooserFileListView = (ListView) fileChooser.findViewById(R.id.fcm_file_list_view);
+                final View fileChooser = LayoutInflater.from(this).inflate(R.layout.cmpt_file_chooser, null);
+                final TextView fileChooserHeader = (TextView) fileChooser.findViewById(R.id.fc_header);
+                final ListView fileChooserFileListView = (ListView) fileChooser.findViewById(R.id.fc_file_list);
 
                 File startDir = Environment.getExternalStorageState()
                                            .equals(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory() : Environment
@@ -324,7 +324,7 @@ public class MainActivity
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
                     {
                         final String currentDir = fileChooserHeader.getText().toString();
-                        final TextView textView = (TextView) view.findViewById(R.id.li_text_view);
+                        final TextView textView = (TextView) view.findViewById(R.id.list_item);
                         final String currentFile = textView.getText().toString();
                         File file = currentFile.equals("..") ? new File(currentDir).getParentFile() : new File(currentDir + "/" + currentFile);
                         if (file.isDirectory())
@@ -345,7 +345,7 @@ public class MainActivity
                         }
                     }
                 });
-                new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_disk)
+                new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_sdcard)
                                                           .setView(fileChooser)
                                                           .show();
                 break;
@@ -407,22 +407,22 @@ public class MainActivity
     {
         switch (view.getId())
         {
-            case R.id.menu_navigate:
+            case R.id.mm_navigate:
             {
                 switchView(VIEW_NAVIGATE);
                 break;
             }
-            case R.id.menu_maps:
+            case R.id.mm_maps:
             {
                 switchView(VIEW_MAPS);
                 break;
             }
-            case R.id.menu_tags:
+            case R.id.mm_tags:
             {
                 switchView(VIEW_TAGS);
                 break;
             }
-            case R.id.menu_settings:
+            case R.id.mm_settings:
             {
                 switchView(VIEW_SETTINGS);
                 break;
@@ -447,9 +447,9 @@ public class MainActivity
         try
         {
             mLogView = (ScrollView) findViewById(R.id.log_view);
-            mMainMenu = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.menu_main, null);
+            mMainMenu = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.cmpt_main_menu, null);
             mMapsView = (RelativeLayout) findViewById(R.id.maps_view);
-            mNavigateView = (MapView) findViewById(R.id.navigate_view);
+            mNavigateView = (RelativeLayout) findViewById(R.id.navigate_view);
             mSettingsView = (LinearLayout) findViewById(R.id.settings_view);
             mTagsView = (LinearLayout) findViewById(R.id.tags_view);
             mToolbar = (cn.vicey.navigator.Components.Toolbar) findViewById(R.id.toolbar);
@@ -803,7 +803,6 @@ public class MainActivity
                         index++;
                     }
                 }
-                alert(getString(R.string.no_permission));
             }
         }
     }
