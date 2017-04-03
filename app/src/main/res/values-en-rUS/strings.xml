@@ -22,14 +22,14 @@
     <string name="download_succeed">Download succeed</string>
     <string name="download_failed">Download failed</string>
     <string name="load">Load</string>
-    <string name="load_from_disk">Load from disk</string>
+    <string name="load_from_sdcard">Load from SD card</string>
     <string name="load_from_net">Load from net</string>
+    <string name="show_log">Show log</string>
+    <string name="log">Log</string>
 
     <string name="confirm_to_delete">Are you sure about deleting this file?</string>
     <string name="debug_mode_notification">%d more clicks to enable debug mode</string>
     <string name="debug_mode_enabled">Debug mode already enabled</string>
-    <string name="show_log">Show log</string>
-    <string name="log">Log</string>
     <string name="unknown_error">Unknown error</string>
     <string name="no_permission">No needed permissions</string>
 </resources>
