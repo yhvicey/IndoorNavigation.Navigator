@@ -1,60 +1,77 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="Navigator" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/background</item>
         <item name="colorPrimaryDark">@color/backgroundDark</item>
         <item name="colorAccent">@color/highlighted</item>
-    </style>
-    <style name="AppTheme.NoActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
     </style>
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
-    <style name="Divider">
+    <style name="Navigator.Component">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+    </style>
+
+    <style name="Navigator.Component.Divider">
         <item name="android:background">?android:attr/listDivider</item>
     </style>
-    <style name="Divider.Horizontal">
+    <style name="Navigator.Component.Divider.Horizontal">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/divider_width</item>
     </style>
-    <style name="Divider.Vertical">
+    <style name="Navigator.Component.Divider.Vertical">
         <item name="android:layout_width">@dimen/divider_width</item>
         <item name="android:layout_height">match_parent</item>
     </style>
 
-    <style name="Settings">
+    <style name="Navigator.Component.List">
+        <item name="android:gravity">start|center</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:paddingTop">@dimen/middle_padding</item>
+        <item name="android:paddingBottom">@dimen/middle_padding</item>
+        <item name="android:textSize">@dimen/middle_font_size</item>
+    </style>
+    <style name="Navigator.Component.List.Header">
+        <item name="android:paddingStart">@dimen/small_padding</item>
+        <item name="android:paddingEnd">@dimen/small_padding</item>
+    </style>
+    <style name="Navigator.Component.List.Item">
+        <item name="android:paddingStart">@dimen/middle_padding</item>
+        <item name="android:paddingEnd">@dimen/middle_padding</item>
+    </style>
+
+    <style name="Navigator.SettingsView">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/middle_item_height</item>
         <item name="android:gravity">start|center</item>
     </style>
-    <style name="Settings.Header">
+    <style name="Navigator.SettingsView.Header">
         <item name="android:paddingStart">@dimen/small_padding</item>
         <item name="android:paddingEnd">@dimen/small_padding</item>
         <item name="android:textSize">@dimen/middle_font_size</item>
     </style>
-    <style name="Settings.Item">
+    <style name="Navigator.SettingsView.Item">
         <item name="android:paddingStart">@dimen/middle_padding</item>
         <item name="android:paddingEnd">@dimen/middle_padding</item>
         <item name="android:textSize">@dimen/small_font_size</item>
     </style>
 
-    <style name="Menu">
+    <style name="Navigator.Menu">
 
     </style>
-    <style name="Menu.FileChooser">
+    <style name="Navigator.Menu.FileChooser">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">@dimen/small_item_height</item>
         <item name="android:gravity">start|center</item>
         <item name="android:textSize">@dimen/small_font_size</item>
     </style>
-    <style name="Menu.FileChooser.Header">
+    <style name="Navigator.Menu.FileChooser.Header">
         <item name="android:layout_alignParentTop">true</item>
         <item name="android:paddingStart">@dimen/small_padding</item>
         <item name="android:paddingEnd">@dimen/small_padding</item>
     </style>
-    <style name="Menu.FileChooser.Item">
+    <style name="Navigator.Menu.FileChooser.Item">
         <item name="android:paddingStart">@dimen/middle_padding</item>
         <item name="android:paddingEnd">@dimen/middle_padding</item>
     </style>

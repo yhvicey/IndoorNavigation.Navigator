@@ -1,23 +1,25 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginStart="@dimen/middle_padding"
-        android:layout_marginTop="@dimen/middle_padding"
-        android:layout_marginBottom="@dimen/middle_padding"
-        android:orientation="horizontal"
-        android:gravity="start|center">
+        style="@style/Navigator.Component"
+        android:paddingStart="@dimen/middle_padding"
+        android:paddingEnd="@dimen/middle_padding"
+        android:paddingTop="@dimen/middle_padding"
+        android:paddingBottom="@dimen/middle_padding"
+        android:orientation="horizontal">
 
     <ImageView
             android:id="@+id/mi_icon"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:src="@drawable/ic_default"/>
+            android:layout_height="match_parent"/>
+
     <TextView
             android:id="@+id/mi_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginStart="@dimen/middle_padding"
+            android:paddingStart="@dimen/large_padding"
+            android:paddingEnd="@dimen/large_padding"
             android:gravity="start|center"
             android:textSize="@dimen/small_font_size"/>
+
 </LinearLayout>
+

@@ -1,13 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          android:id="@+id/li_text_view"
-          android:layout_width="match_parent"
-          android:layout_height="@dimen/large_item_height"
-          android:paddingStart="@dimen/large_padding"
-          android:paddingEnd="@dimen/large_padding"
-          android:paddingTop="@dimen/middle_padding"
-          android:paddingBottom="@dimen/middle_padding"
-          android:gravity="start|center"
-          android:textSize="@dimen/middle_font_size">
+<TextView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Navigator.Component.List.Item"
+        android:id="@+id/list_item">
 
 </TextView>

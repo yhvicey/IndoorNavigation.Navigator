@@ -23,7 +23,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 style="?borderlessButtonStyle"
-                android:text="@string/load_from_disk"
+                android:text="@string/load_from_sdcard"
                 android:textSize="@dimen/small_font_size"
                 android:onClick="onLoadButtonClick"/>
         <Button

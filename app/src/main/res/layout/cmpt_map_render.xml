@@ -1,0 +1,15 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Navigator.Component"
+        android:id="@+id/map_render"
+        android:orientation="vertical"
+        android:gravity="top">
+
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Placeholder"
+            android:textSize="@dimen/large_font_size"/>
+
+</LinearLayout>
