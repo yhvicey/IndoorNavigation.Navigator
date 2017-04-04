@@ -56,6 +56,22 @@ public class Floor
         }
     }
 
+    public void clearTags()
+    {
+        for (NodeBase node : mEntryNodes.values())
+        {
+            node.setTag(null);
+        }
+        for (NodeBase node : mGuideNodes)
+        {
+            node.setTag(null);
+        }
+        for (NodeBase node : mWallNodes)
+        {
+            node.setTag(null);
+        }
+    }
+
     public EntryNode findEntryNode(int id)
     {
         return mEntryNodes.get(id);

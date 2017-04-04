@@ -36,4 +36,5 @@
     <string name="sdcard_not_found">SD card not found</string>
     <string name="exit_notification">Press once more to exit application</string>
     <string name="cant_open_folder">Can\'t open folder</string>
+    <string name="unmatch_name">Unmatched map name, are you sure to load this file?</string>
 </resources>

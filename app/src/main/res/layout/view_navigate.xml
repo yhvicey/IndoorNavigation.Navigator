@@ -3,4 +3,6 @@
         style="@style/Navigator.Component"
         android:id="@+id/navigate_view">
 
+    <include layout="@layout/cmpt_map_render"/>
+
 </RelativeLayout>

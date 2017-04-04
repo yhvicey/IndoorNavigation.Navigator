@@ -84,7 +84,7 @@ public abstract class NodeBase
         return mY;
     }
 
-    public void setTag(@NonNull String tag)
+    public void setTag(String tag)
     {
         mTag = tag;
     }

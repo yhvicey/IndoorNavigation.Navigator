@@ -36,4 +36,5 @@
     <string name="sdcard_not_found">未发现 SD 卡</string>
     <string name="exit_notification">再按一次以退出应用</string>
     <string name="cant_open_folder">无法打开文件夹</string>
+    <string name="unmatch_name">Unmatched map name, are you sure to load this file?</string>
 </resources>

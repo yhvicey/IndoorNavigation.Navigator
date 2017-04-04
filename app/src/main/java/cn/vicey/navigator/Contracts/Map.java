@@ -1,6 +1,7 @@
 package cn.vicey.navigator.Contracts;
 
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Share.Logger;
 
 import java.util.List;
 
@@ -9,6 +10,8 @@ import java.util.List;
  */
 public class Map
 {
+    private static final String LOGGER_TAG = "Map";
+
     private List<Floor> mFloors;
     private String mName;
 
@@ -21,6 +24,14 @@ public class Map
     {
         mFloors = floors;
         mName = name;
+    }
+
+    public void clearTags()
+    {
+        for (Floor floor : mFloors)
+        {
+            floor.clearTags();
+        }
     }
 
     public Floor getFloor(int floor)
@@ -58,8 +69,47 @@ public class Map
         return "1.0";
     }
 
-    public void setName(@NonNull String value)
+    public boolean setTags(TagList tagList)
     {
-        mName = value;
+        clearTags();
+        try
+        {
+            List<Tag> tags = tagList.getTagList();
+            for (Tag tag : tags)
+            {
+                int floor = tag.getFloor();
+                int index = tag.getIndex();
+                String value = tag.getValue();
+                switch (tag.getType())
+                {
+                    case ENTRY_NODE:
+                    {
+                        getFloor(floor).getEntryNodes().get(index).setTag(value);
+                        continue;
+                    }
+                    case GUIDE_NODE:
+                    {
+                        getFloor(floor).getGuideNodes().get(index).setTag(value);
+                        continue;
+                    }
+                    case WALL_NODE:
+                    {
+                        getFloor(floor).getWallNodes().get(index).setTag(value);
+                        continue;
+                    }
+                    default:
+                    {
+                        Logger.error(LOGGER_TAG, "Unexpected tag type.");
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to set tag.", t);
+            return false;
+        }
     }
 }

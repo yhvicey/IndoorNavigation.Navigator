@@ -340,9 +340,9 @@ public class MapParser
                 {
                     case XmlPullParser.START_TAG:
                     {
-                        Logger.info(LOGGER_TAG, "Finished validating map file. Result is " + parser.getName()
-                                                                                                   .equals(ELEMENT_MAP) + ".");
-                        return parser.getName().equals(ELEMENT_MAP);
+                        boolean result = parser.getName().equals(ELEMENT_MAP);
+                        Logger.info(LOGGER_TAG, "Finished validating map file. Result is " + result + ".");
+                        return result;
                     }
                 }
                 event = parser.next();

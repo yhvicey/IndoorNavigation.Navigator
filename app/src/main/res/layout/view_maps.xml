@@ -24,7 +24,7 @@
                 style="?borderlessButtonStyle"
                 android:text="@string/load_from_sdcard"
                 android:textSize="@dimen/small_font_size"
-                android:onClick="onLoadButtonClick"/>
+                android:onClick="onLoadMapButtonClick"/>
         <Button
                 android:id="@+id/mv_load_from_net"
                 android:layout_width="0dp"
@@ -33,7 +33,7 @@
                 style="?borderlessButtonStyle"
                 android:text="@string/load_from_net"
                 android:textSize="@dimen/small_font_size"
-                android:onClick="onLoadButtonClick"/>
+                android:onClick="onLoadMapButtonClick"/>
     </LinearLayout>
 </RelativeLayout>
 
