@@ -2,7 +2,7 @@ package cn.vicey.navigator.Map;
 
 import android.support.annotation.NonNull;
 import cn.vicey.navigator.Contracts.Map;
-import cn.vicey.navigator.Contracts.TagList;
+import cn.vicey.navigator.Contracts.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
@@ -91,42 +91,9 @@ public class MapManager
         }
     }
 
-    public static List<File> getAllTagFiles()
-    {
-        try
-        {
-            File tagDir = new File(mTagDirFullPath);
-            List<File> files = Utils.getFiles(tagDir);
-            if (files == null)
-            {
-                Logger.error(LOGGER_TAG, "Failed to get all tag files.");
-                return null;
-            }
-            for (File file : files)
-            {
-                if (!validateTagFile(file))
-                {
-                    deleteTagFile(file.getName());
-                    files.remove(file);
-                }
-            }
-            return files;
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to get all tag files.", t);
-            return null;
-        }
-    }
-
     public static String getAvailableDefaultMapFileName()
     {
         return Utils.getAvailableDefaultName(new File(mMapDirFullPath), ".xml");
-    }
-
-    public static String getAvailableDefaultTagFileName()
-    {
-        return Utils.getAvailableDefaultName(new File(mTagDirFullPath), ".xml");
     }
 
     public static boolean hasMapFile(final @NonNull String mapFileName)
@@ -134,9 +101,9 @@ public class MapManager
         return validateMapFile(new File(mMapDirFullPath + mapFileName));
     }
 
-    public static boolean hasTagFile(final @NonNull String tagFileName)
+    public static boolean hasTags(final @NonNull String mapName)
     {
-        return validateMapFile(new File(mTagDirFullPath + tagFileName));
+        return validateTagFile(new File(mTagDirFullPath + mapName));
     }
 
     public static Map loadMapFile(final @NonNull String mapFileName)
@@ -144,9 +111,10 @@ public class MapManager
         return MapParser.parse(new File(mMapDirFullPath + mapFileName));
     }
 
-    public static TagList loadTagFile(final @NonNull String tagFileName)
+    public static List<Tag> loadTags(final @NonNull String mapName)
     {
-        return TagParser.parse(new File(mTagDirFullPath + tagFileName));
+        if (!hasTags(mapName)) return null;
+        return TagParser.parse(new File(mTagDirFullPath + mapName));
     }
 
     public static boolean renameMapFile(final @NonNull String mapName, final @NonNull String newMapName)
@@ -157,14 +125,6 @@ public class MapManager
         return map.renameTo(new File(mMapDirFullPath + newMapName));
     }
 
-    public static boolean renameTagFile(final @NonNull String tagName, final @NonNull String newMapName)
-    {
-        if (!hasTagFile(tagName)) return false;
-        if (hasTagFile(newMapName)) return false;
-        File tag = new File(mTagDirFullPath + tagName);
-        return tag.renameTo(new File(mTagDirFullPath + newMapName));
-    }
-
     public static boolean saveMapFile(final @NonNull File src, boolean overwrite)
     {
         if (!MapParser.validate(src)) return false;
@@ -173,12 +133,11 @@ public class MapManager
         return Utils.copyFile(src, new File(mMapDirFullPath + fileName), overwrite);
     }
 
-    public static boolean saveTagFile(final @NonNull File src, boolean overwrite)
+    public static boolean saveTags(final @NonNull String mapName, List<Tag> tags)
     {
-        if (!TagParser.validate(src)) return false;
-        String fileName = src.getName();
-        if (!overwrite && hasTagFile(fileName)) fileName = getAvailableDefaultTagFileName();
-        return Utils.copyFile(src, new File(mTagDirFullPath + fileName), overwrite);
+        File file = TagSaver.save(mapName, tags);
+        if (file == null) return false;
+        return Utils.copyFile(file, new File(mTagDirFullPath + mapName), true);
     }
 
     public static boolean validateMapFile(final @NonNull File mapFile)

@@ -1,0 +1,24 @@
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Navigator.Component.List.Item"
+        android:orientation="vertical">
+
+    <TextView
+            android:id="@+id/tli_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/middle_padding"
+            android:paddingEnd="@dimen/middle_padding"
+            android:gravity="start|center"
+            android:textSize="@dimen/middle_font_size"/>
+
+    <TextView
+            android:id="@+id/tli_sub_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/middle_padding"
+            android:paddingEnd="@dimen/middle_padding"
+            android:gravity="start|center"
+            android:textSize="@dimen/small_font_size"/>
+
+</LinearLayout>

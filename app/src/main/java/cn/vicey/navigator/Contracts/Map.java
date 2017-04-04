@@ -1,8 +1,10 @@
 package cn.vicey.navigator.Contracts;
 
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Contracts.Nodes.NodeBase;
 import cn.vicey.navigator.Share.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,6 +26,14 @@ public class Map
     {
         mFloors = floors;
         mName = name;
+    }
+
+    public boolean addTag(int floor, final @NonNull NodeBase node, final @NonNull String value)
+    {
+        NodeBase target = getFloor(floor).findNode(node);
+        if (target == null) return false;
+        target.setTag(value);
+        return true;
     }
 
     public void clearTags()
@@ -59,6 +69,18 @@ public class Map
         return mName;
     }
 
+    public List<Tag> getTags()
+    {
+        List<Tag> tags = new ArrayList<>();
+        int index = 0;
+        for (Floor floor : mFloors)
+        {
+            tags.addAll(floor.getTags(index));
+            index++;
+        }
+        return tags;
+    }
+
     /**
      * Gets map's version.
      *
@@ -69,12 +91,11 @@ public class Map
         return "1.0";
     }
 
-    public boolean setTags(TagList tagList)
+    public boolean setTags(List<Tag> tags)
     {
         clearTags();
         try
         {
-            List<Tag> tags = tagList.getTagList();
             for (Tag tag : tags)
             {
                 int floor = tag.getFloor();

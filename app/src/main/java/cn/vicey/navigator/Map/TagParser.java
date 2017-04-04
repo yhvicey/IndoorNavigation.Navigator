@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.util.Xml;
 import cn.vicey.navigator.Contracts.Nodes.NodeType;
 import cn.vicey.navigator.Contracts.Tag;
-import cn.vicey.navigator.Contracts.TagList;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 import org.xmlpull.v1.XmlPullParser;
@@ -18,9 +17,8 @@ import java.util.List;
 public class TagParser
 {
     private static final String LOGGER_TAG = "TagParser";
-    private static final String SUPPORT_VERSIONS = "1.0";
+    private static final String SUPPORTED_VERSION = "1.0";
     private static final String ATTR_VERSION = "Version";
-    private static final String ATTR_NAME = "Name";
     private static final String ATTR_FLOOR = "Floor";
     private static final String ATTR_INDEX = "Index";
     private static final String ATTR_TYPE = "Type";
@@ -84,11 +82,10 @@ public class TagParser
         }
     }
 
-    private static TagList parseStream(final @NonNull InputStream stream)
+    private static List<Tag> parseStream(final @NonNull InputStream stream)
     {
         try
         {
-            String name = null;
             List<Tag> tagList = new ArrayList<>();
 
             XmlPullParser parser = Xml.newPullParser();
@@ -109,25 +106,16 @@ public class TagParser
                             case ELEMENT_TAGS:
                             {
                                 String version = parser.getAttributeValue(null, ATTR_VERSION);
-                                if (!version.equals(SUPPORT_VERSIONS))
+                                if (!SUPPORTED_VERSION.equals(version))
                                 {
                                     Logger.error(LOGGER_TAG, "Unsupported tag file version. Version: " + version);
                                     return null;
                                 }
-                                String mapNameStr = parser.getAttributeValue(null, ATTR_NAME);
-                                if (Utils.isStringEmpty(mapNameStr, true))
-                                {
-                                    Logger.info(LOGGER_TAG, "Tag does not have a name.");
-                                }
-                                else
-                                {
-                                    name = mapNameStr;
-                                }
                                 break;
                             }
                             //endregion
-                            // Meet tag element, add the tag to the floor
-                            //region Node element
+                            // Meet tag element, add the tag to the list
+                            //region Tag element
                             case ELEMENT_TAG:
                             {
                                 Tag tag = generateTag(parser);
@@ -147,7 +135,7 @@ public class TagParser
                 }
                 event = parser.next();
             }
-            return new TagList(name, tagList);
+            return tagList;
         }
         catch (Throwable t)
         {
@@ -156,7 +144,7 @@ public class TagParser
         }
     }
 
-    public static TagList parse(final @NonNull File file)
+    public static List<Tag> parse(final @NonNull File file)
     {
         try
         {
@@ -166,7 +154,7 @@ public class TagParser
                 Logger.error(LOGGER_TAG, "Can't find tag file. File path: " + file.getPath());
                 return null;
             }
-            TagList tagList = parseStream(new FileInputStream(file));
+            List<Tag> tagList = parseStream(new FileInputStream(file));
             Logger.info(LOGGER_TAG, "Finished parsing file: " + file.getPath());
             return tagList;
         }

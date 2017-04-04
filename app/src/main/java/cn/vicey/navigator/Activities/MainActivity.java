@@ -17,7 +17,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import cn.vicey.navigator.Components.MenuItem;
 import cn.vicey.navigator.Contracts.Map;
-import cn.vicey.navigator.Contracts.TagList;
+import cn.vicey.navigator.Contracts.Tag;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -39,13 +39,13 @@ public class MainActivity
     private class ListViewAdapter<T>
             extends BaseAdapter
     {
-        protected LayoutInflater mInflater;
-        protected List<T> mItems;
+        protected final LayoutInflater mInflater;
+        protected final List<T> mItems;
 
-        public ListViewAdapter(Context context, List<T> items)
+        public ListViewAdapter(Context context)
         {
             mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            mItems = items;
+            mItems = new ArrayList<>();
         }
 
         public void addItem(T item)
@@ -102,9 +102,9 @@ public class MainActivity
     private class FileListAdapter
             extends ListViewAdapter<File>
     {
-        public FileListAdapter(Context context, List<File> items)
+        public FileListAdapter(Context context)
         {
-            super(context, items);
+            super(context);
         }
 
         @Override
@@ -120,6 +120,37 @@ public class MainActivity
                 imageView.setImageDrawable(getDrawable(file.isFile() ? R.drawable.ic_file : R.drawable.ic_folder));
             TextView textView = (TextView) view.findViewById(R.id.fli_text);
             if (textView != null) textView.setText(file.getName());
+            return view;
+        }
+    }
+
+    private class TagListAdapter
+            extends ListViewAdapter<Tag>
+    {
+        public TagListAdapter(Context context)
+        {
+            super(context);
+        }
+
+        public List<Tag> getAll()
+        {
+            return mItems;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup)
+        {
+            if (view == null)
+            {
+                view = mInflater.inflate(R.layout.cmpt_tag_list_item, null);
+            }
+            Tag tag = mItems.get(i);
+            TextView textView = (TextView) view.findViewById(R.id.tli_text);
+            TextView subTextView = (TextView) view.findViewById(R.id.tli_sub_text);
+            if (textView != null) textView.setText(tag.getValue());
+            if (subTextView != null)
+                subTextView.setText(getString(R.string.tag_metadata, tag.getFloor(), Tag.getNodeText(tag.getType()), tag
+                        .getIndex()));
             return view;
         }
     }
@@ -165,7 +196,7 @@ public class MainActivity
     private RelativeLayout mMapsView;
     private RelativeLayout mNavigateView;
     private LinearLayout mSettingsView;
-    private FileListAdapter mTagListAdapter;
+    private TagListAdapter mTagListAdapter;
     private RelativeLayout mTagsView;
     private cn.vicey.navigator.Components.Toolbar mToolbar;
     private ViewFlipper mViewFlipper;
@@ -300,8 +331,7 @@ public class MainActivity
         {
             final TextView textView = (TextView) view.findViewById(R.id.fli_text);
             new AlertDialog.Builder(MainActivity.this).setTitle(R.string.manage).setItems(new String[]{
-                    getString(R.string.load),
-                    getString(R.string.rename),
+                    getString(R.string.modify),
                     getString(R.string.delete)
             }, new DialogInterface.OnClickListener()
             {
@@ -311,93 +341,42 @@ public class MainActivity
                     dialogInterface.dismiss();
                     switch (i)
                     {
-                        //region Load
+                        //region Modify
                         case 0:
                         {
-                            if (mCurrentMap == null)
-                            {
-                                alert("No loaded map");
-                                return;
-                            }
-                            if (textView == null) return;
-                            String tagName = textView.getText().toString();
-                            final TagList tagList = MapManager.loadTagFile(tagName);
-                            if (tagList == null)
-                            {
-                                alert(getString(R.string.load_failed));
-                                return;
-                            }
-                            if (!mCurrentMap.getName().equals(tagList.getName()))
-                            {
-                                new AlertDialog.Builder(MainActivity.this).setTitle(getString(R.string.alert))
-                                                                          .setMessage(R.string.unmatch_name)
-                                                                          .setPositiveButton(getString(R.string.confirm), new DialogInterface.OnClickListener()
-                                                                          {
-                                                                              @Override
-                                                                              public void onClick(DialogInterface dialogInterface, int i)
-                                                                              {
-                                                                                  if (mCurrentMap.setTags(tagList))
-                                                                                  {
-                                                                                      alert(getString(R.string.load_succeed));
-                                                                                      switchView(VIEW_NAVIGATE);
-                                                                                  }
-                                                                                  else
-                                                                                      alert(getString(R.string.load_failed));
-                                                                              }
-                                                                          })
-                                                                          .setNegativeButton(getString(R.string.cancel), null)
-                                                                          .show();
-                            }
-                            else
-                            {
-                                if (mCurrentMap.setTags(tagList))
-                                {
-                                    alert(getString(R.string.load_succeed));
-                                    switchView(VIEW_NAVIGATE);
-                                }
-                                else alert(getString(R.string.load_failed));
-                                break;
-                            }
-                        }
-                        //endregion
-                        //region Rename
-                        case 1:
-                        {
-                            if (textView == null) return;
-                            final String tagFileName = textView.getText().toString();
+                            final String tagValue = textView.getText().toString();
                             final EditText editor = new EditText(MainActivity.this);
-                            editor.setText(tagFileName);
+                            editor.setText(tagValue);
                             editor.selectAll();
+                            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface childDialogInterface, int i)
+                                {
+                                    childDialogInterface.dismiss();
+                                    switch (i)
+                                    {
+                                        case AlertDialog.BUTTON_POSITIVE:
+                                        {
+                                            String newMapName = editor.getText().toString();
+                                            if (MapManager.renameMapFile(tagValue, newMapName))
+                                                alert(getString(R.string.rename_succeed));
+                                            else alert(getString(R.string.rename_failed));
+                                            flushMapsView();
+                                        }
+                                    }
+                                }
+                            };
                             new AlertDialog.Builder(MainActivity.this).setTitle(R.string.rename)
                                                                       .setView(editor)
-                                                                      .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener()
-                                                                      {
-                                                                          @Override
-                                                                          public void onClick(DialogInterface childDialogInterface, int i)
-                                                                          {
-                                                                              childDialogInterface.dismiss();
-                                                                              switch (i)
-                                                                              {
-                                                                                  case AlertDialog.BUTTON_POSITIVE:
-                                                                                  {
-                                                                                      String newTagFileName = editor.getText()
-                                                                                                                    .toString();
-                                                                                      if (MapManager.renameTagFile(tagFileName, newTagFileName))
-                                                                                          alert(getString(R.string.rename_succeed));
-                                                                                      else
-                                                                                          alert(getString(R.string.rename_failed));
-                                                                                      flushTagsView();
-                                                                                  }
-                                                                              }
-                                                                          }
-                                                                      })
-                                                                      .setNegativeButton(R.string.cancel, null)
+                                                                      .setPositiveButton(R.string.confirm, listener)
+                                                                      .setNegativeButton(R.string.cancel, listener)
                                                                       .show();
                             break;
                         }
                         //endregion
                         //region Delete
-                        case 2:
+                        case 1:
                         {
                             new AlertDialog.Builder(MainActivity.this).setTitle(R.string.alert)
                                                                       .setMessage(R.string.confirm_to_delete)
@@ -463,14 +442,15 @@ public class MainActivity
         }
         else if (mClickCount > 3)
         {
-            alert(String.format(getString(R.string.debug_mode_notification), 5 - mClickCount + 1), 300);
+            alert(getString(R.string.debug_mode_notification, 5 - mClickCount + 1), 300);
         }
     }
 
-    public void onLoadMapButtonClick(View view)
+    public void onMapsViewButtonClick(View view)
     {
         switch (view.getId())
         {
+            //region Load from sdcard
             case R.id.mv_load_from_sdcard:
             {
                 if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
@@ -497,7 +477,11 @@ public class MainActivity
                 }
                 fileChooserHeader.setText(startDir.getAbsolutePath());
 
-                if (mFileListAdapter == null) mFileListAdapter = new FileListAdapter(this, entries);
+                if (mFileListAdapter == null)
+                {
+                    mFileListAdapter = new FileListAdapter(this);
+                    mFileListAdapter.replace(entries);
+                }
                 else mFileListAdapter.replace(entries);
                 fileChooserFileListView.setAdapter(mFileListAdapter);
                 fileChooserFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -541,6 +525,8 @@ public class MainActivity
                                                                                .show();
                 break;
             }
+            //endregion
+            //region Load from net
             case R.id.mv_load_from_net:
             {
                 final EditText editor = new EditText(MainActivity.this);
@@ -592,134 +578,52 @@ public class MainActivity
                                                           .show();
                 break;
             }
+            //endregion
         }
     }
 
-    public void onLoadTagButtonClick(View view)
+    public void onTagsViewButtonClick(View view)
     {
         switch (view.getId())
         {
-            case R.id.tv_load_from_sdcard:
+            //region Load tags
+            case R.id.tv_load_tags:
             {
-                if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
+                if (mCurrentMap == null)
                 {
-                    alert(getString(R.string.no_permission));
-                    requestPermission(REQ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+                    alert(getString(R.string.no_loaded_map));
                     return;
                 }
-                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+                String mapName = mCurrentMap.getName();
+                List<Tag> tags = MapManager.loadTags(mapName);
+                if (tags == null) alert(getString(R.string.no_tag));
+                else
                 {
-                    alert(getString(R.string.sdcard_not_found));
-                    return;
+                    if (mCurrentMap.setTags(tags)) alert(getString(R.string.load_succeed));
+                    else alert(getString(R.string.load_failed));
                 }
-                final View fileChooser = LayoutInflater.from(this).inflate(R.layout.cmpt_file_chooser, null);
-                final TextView fileChooserHeader = (TextView) fileChooser.findViewById(R.id.fc_header);
-                final ListView fileChooserFileListView = (ListView) fileChooser.findViewById(R.id.fc_file_list);
-
-                File startDir = Environment.getExternalStorageDirectory();
-                List<File> entries = Utils.getEntries(startDir);
-                if (entries == null)
-                {
-                    alert(getString(R.string.cant_open_folder));
-                    return;
-                }
-                fileChooserHeader.setText(startDir.getAbsolutePath());
-
-                if (mFileListAdapter == null) mFileListAdapter = new FileListAdapter(this, entries);
-                else mFileListAdapter.replace(entries);
-                fileChooserFileListView.setAdapter(mFileListAdapter);
-                fileChooserFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-                {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
-                    {
-                        File currentDir = new File(fileChooserHeader.getText().toString());
-                        TextView textView = (TextView) view.findViewById(R.id.fli_text);
-                        String currentEntryName = textView.getText().toString();
-                        File nextEntry = currentEntryName.equals("..") ? currentDir.getParentFile() : new File(currentDir + "/" + currentEntryName);
-                        if (nextEntry.isDirectory())
-                        {
-                            List<File> newEntries = Utils.getEntries(nextEntry);
-                            if (newEntries == null)
-                            {
-                                alert(getString(R.string.cant_open_folder));
-                                return;
-                            }
-                            mFileListAdapter.replace(newEntries);
-                            fileChooserHeader.setText(nextEntry.getAbsolutePath());
-                        }
-                        else if (nextEntry.isFile())
-                        {
-                            if (MapManager.saveTagFile(nextEntry, true))
-                            {
-                                alert(getString(R.string.load_succeed));
-                                flushTagsView();
-                            }
-                            else alert(getString(R.string.load_failed));
-                            if (mFileChooserDialog != null)
-                            {
-                                mFileChooserDialog.dismiss();
-                                mFileChooserDialog = null;
-                            }
-                        }
-                    }
-                });
-                mFileChooserDialog = new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_sdcard)
-                                                                               .setView(fileChooser)
-                                                                               .show();
                 break;
             }
-            case R.id.tv_load_from_net:
+            //endregion
+            //region Save tags
+            case R.id.tv_save_tags:
             {
-                final EditText editor = new EditText(MainActivity.this);
-                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+                if (mCurrentMap == null)
                 {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i)
-                    {
-                        dialogInterface.dismiss();
-                        switch (i)
-                        {
-                            case AlertDialog.BUTTON_POSITIVE:
-                            {
-                                String url = editor.getText().toString();
-                                alert(getString(R.string.downloading));
-                                Utils.downloadFile(url, new Utils.DownloadCallback()
-                                {
-                                    @Override
-                                    public void onDownloadSucceed(@NonNull String filePath)
-                                    {
-                                        if (MapManager.saveTagFile(new File(filePath), true))
-                                        {
-                                            alert(getString(R.string.download_succeed));
-                                            invoke(new Runnable()
-                                            {
-                                                @Override
-                                                public void run()
-                                                {
-                                                    flushTagsView();
-                                                }
-                                            });
-                                        }
-                                    }
-
-                                    @Override
-                                    public void onDownloadFailed()
-                                    {
-                                        alert(getString(R.string.download_failed));
-                                    }
-                                });
-                            }
-                        }
-                    }
-                };
-                new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_net)
-                                                          .setView(editor)
-                                                          .setPositiveButton(R.string.confirm, listener)
-                                                          .setNegativeButton(R.string.cancel, listener)
-                                                          .show();
+                    alert(getString(R.string.no_loaded_map));
+                    return;
+                }
+                List<Tag> tags = mTagListAdapter.getAll();
+                if (tags.size() == 0)
+                {
+                    alert(getString(R.string.no_tag));
+                    return;
+                }
+                if (MapManager.saveTags(mCurrentMap.getName(), tags)) alert(getString(R.string.save_succeed));
+                else alert(getString(R.string.save_failed));
                 break;
             }
+            //endregion
         }
     }
 
@@ -831,7 +735,7 @@ public class MainActivity
     {
         try
         {
-            mMapListAdapter = new FileListAdapter(this, new ArrayList<File>());
+            mMapListAdapter = new FileListAdapter(this);
             ListView mapList = (ListView) mMapsView.findViewById(R.id.mv_list_view);
             mapList.setOnItemClickListener(mMapListOnItemClickListener);
             mapList.setAdapter(mMapListAdapter);
@@ -859,7 +763,7 @@ public class MainActivity
     {
         try
         {
-            mTagListAdapter = new FileListAdapter(this, new ArrayList<File>());
+            mTagListAdapter = new TagListAdapter(this);
             ListView tagList = (ListView) mTagsView.findViewById(R.id.tv_list_view);
             tagList.setOnItemClickListener(mTagListOnItemClickListener);
             tagList.setAdapter(mTagListAdapter);
@@ -988,8 +892,15 @@ public class MainActivity
     private void flushTagsView()
     {
         mToolbar.setTitleText(R.string.tags);
-        List<File> tags = MapManager.getAllTagFiles();
-        mTagListAdapter.replace(tags);
+        if (mCurrentMap != null)
+        {
+            List<Tag> tags = mCurrentMap.getTags();
+            mTagListAdapter.replace(tags);
+        }
+        else
+        {
+            alert(getString(R.string.no_loaded_map));
+        }
     }
 
     private void flushSettingsView()

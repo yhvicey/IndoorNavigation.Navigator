@@ -25,7 +25,7 @@ import java.util.List;
 public class MapParser
 {
     private static final String LOGGER_TAG = "MapParser";
-    private static final String SUPPORT_VERSIONS = "1.0";
+    private static final String SUPPORTED_VERSION = "1.0";
     private static final String ATTR_VERSION = "Version";
     private static final String ATTR_SCALE = "Scale";
     private static final String ATTR_TYPE = "Type";
@@ -170,7 +170,7 @@ public class MapParser
                             case ELEMENT_MAP:
                             {
                                 String version = parser.getAttributeValue(null, ATTR_VERSION);
-                                if (!version.equals(SUPPORT_VERSIONS))
+                                if (!SUPPORTED_VERSION.equals(version))
                                 {
                                     Logger.error(LOGGER_TAG, "Unsupported map file version. Version: " + version);
                                     return null;

@@ -16,23 +16,23 @@
             android:layout_alignParentBottom="true"
             android:orientation="horizontal">
         <Button
-                android:id="@+id/tv_load_from_sdcard"
+                android:id="@+id/tv_load_tags"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 style="?borderlessButtonStyle"
-                android:text="@string/load_from_sdcard"
+                android:text="@string/load_tags"
                 android:textSize="@dimen/small_font_size"
-                android:onClick="onLoadTagButtonClick"/>
+                android:onClick="onTagsViewButtonClick"/>
         <Button
-                android:id="@+id/tv_load_from_net"
+                android:id="@+id/tv_save_tags"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 style="?borderlessButtonStyle"
-                android:text="@string/load_from_net"
+                android:text="@string/save_tags"
                 android:textSize="@dimen/small_font_size"
-                android:onClick="onLoadTagButtonClick"/>
+                android:onClick="onTagsViewButtonClick"/>
     </LinearLayout>
 
 </RelativeLayout>

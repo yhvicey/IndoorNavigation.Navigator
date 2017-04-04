@@ -2,10 +2,7 @@ package cn.vicey.navigator.Contracts;
 
 import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Contracts.Nodes.EntryNode;
-import cn.vicey.navigator.Contracts.Nodes.GuideNode;
-import cn.vicey.navigator.Contracts.Nodes.NodeBase;
-import cn.vicey.navigator.Contracts.Nodes.WallNode;
+import cn.vicey.navigator.Contracts.Nodes.*;
 import cn.vicey.navigator.Share.Utils;
 
 import java.util.ArrayList;
@@ -28,7 +25,7 @@ public class Floor
      * @param links Links of the floor.
      */
     @SuppressLint("UseSparseArrays")
-    public Floor(@NonNull List<NodeBase> nodes, @NonNull List<Link> links)
+    public Floor(final @NonNull List<NodeBase> nodes, final @NonNull List<Link> links)
     {
         for (Link link : links)
         {
@@ -77,7 +74,7 @@ public class Floor
         return mEntryNodes.get(id);
     }
 
-    public List<GuideNode> findGuideNode(String pattern)
+    public List<GuideNode> findGuideNode(final @NonNull String pattern)
     {
         if (Utils.isStringEmpty(pattern, true)) return null;
         List<GuideNode> result = new ArrayList<>();
@@ -106,6 +103,23 @@ public class Floor
         return null;
     }
 
+    public NodeBase findNode(final @NonNull NodeBase target)
+    {
+        for (NodeBase node : mEntryNodes.values())
+        {
+            if (target == node) return node;
+        }
+        for (NodeBase node : mGuideNodes)
+        {
+            if (target == node) return node;
+        }
+        for (NodeBase node : mWallNodes)
+        {
+            if (target == node) return node;
+        }
+        return null;
+    }
+
     public List<EntryNode> getEntryNodes()
     {
         return new ArrayList<>(mEntryNodes.values());
@@ -114,6 +128,31 @@ public class Floor
     public List<GuideNode> getGuideNodes()
     {
         return mGuideNodes;
+    }
+
+    public List<Tag> getTags(int floor)
+    {
+        List<Tag> tags = new ArrayList<>();
+        int index = 0;
+        for (NodeBase node : mEntryNodes.values())
+        {
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.ENTRY_NODE, tagValue));
+            index++;
+        }
+        for (NodeBase node : mGuideNodes)
+        {
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.GUIDE_NODE, tagValue));
+            index++;
+        }
+        for (NodeBase node : mWallNodes)
+        {
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.WALL_NODE, tagValue));
+            index++;
+        }
+        return tags;
     }
 
     public List<WallNode> getWallNodes()
