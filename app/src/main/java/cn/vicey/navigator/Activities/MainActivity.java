@@ -38,8 +38,8 @@ public class MainActivity
     private class ListViewAdapter<T>
             extends BaseAdapter
     {
-        private LayoutInflater mInflater;
-        private List<T> mItems;
+        protected LayoutInflater mInflater;
+        protected List<T> mItems;
 
         public ListViewAdapter(Context context, List<T> items)
         {
@@ -56,6 +56,13 @@ public class MainActivity
         public void clear()
         {
             mItems.clear();
+            notifyDataSetChanged();
+        }
+
+        public void replace(List<T> items)
+        {
+            mItems.clear();
+            mItems.addAll(items);
             notifyDataSetChanged();
         }
 
@@ -90,6 +97,31 @@ public class MainActivity
         }
     }
 
+    private class FileListAdapter
+            extends ListViewAdapter<File>
+    {
+        public FileListAdapter(Context context, List<File> items)
+        {
+            super(context, items);
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup)
+        {
+            if (view == null)
+            {
+                view = mInflater.inflate(R.layout.cmpt_file_list_item, null);
+            }
+            File file = mItems.get(i);
+            ImageView imageView = (ImageView) view.findViewById(R.id.fli_icon);
+            if (imageView != null)
+                imageView.setImageDrawable(getDrawable(file.isFile() ? R.drawable.ic_file : R.drawable.ic_folder));
+            TextView textView = (TextView) view.findViewById(R.id.fli_text);
+            if (textView != null) textView.setText(file.getName());
+            return view;
+        }
+    }
+
     //endregion
 
     //region Constants
@@ -100,7 +132,8 @@ public class MainActivity
     private static final int VIEW_TAGS = 2;
     private static final int VIEW_SETTINGS = 3;
     private static final int VIEW_LOG = 4;
-    private static final long SHORT_TOAST_DURATION = 2000;
+    private static final long SHORT_TOAST_DURATION = 1000;
+    private static final long MIDDLE_TOAST_DURATION = 2000;
     private static final long LONG_TOAST_DURATION = 3500;
     private static final long RIPPLE_DURATION = 250;
     private static final int REQ_STORAGE = 1;
@@ -114,13 +147,15 @@ public class MainActivity
     private int mCurrentView = VIEW_NAVIGATE;
     private boolean mIsDebugModeEnabled;
     private boolean mIsMenuOpened;
-    private Date mLastClickTime;
+    private long mLastBackPressedTime;
+    private long mLastClickTime;
 
     //endregion
 
     //region UI variables
 
-    private ListViewAdapter<String> mFileListViewAdapter;
+    private DialogInterface mFileChooserDialog;
+    private FileListAdapter mFileListAdapter;
     private GuillotineAnimation mGuillotineAnimation;
     private ScrollView mLogView;
     private LinearLayout mMainMenu;
@@ -268,9 +303,9 @@ public class MainActivity
     {
         if (mIsDebugModeEnabled) return;
         if (view.getId() != R.id.sv_general_header) return;
-        if (mLastClickTime == null || new Date().getTime() - mLastClickTime.getTime() > 2 * 1000)
+        if (new Date().getTime() - mLastClickTime > 2 * 1000)
         {
-            mLastClickTime = new Date();
+            mLastClickTime = new Date().getTime();
             mClickCount = 1;
             return;
         }
@@ -292,7 +327,7 @@ public class MainActivity
     {
         switch (view.getId())
         {
-            case R.id.mv_load_from_disk:
+            case R.id.mv_load_from_sdcard:
             {
                 if (!hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
                 {
@@ -300,54 +335,66 @@ public class MainActivity
                     requestPermission(REQ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
                     return;
                 }
+                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+                {
+                    alert(getString(R.string.sdcard_not_found));
+                    return;
+                }
                 final View fileChooser = LayoutInflater.from(this).inflate(R.layout.cmpt_file_chooser, null);
                 final TextView fileChooserHeader = (TextView) fileChooser.findViewById(R.id.fc_header);
                 final ListView fileChooserFileListView = (ListView) fileChooser.findViewById(R.id.fc_file_list);
 
-                File startDir = Environment.getExternalStorageState()
-                                           .equals(Environment.MEDIA_MOUNTED) ? Environment.getExternalStorageDirectory() : Environment
-                        .getDownloadCacheDirectory();
-                List<String> entries = Utils.getEntries(startDir);
+                File startDir = Environment.getExternalStorageDirectory();
+                List<File> entries = Utils.getEntries(startDir);
                 if (entries == null)
                 {
-                    alert(getString(R.string.unknown_error));
+                    alert(getString(R.string.cant_open_folder));
                     return;
                 }
-                entries.add(0, "..");
                 fileChooserHeader.setText(startDir.getAbsolutePath());
 
-                if (mFileListViewAdapter == null) mFileListViewAdapter = new ListViewAdapter<>(this, entries);
-                fileChooserFileListView.setAdapter(mFileListViewAdapter);
+                if (mFileListAdapter == null) mFileListAdapter = new FileListAdapter(this, entries);
+                else mFileListAdapter.replace(entries);
+                fileChooserFileListView.setAdapter(mFileListAdapter);
                 fileChooserFileListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
                 {
                     @Override
                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
                     {
-                        final String currentDir = fileChooserHeader.getText().toString();
-                        final TextView textView = (TextView) view.findViewById(R.id.list_item);
-                        final String currentFile = textView.getText().toString();
-                        File file = currentFile.equals("..") ? new File(currentDir).getParentFile() : new File(currentDir + "/" + currentFile);
-                        if (file.isDirectory())
+                        File currentDir = new File(fileChooserHeader.getText().toString());
+                        TextView textView = (TextView) view.findViewById(R.id.fli_text);
+                        String currentEntryName = textView.getText().toString();
+                        File nextEntry = currentEntryName.equals("..") ? currentDir.getParentFile() : new File(currentDir + "/" + currentEntryName);
+                        if (nextEntry.isDirectory())
                         {
-                            List<String> newEntries = Utils.getEntries(file);
+                            List<File> newEntries = Utils.getEntries(nextEntry);
                             if (newEntries == null)
                             {
-                                alert(getString(R.string.unknown_error));
+                                alert(getString(R.string.cant_open_folder));
                                 return;
                             }
-                            newEntries.add(0, "..");
-                            fileChooserHeader.setText(file.getAbsolutePath());
+                            mFileListAdapter.replace(newEntries);
+                            fileChooserHeader.setText(nextEntry.getAbsolutePath());
                         }
-                        else if (file.isFile())
+                        else if (nextEntry.isFile())
                         {
-                            if (MapManager.saveMap(file, true)) alert(getString(R.string.load_succeed));
+                            if (MapManager.saveMap(nextEntry, true))
+                            {
+                                alert(getString(R.string.load_succeed));
+                                flushMapsView();
+                            }
                             else alert(getString(R.string.load_failed));
+                            if (mFileChooserDialog != null)
+                            {
+                                mFileChooserDialog.dismiss();
+                                mFileChooserDialog = null;
+                            }
                         }
                     }
                 });
-                new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_sdcard)
-                                                          .setView(fileChooser)
-                                                          .show();
+                mFileChooserDialog = new AlertDialog.Builder(MainActivity.this).setTitle(R.string.load_from_sdcard)
+                                                                               .setView(fileChooser)
+                                                                               .show();
                 break;
             }
             case R.id.mv_load_from_net:
@@ -364,6 +411,7 @@ public class MainActivity
                             case AlertDialog.BUTTON_POSITIVE:
                             {
                                 String url = editor.getText().toString();
+                                alert(getString(R.string.downloading));
                                 Utils.downloadFile(url, new Utils.DownloadCallback()
                                 {
                                     @Override
@@ -622,12 +670,8 @@ public class MainActivity
     private void flushMapsView()
     {
         mToolbar.setTitleText(R.string.maps);
-        mMapsListViewAdapter.clear();
         List<String> maps = MapManager.getAllMaps();
-        for (String map : maps)
-        {
-            mMapsListViewAdapter.addItem(map);
-        }
+        mMapsListViewAdapter.replace(maps);
     }
 
     private void flushTagsView()
@@ -683,7 +727,7 @@ public class MainActivity
 
     private void alert(final @NonNull String message)
     {
-        alert(message, LONG_TOAST_DURATION);
+        alert(message, MIDDLE_TOAST_DURATION);
     }
 
     private void alert(final @NonNull String message, final long duration)
@@ -733,6 +777,29 @@ public class MainActivity
     //region System event callbacks
 
     @Override
+    public void onBackPressed()
+    {
+        if (mIsMenuOpened)
+        {
+            mGuillotineAnimation.close();
+        }
+        else
+        {
+            long current = new Date().getTime();
+            if (current - mLastBackPressedTime > SHORT_TOAST_DURATION)
+            {
+                alert(getString(R.string.exit_notification), SHORT_TOAST_DURATION);
+                mLastBackPressedTime = current;
+            }
+            else
+            {
+                super.onBackPressed();
+                Navigator.exit();
+            }
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         try
@@ -766,20 +833,6 @@ public class MainActivity
     {
         Logger.flush();
         super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed()
-    {
-        if (mIsMenuOpened)
-        {
-            mGuillotineAnimation.close();
-        }
-        else
-        {
-            super.onBackPressed();
-            Navigator.exit();
-        }
     }
 
     @Override

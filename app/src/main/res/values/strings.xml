@@ -19,6 +19,7 @@
     <string name="rename_failed">重命名失败</string>
     <string name="delete_succeed">删除成功</string>
     <string name="delete_failed">删除失败</string>
+    <string name="downloading">下载中…</string>
     <string name="download_succeed">下载成功</string>
     <string name="download_failed">下载失败</string>
     <string name="load">加载</string>
@@ -32,4 +33,7 @@
     <string name="debug_mode_enabled">开发者模式已开启</string>
     <string name="unknown_error">未知错误</string>
     <string name="no_permission">没有所需的权限</string>
+    <string name="sdcard_not_found">未发现 SD 卡</string>
+    <string name="exit_notification">再按一次以退出应用</string>
+    <string name="cant_open_folder">无法打开文件夹</string>
 </resources>

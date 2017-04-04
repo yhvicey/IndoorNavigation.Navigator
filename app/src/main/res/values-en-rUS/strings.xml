@@ -19,6 +19,7 @@
     <string name="rename_failed">Rename failed</string>
     <string name="delete_succeed">Delete succeed</string>
     <string name="delete_failed">Delete failed</string>
+    <string name="downloading">Downloading…</string>
     <string name="download_succeed">Download succeed</string>
     <string name="download_failed">Download failed</string>
     <string name="load">Load</string>
@@ -32,4 +33,7 @@
     <string name="debug_mode_enabled">Debug mode already enabled</string>
     <string name="unknown_error">Unknown error</string>
     <string name="no_permission">No needed permissions</string>
+    <string name="sdcard_not_found">SD card not found</string>
+    <string name="exit_notification">Press once more to exit application</string>
+    <string name="cant_open_folder">Can\'t open folder</string>
 </resources>

@@ -5,11 +5,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
     <ListView
+            style="@style/Navigator.Component"
             android:id="@+id/mv_list_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_above="@+id/mv_list_bottom">
+            android:layout_above="@+id/mv_list_bottom"
+            android:orientation="vertical">
     </ListView>
     <LinearLayout
             android:id="@+id/mv_list_bottom"
@@ -18,7 +17,7 @@
             android:layout_alignParentBottom="true"
             android:orientation="horizontal">
         <Button
-                android:id="@+id/mv_load_from_disk"
+                android:id="@+id/mv_load_from_sdcard"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
