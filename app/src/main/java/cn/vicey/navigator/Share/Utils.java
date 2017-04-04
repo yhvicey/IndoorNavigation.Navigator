@@ -7,10 +7,7 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public final class Utils
 {
@@ -198,16 +195,26 @@ public final class Utils
         return getCurrentDateString() + " " + getCurrentTimeString();
     }
 
-    public static List<String> getDirs(final @NonNull File dir)
+    public static List<File> getDirs(final @NonNull File dir)
     {
         if (!dir.isDirectory()) return null;
         try
         {
-            List<String> result = new ArrayList<>();
+            List<File> result = new ArrayList<>();
             for (File file : dir.listFiles())
             {
-                if (file.isDirectory()) result.add(file.getName());
+                if (file.isDirectory()) result.add(file);
             }
+            //noinspection ComparatorCombinators
+            Collections.sort(result, new Comparator<File>()
+            {
+                @Override
+                public int compare(File file1, File file2)
+                {
+                    return file1.getName().compareTo(file2.getName());
+                }
+            });
+            if (dir.getParent() != null) result.add(0, new File(".."));
             return result;
         }
         catch (Throwable t)
@@ -227,16 +234,14 @@ public final class Utils
         return new Date().getTime() - Navigator.getStartTime();
     }
 
-    public static List<String> getEntries(final @NonNull File dir)
+    public static List<File> getEntries(final @NonNull File dir)
     {
         if (!dir.isDirectory()) return null;
         try
         {
-            List<String> result = new ArrayList<>();
-            for (File file : dir.listFiles())
-            {
-                result.add(file.getName());
-            }
+            List<File> result = new ArrayList<>();
+            result.addAll(getDirs(dir));
+            result.addAll(getFiles(dir));
             return result;
         }
         catch (Throwable t)
@@ -246,16 +251,25 @@ public final class Utils
         }
     }
 
-    public static List<String> getFiles(final @NonNull File dir)
+    public static List<File> getFiles(final @NonNull File dir)
     {
         if (!dir.isDirectory()) return null;
         try
         {
-            List<String> result = new ArrayList<>();
+            List<File> result = new ArrayList<>();
             for (File file : dir.listFiles())
             {
-                if (file.isFile()) result.add(file.getName());
+                if (file.isFile()) result.add(file);
             }
+            //noinspection ComparatorCombinators
+            Collections.sort(result, new Comparator<File>()
+            {
+                @Override
+                public int compare(File file1, File file2)
+                {
+                    return file1.getName().compareTo(file2.getName());
+                }
+            });
             return result;
         }
         catch (Throwable t)
