@@ -2,8 +2,8 @@ package cn.vicey.navigator.Map;
 
 import android.support.annotation.NonNull;
 import android.util.Xml;
-import cn.vicey.navigator.Contracts.Nodes.NodeType;
-import cn.vicey.navigator.Contracts.Tag;
+import cn.vicey.navigator.Models.Nodes.NodeType;
+import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 import org.xmlpull.v1.XmlPullParser;

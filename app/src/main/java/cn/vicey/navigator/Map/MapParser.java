@@ -2,13 +2,13 @@ package cn.vicey.navigator.Map;
 
 import android.support.annotation.NonNull;
 import android.util.Xml;
-import cn.vicey.navigator.Contracts.Floor;
-import cn.vicey.navigator.Contracts.Link;
-import cn.vicey.navigator.Contracts.Map;
-import cn.vicey.navigator.Contracts.Nodes.EntryNode;
-import cn.vicey.navigator.Contracts.Nodes.GuideNode;
-import cn.vicey.navigator.Contracts.Nodes.NodeBase;
-import cn.vicey.navigator.Contracts.Nodes.WallNode;
+import cn.vicey.navigator.Models.Floor;
+import cn.vicey.navigator.Models.Link;
+import cn.vicey.navigator.Models.Map;
+import cn.vicey.navigator.Models.Nodes.EntryNode;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 import org.xmlpull.v1.XmlPullParser;
@@ -27,12 +27,10 @@ public class MapParser
     private static final String LOGGER_TAG = "MapParser";
     private static final String SUPPORTED_VERSION = "1.0";
     private static final String ATTR_VERSION = "Version";
-    private static final String ATTR_SCALE = "Scale";
     private static final String ATTR_TYPE = "Type";
     private static final String ATTR_X = "X";
     private static final String ATTR_Y = "Y";
     private static final String ATTR_NAME = "Name";
-    private static final String ATTR_ID = "Id";
     private static final String ATTR_PREV_ENTRY = "PrevEntry";
     private static final String ATTR_NEXT_ENTRY = "NextEntry";
     private static final String ATTR_START = "Start";
@@ -45,14 +43,13 @@ public class MapParser
     private static final String TYPE_GUIDE = "Guide";
     private static final String TYPE_WALL = "Wall";
     private static final String DEFAULT_MAP_NAME = "Untitled";
-    private static int STANDARD_SCALE = 100000; // <pixel> * STANDARD_SCALE = <real centimeter>
 
     private MapParser()
     {
         // no-op
     }
 
-    private static NodeBase generateNode(final @NonNull XmlPullParser parser, double scaleFactor)
+    private static NodeBase generateNode(final @NonNull XmlPullParser parser)
     {
         String type = parser.getAttributeValue(null, ATTR_TYPE);
         if (Utils.isStringEmpty(type, true))
@@ -64,8 +61,8 @@ public class MapParser
         double y;
         try
         {
-            x = Double.parseDouble(parser.getAttributeValue(null, ATTR_X)) * scaleFactor;
-            y = Double.parseDouble(parser.getAttributeValue(null, ATTR_Y)) * scaleFactor;
+            x = Double.parseDouble(parser.getAttributeValue(null, ATTR_X));
+            y = Double.parseDouble(parser.getAttributeValue(null, ATTR_Y));
         }
         catch (Throwable t)
         {
@@ -76,18 +73,8 @@ public class MapParser
         {
             case TYPE_ENTRY:
             {
-                int id;
                 Integer prev;
                 Integer next;
-                try
-                {
-                    id = Integer.parseInt(parser.getAttributeValue(null, ATTR_ID));
-                }
-                catch (Throwable t)
-                {
-                    Logger.error(LOGGER_TAG, "Entry element must have valid id attribute. Line: " + parser.getLineNumber(), t);
-                    return null;
-                }
                 try
                 {
                     String prevStr = parser.getAttributeValue(null, ATTR_PREV_ENTRY);
@@ -101,7 +88,8 @@ public class MapParser
                             .getLineNumber(), t);
                     return null;
                 }
-                return new EntryNode(x, y, id, prev, next);
+                String name = parser.getAttributeValue(null, ATTR_NAME);
+                return new EntryNode(x, y, name, prev, next);
             }
             case TYPE_GUIDE:
             {
@@ -146,7 +134,6 @@ public class MapParser
         try
         {
             boolean isParsingFloor = false;
-            double scaleFactor = 1;
             String mapName = DEFAULT_MAP_NAME;
             List<Floor> floors = new ArrayList<>();
             List<NodeBase> nodes = new ArrayList<>();
@@ -197,7 +184,7 @@ public class MapParser
                                             .getLineNumber());
                                     return null;
                                 }
-                                NodeBase node = generateNode(parser, scaleFactor);
+                                NodeBase node = generateNode(parser);
                                 if (node == null)
                                 {
                                     Logger.error(LOGGER_TAG, "Failed in building node. Line:" + parser.getLineNumber());
@@ -239,17 +226,6 @@ public class MapParser
                                 }
                                 nodes.clear();
                                 links.clear();
-                                try
-                                {
-                                    int scale = Integer.parseInt(parser.getAttributeValue(null, ATTR_SCALE));
-                                    scaleFactor = STANDARD_SCALE / scale;
-                                }
-                                catch (Throwable t)
-                                {
-                                    Logger.error(LOGGER_TAG, "Floor element must have a valid attribute Scale. Line: " + parser
-                                            .getLineNumber());
-                                    return null;
-                                }
                                 isParsingFloor = true;
                                 break;
                             }

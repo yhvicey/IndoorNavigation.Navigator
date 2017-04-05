@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Contracts.Nodes;
+package cn.vicey.navigator.Models.Nodes;
 
 import android.support.annotation.NonNull;
 
@@ -36,6 +36,11 @@ public abstract class NodeBase
         if (mAdjacentNodes.contains(node)) return;
         getDistance(node);
         mAdjacentNodes.add(node);
+    }
+
+    public void clearTag()
+    {
+        mTag = null;
     }
 
     public List<NodeBase> getAdjacentNodes()
@@ -84,7 +89,7 @@ public abstract class NodeBase
         return mY;
     }
 
-    public void setTag(String tag)
+    public void setTag(@NonNull String tag)
     {
         mTag = tag;
     }

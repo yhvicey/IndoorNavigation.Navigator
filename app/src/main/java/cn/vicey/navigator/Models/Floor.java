@@ -1,12 +1,10 @@
-package cn.vicey.navigator.Contracts;
+package cn.vicey.navigator.Models;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Contracts.Nodes.*;
+import cn.vicey.navigator.Models.Nodes.*;
 import cn.vicey.navigator.Share.Utils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -14,9 +12,9 @@ import java.util.List;
  */
 public class Floor
 {
-    private HashMap<Integer, EntryNode> mEntryNodes;
-    private List<GuideNode> mGuideNodes;
-    private List<WallNode> mWallNodes;
+    private List<EntryNode> mEntryNodes = new ArrayList<>();
+    private List<GuideNode> mGuideNodes = new ArrayList<>();
+    private List<WallNode> mWallNodes = new ArrayList<>();
 
     /**
      * Initialize new instance of class Floor.
@@ -24,7 +22,6 @@ public class Floor
      * @param nodes Nodes of the floor.
      * @param links Links of the floor.
      */
-    @SuppressLint("UseSparseArrays")
     public Floor(final @NonNull List<NodeBase> nodes, final @NonNull List<Link> links)
     {
         for (Link link : links)
@@ -37,17 +34,14 @@ public class Floor
         {
             if (node instanceof EntryNode)
             {
-                if (mEntryNodes == null) mEntryNodes = new HashMap<>();
-                mEntryNodes.put(((EntryNode) node).getId(), (EntryNode) node);
+                mEntryNodes.add((EntryNode) node);
             }
             else if (node instanceof GuideNode)
             {
-                if (mGuideNodes == null) mGuideNodes = new ArrayList<>();
                 mGuideNodes.add((GuideNode) node);
             }
             else if (node instanceof WallNode)
             {
-                if (mWallNodes == null) mWallNodes = new ArrayList<>();
                 mWallNodes.add((WallNode) node);
             }
         }
@@ -55,28 +49,35 @@ public class Floor
 
     public void clearTags()
     {
-        for (NodeBase node : mEntryNodes.values())
+        for (NodeBase node : mEntryNodes)
         {
-            node.setTag(null);
+            node.clearTag();
         }
         for (NodeBase node : mGuideNodes)
         {
-            node.setTag(null);
+            node.clearTag();
         }
         for (NodeBase node : mWallNodes)
         {
-            node.setTag(null);
+            node.clearTag();
         }
     }
 
-    public EntryNode findEntryNode(int id)
+    public List<EntryNode> findEntryNode(final @NonNull String pattern)
     {
-        return mEntryNodes.get(id);
+        if (Utils.isStringEmpty(pattern, true)) return new ArrayList<>();
+        List<EntryNode> result = new ArrayList<>();
+        for (EntryNode node : mEntryNodes)
+        {
+            if (node.getName() == null) continue;
+            if (pattern.matches(node.getName())) result.add(node);
+        }
+        return result;
     }
 
     public List<GuideNode> findGuideNode(final @NonNull String pattern)
     {
-        if (Utils.isStringEmpty(pattern, true)) return null;
+        if (Utils.isStringEmpty(pattern, true)) return new ArrayList<>();
         List<GuideNode> result = new ArrayList<>();
         for (GuideNode node : mGuideNodes)
         {
@@ -86,43 +87,17 @@ public class Floor
         return result;
     }
 
-    public NodeBase findNode(double x, double y)
+    public List<NodeBase> findNode(final @NonNull String pattern)
     {
-        for (NodeBase node : mEntryNodes.values())
-        {
-            if (Utils.isDoubleEqual(x, node.getX()) && Utils.isDoubleEqual(y, node.getY())) return node;
-        }
-        for (NodeBase node : mGuideNodes)
-        {
-            if (Utils.isDoubleEqual(x, node.getX()) && Utils.isDoubleEqual(y, node.getY())) return node;
-        }
-        for (NodeBase node : mWallNodes)
-        {
-            if (Utils.isDoubleEqual(x, node.getX()) && Utils.isDoubleEqual(y, node.getY())) return node;
-        }
-        return null;
-    }
-
-    public NodeBase findNode(final @NonNull NodeBase target)
-    {
-        for (NodeBase node : mEntryNodes.values())
-        {
-            if (target == node) return node;
-        }
-        for (NodeBase node : mGuideNodes)
-        {
-            if (target == node) return node;
-        }
-        for (NodeBase node : mWallNodes)
-        {
-            if (target == node) return node;
-        }
-        return null;
+        List<NodeBase> result = new ArrayList<>();
+        result.addAll(findEntryNode(pattern));
+        result.addAll(findGuideNode(pattern));
+        return result;
     }
 
     public List<EntryNode> getEntryNodes()
     {
-        return new ArrayList<>(mEntryNodes.values());
+        return mEntryNodes;
     }
 
     public List<GuideNode> getGuideNodes()
@@ -134,7 +109,7 @@ public class Floor
     {
         List<Tag> tags = new ArrayList<>();
         int index = 0;
-        for (NodeBase node : mEntryNodes.values())
+        for (NodeBase node : mEntryNodes)
         {
             String tagValue = node.getTag();
             if (tagValue != null) tags.add(new Tag(floor, index, NodeType.ENTRY_NODE, tagValue));

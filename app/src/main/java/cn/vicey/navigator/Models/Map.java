@@ -1,7 +1,6 @@
-package cn.vicey.navigator.Contracts;
+package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Contracts.Nodes.NodeBase;
 import cn.vicey.navigator.Share.Logger;
 
 import java.util.ArrayList;
@@ -26,14 +25,6 @@ public class Map
     {
         mFloors = floors;
         mName = name;
-    }
-
-    public boolean addTag(int floor, final @NonNull NodeBase node, final @NonNull String value)
-    {
-        NodeBase target = getFloor(floor).findNode(node);
-        if (target == null) return false;
-        target.setTag(value);
-        return true;
     }
 
     public void clearTags()

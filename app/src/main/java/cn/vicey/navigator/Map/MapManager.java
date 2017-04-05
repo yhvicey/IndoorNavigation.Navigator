@@ -1,8 +1,8 @@
 package cn.vicey.navigator.Map;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Contracts.Map;
-import cn.vicey.navigator.Contracts.Tag;
+import cn.vicey.navigator.Models.Map;
+import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;

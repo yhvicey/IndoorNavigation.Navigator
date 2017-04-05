@@ -1,16 +1,16 @@
-package cn.vicey.navigator.Contracts.Nodes;
+package cn.vicey.navigator.Models.Nodes;
 
 public class EntryNode
         extends NodeBase
 {
-    private int mId;
+    private String mName;
     private Integer mNextEntry;
     private Integer mPrevEntry;
 
-    public EntryNode(double x, double y, int id, Integer prevEntry, Integer nextEntry)
+    public EntryNode(double x, double y, String name, Integer prevEntry, Integer nextEntry)
     {
         super(x, y);
-        mId = id;
+        mName = name;
         mNextEntry = nextEntry;
         mPrevEntry = prevEntry;
     }
@@ -20,9 +20,9 @@ public class EntryNode
         return NodeType.ENTRY_NODE;
     }
 
-    public int getId()
+    public String getName()
     {
-        return mId;
+        return mName;
     }
 
     public Integer getNextEntry()

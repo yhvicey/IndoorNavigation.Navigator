@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Contracts.Nodes;
+package cn.vicey.navigator.Models.Nodes;
 
 
 import android.support.annotation.NonNull;

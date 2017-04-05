@@ -1,7 +1,7 @@
-package cn.vicey.navigator.Contracts;
+package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Contracts.Nodes.NodeType;
+import cn.vicey.navigator.Models.Nodes.NodeType;
 
 public class Tag
 {
@@ -10,7 +10,7 @@ public class Tag
     private static final String WALL_NODE_TEXT = "Wall";
     private static final String UNKNOWN_NODE_TEXT = "Unknown";
 
-    public static final String getNodeText(NodeType type)
+    public static String getNodeText(NodeType type)
     {
         switch (type)
         {

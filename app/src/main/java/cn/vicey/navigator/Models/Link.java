@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Contracts;
+package cn.vicey.navigator.Models;
 
 /**
  * Link class.
