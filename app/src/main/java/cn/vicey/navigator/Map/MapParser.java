@@ -73,6 +73,7 @@ public class MapParser
         {
             case TYPE_ENTRY:
             {
+                String name = parser.getAttributeValue(null, ATTR_NAME);
                 Integer prev;
                 Integer next;
                 try
@@ -88,7 +89,6 @@ public class MapParser
                             .getLineNumber(), t);
                     return null;
                 }
-                String name = parser.getAttributeValue(null, ATTR_NAME);
                 return new EntryNode(x, y, name, prev, next);
             }
             case TYPE_GUIDE:
