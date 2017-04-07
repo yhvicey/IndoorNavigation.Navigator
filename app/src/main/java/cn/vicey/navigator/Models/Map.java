@@ -1,6 +1,7 @@
 package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Share.Logger;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class Map
 {
     private static final String LOGGER_TAG = "Map";
 
-    private List<Floor> mFloors;
+    private List<Floor> mFloors = new ArrayList<>();
     private String mName;
 
     /**
@@ -23,26 +24,12 @@ public class Map
      */
     public Map(@NonNull String name, @NonNull List<Floor> floors)
     {
-        mFloors = floors;
         mName = name;
-    }
-
-    public void clearTags()
-    {
-        for (Floor floor : mFloors)
+        for (Floor floor : floors)
         {
-            floor.clearTags();
+            addFloor(floor);
         }
-    }
-
-    public Floor getFloor(int floor)
-    {
-        return mFloors.get(floor);
-    }
-
-    public int getFloorCount()
-    {
-        return mFloors.size();
+        onLoadFinished();
     }
 
     /**
@@ -96,17 +83,17 @@ public class Map
                 {
                     case ENTRY_NODE:
                     {
-                        getFloor(floor).getEntryNodes().get(index).setTag(value);
+                        mFloors.get(floor).getEntryNodes().get(index).setTag(value);
                         continue;
                     }
                     case GUIDE_NODE:
                     {
-                        getFloor(floor).getGuideNodes().get(index).setTag(value);
+                        mFloors.get(floor).getGuideNodes().get(index).setTag(value);
                         continue;
                     }
                     case WALL_NODE:
                     {
-                        getFloor(floor).getWallNodes().get(index).setTag(value);
+                        mFloors.get(floor).getWallNodes().get(index).setTag(value);
                         continue;
                     }
                     default:
@@ -122,6 +109,32 @@ public class Map
         {
             Logger.error(LOGGER_TAG, "Failed to set tag.", t);
             return false;
+        }
+    }
+
+    public void addFloor(Floor floor)
+    {
+        mFloors.add(floor);
+    }
+
+    public void addNode(NodeBase node, int floor)
+    {
+        mFloors.get(floor).addNode(node);
+    }
+
+    public void clearTags()
+    {
+        for (Floor floor : mFloors)
+        {
+            floor.clearTags();
+        }
+    }
+
+    public void onLoadFinished()
+    {
+        for (Floor floor : mFloors)
+        {
+            floor.onLoadFinished();
         }
     }
 }

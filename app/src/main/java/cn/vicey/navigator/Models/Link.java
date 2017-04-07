@@ -1,42 +1,49 @@
 package cn.vicey.navigator.Models;
 
+import android.support.annotation.NonNull;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.NodeType;
+
 /**
  * Link class.
  */
 public class Link
 {
-    private int mStart;
-    private int mEnd;
+    private double mDistance;
+    private NodeBase mParent;
+    private NodeType mType;
+    private int mIndex;
 
-    /**
-     * Initialize new instance of class Link.
-     *
-     * @param start Link's start node's index.
-     * @param end   Link's end node's index.
-     */
-    public Link(int start, int end)
+    public Link(@NonNull NodeBase parent, NodeType type, int index)
     {
-        mStart = start;
-        mEnd = end;
+        mParent = parent;
+        mType = type;
+        mIndex = index;
     }
 
-    /**
-     * Gets link's start node's index.
-     *
-     * @return Link's start node's index.
-     */
-    public int getStart()
+    public double getDistance()
     {
-        return mStart;
+        return mDistance;
     }
 
-    /**
-     * Gets link's end node's index.
-     *
-     * @return Link's end node's index.
-     */
-    public int getEnd()
+    public NodeType getType()
     {
-        return mEnd;
+        return mType;
+    }
+
+    public int getIndex()
+    {
+        return mIndex;
+    }
+
+    public void onLoadFinished()
+    {
+        mDistance = mParent.getDistance(mType, mIndex);
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Link(" + mType.toString() + ", " + mIndex + ")";
     }
 }

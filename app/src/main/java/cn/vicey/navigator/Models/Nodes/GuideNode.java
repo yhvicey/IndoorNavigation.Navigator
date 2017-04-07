@@ -1,7 +1,7 @@
 package cn.vicey.navigator.Models.Nodes;
 
 
-import android.support.annotation.NonNull;
+import cn.vicey.navigator.Models.Floor;
 
 /**
  * Guide node.
@@ -17,9 +17,9 @@ public class GuideNode
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    public GuideNode(double x, double y)
+    public GuideNode(Floor parent, double x, double y)
     {
-        this(x, y, null);
+        this(parent, x, y, null);
     }
 
     /**
@@ -29,9 +29,9 @@ public class GuideNode
      * @param y    Y position of the node.
      * @param name Name of the node.
      */
-    public GuideNode(double x, double y, @NonNull String name)
+    public GuideNode(Floor parent, double x, double y, String name)
     {
-        super(x, y);
+        super(parent, x, y);
         mName = name;
     }
 
@@ -64,5 +64,11 @@ public class GuideNode
     public void setName(String value)
     {
         mName = value;
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + (mName == null ? "" : "Name: " + mName);
     }
 }

@@ -1,23 +1,20 @@
 package cn.vicey.navigator.Models.Nodes;
 
+import cn.vicey.navigator.Models.Floor;
+
 public class EntryNode
         extends NodeBase
 {
     private String mName;
-    private Integer mNextEntry;
-    private Integer mPrevEntry;
+    private Integer mNext;
+    private Integer mPrev;
 
-    public EntryNode(double x, double y, String name, Integer prevEntry, Integer nextEntry)
+    public EntryNode(Floor parent, double x, double y, String name, Integer prev, Integer next)
     {
-        super(x, y);
+        super(parent, x, y);
         mName = name;
-        mNextEntry = nextEntry;
-        mPrevEntry = prevEntry;
-    }
-
-    public NodeType getType()
-    {
-        return NodeType.ENTRY_NODE;
+        mNext = next;
+        mPrev = prev;
     }
 
     public String getName()
@@ -25,13 +22,18 @@ public class EntryNode
         return mName;
     }
 
-    public Integer getNextEntry()
+    public Integer getNext()
     {
-        return mNextEntry;
+        return mNext;
     }
 
-    public Integer getPrevEntry()
+    public Integer getPrev()
     {
-        return mPrevEntry;
+        return mPrev;
+    }
+
+    public NodeType getType()
+    {
+        return NodeType.ENTRY_NODE;
     }
 }

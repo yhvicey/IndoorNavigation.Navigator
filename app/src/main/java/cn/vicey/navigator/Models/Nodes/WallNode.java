@@ -1,5 +1,7 @@
 package cn.vicey.navigator.Models.Nodes;
 
+import cn.vicey.navigator.Models.Floor;
+
 /**
  * Wall node.
  */
@@ -12,9 +14,9 @@ public class WallNode
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    public WallNode(double x, double y)
+    public WallNode(Floor parent, double x, double y)
     {
-        super(x, y);
+        super(parent, x, y);
     }
 
     /**

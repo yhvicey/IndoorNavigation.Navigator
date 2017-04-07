@@ -2,6 +2,7 @@ package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
 import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 
 import java.util.ArrayList;
@@ -12,38 +13,83 @@ import java.util.List;
  */
 public class Floor
 {
+    private static final String LOGGER_TAG = "Floor";
+
     private List<EntryNode> mEntryNodes = new ArrayList<>();
     private List<GuideNode> mGuideNodes = new ArrayList<>();
     private List<WallNode> mWallNodes = new ArrayList<>();
 
-    /**
-     * Initialize new instance of class Floor.
-     *
-     * @param nodes Nodes of the floor.
-     * @param links Links of the floor.
-     */
-    public Floor(final @NonNull List<NodeBase> nodes, final @NonNull List<Link> links)
+    public List<EntryNode> getEntryNodes()
     {
-        for (Link link : links)
+        return mEntryNodes;
+    }
+
+    public List<GuideNode> getGuideNodes()
+    {
+        return mGuideNodes;
+    }
+
+    public List<Tag> getTags(int floor)
+    {
+        List<Tag> tags = new ArrayList<>();
+        int index = 0;
+        for (NodeBase node : mEntryNodes)
         {
-            NodeBase start = nodes.get(link.getStart());
-            NodeBase target = nodes.get(link.getEnd());
-            start.addAdjacentNode(target);
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.ENTRY_NODE, tagValue));
+            index++;
         }
-        for (NodeBase node : nodes)
+        for (NodeBase node : mGuideNodes)
         {
-            if (node instanceof EntryNode)
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.GUIDE_NODE, tagValue));
+            index++;
+        }
+        for (NodeBase node : mWallNodes)
+        {
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.WALL_NODE, tagValue));
+            index++;
+        }
+        return tags;
+    }
+
+    public List<WallNode> getWallNodes()
+    {
+        return mWallNodes;
+    }
+
+    public void addNode(final @NonNull NodeBase node)
+    {
+        switch (node.getType())
+        {
+            case ENTRY_NODE:
             {
                 mEntryNodes.add((EntryNode) node);
+                return;
             }
-            else if (node instanceof GuideNode)
+            case GUIDE_NODE:
             {
                 mGuideNodes.add((GuideNode) node);
+                return;
             }
-            else if (node instanceof WallNode)
+            case WALL_NODE:
             {
                 mWallNodes.add((WallNode) node);
+                return;
             }
+            default:
+            {
+                Logger.error(LOGGER_TAG, "Unexpected node type.");
+            }
+        }
+    }
+
+    public void addNodes(final @NonNull List<NodeBase> nodes)
+    {
+        for (NodeBase node : nodes)
+        {
+            addNode(node);
         }
     }
 
@@ -95,43 +141,97 @@ public class Floor
         return result;
     }
 
-    public List<EntryNode> getEntryNodes()
+    public EntryNode getEntryNode(int index)
     {
-        return mEntryNodes;
+        return mEntryNodes.get(index);
     }
 
-    public List<GuideNode> getGuideNodes()
+    public int getEntryNodeIndex(@NonNull EntryNode node)
     {
-        return mGuideNodes;
+        return mEntryNodes.indexOf(node);
     }
 
-    public List<Tag> getTags(int floor)
+    public GuideNode getGuideNode(int index)
     {
-        List<Tag> tags = new ArrayList<>();
-        int index = 0;
-        for (NodeBase node : mEntryNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.ENTRY_NODE, tagValue));
-            index++;
-        }
-        for (NodeBase node : mGuideNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.GUIDE_NODE, tagValue));
-            index++;
-        }
-        for (NodeBase node : mWallNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.WALL_NODE, tagValue));
-            index++;
-        }
-        return tags;
+        return mGuideNodes.get(index);
     }
 
-    public List<WallNode> getWallNodes()
+    public int getGuideNodeIndex(@NonNull GuideNode node)
     {
-        return mWallNodes;
+        return mGuideNodes.indexOf(node);
+    }
+
+    public WallNode getWallNode(int index)
+    {
+        return mWallNodes.get(index);
+    }
+
+    public int getWallNodeIndex(@NonNull WallNode node)
+    {
+        return mWallNodes.indexOf(node);
+    }
+
+    public NodeBase getNode(NodeType type, int index)
+    {
+        switch (type)
+        {
+            case ENTRY_NODE:
+            {
+                return getEntryNode(index);
+            }
+            case GUIDE_NODE:
+            {
+                return getGuideNode(index);
+            }
+            case WALL_NODE:
+            {
+                return getWallNode(index);
+            }
+            default:
+            {
+                Logger.error(LOGGER_TAG, "Unexpected node type.");
+                return null;
+            }
+        }
+    }
+
+    public int getNodeIndex(NodeBase node)
+    {
+        switch (node.getType())
+        {
+            case ENTRY_NODE:
+            {
+                return getEntryNodeIndex((EntryNode) node);
+            }
+            case GUIDE_NODE:
+            {
+                return getGuideNodeIndex((GuideNode) node);
+            }
+            case WALL_NODE:
+            {
+                return getWallNodeIndex((WallNode) node);
+            }
+            default:
+            {
+                Logger.error(LOGGER_TAG, "Unexpected node type.");
+                return -1;
+            }
+        }
+    }
+
+    public void onLoadFinished()
+    {
+        for (EntryNode node : mEntryNodes)
+        {
+            node.onLoadFinished();
+        }
+        for (GuideNode node : mGuideNodes)
+        {
+            node.onLoadFinished();
+        }
+        for (WallNode node : mWallNodes)
+        {
+            node.onLoadFinished();
+        }
     }
 }
