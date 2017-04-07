@@ -3,12 +3,8 @@ package cn.vicey.navigator.Map;
 import android.support.annotation.NonNull;
 import android.util.Xml;
 import cn.vicey.navigator.Models.Floor;
-import cn.vicey.navigator.Models.Link;
 import cn.vicey.navigator.Models.Map;
-import cn.vicey.navigator.Models.Nodes.EntryNode;
-import cn.vicey.navigator.Models.Nodes.GuideNode;
-import cn.vicey.navigator.Models.Nodes.NodeBase;
-import cn.vicey.navigator.Models.Nodes.WallNode;
+import cn.vicey.navigator.Models.Nodes.*;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 import org.xmlpull.v1.XmlPullParser;
@@ -26,22 +22,20 @@ public class MapParser
 {
     private static final String LOGGER_TAG = "MapParser";
     private static final String SUPPORTED_VERSION = "1.0";
-    private static final String ATTR_VERSION = "Version";
+    private static final String ATTR_INDEX = "Index";
+    private static final String ATTR_NAME = "Name";
+    private static final String ATTR_NEXT = "Next";
+    private static final String ATTR_PREV = "Prev";
     private static final String ATTR_TYPE = "Type";
+    private static final String ATTR_VERSION = "Version";
     private static final String ATTR_X = "X";
     private static final String ATTR_Y = "Y";
-    private static final String ATTR_NAME = "Name";
-    private static final String ATTR_PREV_ENTRY = "PrevEntry";
-    private static final String ATTR_NEXT_ENTRY = "NextEntry";
-    private static final String ATTR_START = "Start";
-    private static final String ATTR_END = "End";
-    private static final String ELEMENT_MAP = "Map";
-    private static final String ELEMENT_NODE = "Node";
-    private static final String ELEMENT_LINK = "Link";
+    private static final String ELEMENT_ENTRY = "EntryNode";
     private static final String ELEMENT_FLOOR = "Floor";
-    private static final String TYPE_ENTRY = "Entry";
-    private static final String TYPE_GUIDE = "Guide";
-    private static final String TYPE_WALL = "Wall";
+    private static final String ELEMENT_GUIDE = "GuideNode";
+    private static final String ELEMENT_LINK = "Link";
+    private static final String ELEMENT_MAP = "Map";
+    private static final String ELEMENT_WALL = "WallNode";
     private static final String DEFAULT_MAP_NAME = "Untitled";
 
     private MapParser()
@@ -49,10 +43,28 @@ public class MapParser
         // no-op
     }
 
-    private static NodeBase generateNode(final @NonNull XmlPullParser parser)
+    private static void generateLink(final @NonNull NodeBase parent, final @NonNull XmlPullParser parser)
     {
-        String type = parser.getAttributeValue(null, ATTR_TYPE);
-        if (Utils.isStringEmpty(type, true))
+        try
+        {
+            NodeType type = NodeType.parse(parser.getAttributeValue(null, ATTR_TYPE));
+            int index = Integer.parseInt(parser.getAttributeValue(null, ATTR_INDEX));
+            parent.link(type, index);
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Link element must have valid type or index attribute.", t);
+        }
+    }
+
+    private static NodeBase generateNode(final @NonNull Floor parent, final @NonNull XmlPullParser parser)
+    {
+        NodeType type;
+        try
+        {
+            type = NodeType.parse(parser.getName());
+        }
+        catch (Throwable t)
         {
             Logger.error(LOGGER_TAG, "Node element must have valid type attribute. Line: " + parser.getLineNumber());
             return null;
@@ -71,15 +83,15 @@ public class MapParser
         }
         switch (type)
         {
-            case TYPE_ENTRY:
+            case ENTRY_NODE:
             {
                 String name = parser.getAttributeValue(null, ATTR_NAME);
                 Integer prev;
                 Integer next;
                 try
                 {
-                    String prevStr = parser.getAttributeValue(null, ATTR_PREV_ENTRY);
-                    String nextStr = parser.getAttributeValue(null, ATTR_NEXT_ENTRY);
+                    String prevStr = parser.getAttributeValue(null, ATTR_PREV);
+                    String nextStr = parser.getAttributeValue(null, ATTR_NEXT);
                     prev = prevStr == null ? null : Integer.parseInt(prevStr);
                     next = nextStr == null ? null : Integer.parseInt(nextStr);
                 }
@@ -89,37 +101,22 @@ public class MapParser
                             .getLineNumber(), t);
                     return null;
                 }
-                return new EntryNode(x, y, name, prev, next);
+                return new EntryNode(parent, x, y, name, prev, next);
             }
-            case TYPE_GUIDE:
+            case GUIDE_NODE:
             {
                 String name = parser.getAttributeValue(null, ATTR_NAME);
-                return new GuideNode(x, y, name);
+                return new GuideNode(parent, x, y, name);
             }
-            case TYPE_WALL:
+            case WALL_NODE:
             {
-                return new WallNode(x, y);
+                return new WallNode(parent, x, y);
             }
             default:
             {
                 Logger.error(LOGGER_TAG, "Node element must have valid type attribute. Line: " + parser.getLineNumber());
                 return null;
             }
-        }
-    }
-
-    private static Link generateLink(final @NonNull XmlPullParser parser)
-    {
-        try
-        {
-            int start = Integer.parseInt(parser.getAttributeValue(null, ATTR_START));
-            int end = Integer.parseInt(parser.getAttributeValue(null, ATTR_END));
-            return new Link(start, end);
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Link element must have valid Start or End attribute.");
-            return null;
         }
     }
 
@@ -133,11 +130,12 @@ public class MapParser
     {
         try
         {
-            boolean isParsingFloor = false;
             String mapName = DEFAULT_MAP_NAME;
+
+            String currentElement = "";
+            Floor currentFloor = null;
+            NodeBase currentNode = null;
             List<Floor> floors = new ArrayList<>();
-            List<NodeBase> nodes = new ArrayList<>();
-            List<Link> links = new ArrayList<>();
 
             XmlPullParser parser = Xml.newPullParser();
             parser.setInput(stream, Utils.FILE_ENCODING);
@@ -174,23 +172,39 @@ public class MapParser
                                 break;
                             }
                             //endregion
+                            // Meet floor element, if isn't parsing a floor, then clear all nodes and links and get its scale, else break parsing
+                            //region Floor element
+                            case ELEMENT_FLOOR:
+                            {
+                                if (currentFloor != null)
+                                {
+                                    Logger.error(LOGGER_TAG, "Meet unexpected element while parsing floor. Line: " + parser
+                                            .getLineNumber());
+                                    return null;
+                                }
+                                currentFloor = new Floor();
+                                break;
+                            }
+                            //endregion
                             // Meet node element, if is parsing a floor, then add the node to the floor, else break the parsing
                             //region Node element
-                            case ELEMENT_NODE:
+                            case ELEMENT_ENTRY:
+                            case ELEMENT_GUIDE:
+                            case ELEMENT_WALL:
                             {
-                                if (!isParsingFloor)
+                                if (currentFloor == null)
                                 {
                                     Logger.error(LOGGER_TAG, "Meet unexpected element while parsing map. Line: " + parser
                                             .getLineNumber());
                                     return null;
                                 }
-                                NodeBase node = generateNode(parser);
-                                if (node == null)
+                                currentElement = parser.getName();
+                                currentNode = generateNode(currentFloor, parser);
+                                if (currentNode == null)
                                 {
                                     Logger.error(LOGGER_TAG, "Failed in building node. Line:" + parser.getLineNumber());
                                     return null;
                                 }
-                                nodes.add(node);
                                 break;
                             }
                             //endregion
@@ -198,35 +212,13 @@ public class MapParser
                             //region Link element
                             case ELEMENT_LINK:
                             {
-                                if (!isParsingFloor)
+                                if (currentNode == null)
                                 {
                                     Logger.error(LOGGER_TAG, "Meet unexpected element while parsing map. Line: " + parser
                                             .getLineNumber());
                                     return null;
                                 }
-                                Link link = generateLink(parser);
-                                if (link == null)
-                                {
-                                    Logger.error(LOGGER_TAG, "Failed in building link. Line:" + parser.getLineNumber());
-                                    return null;
-                                }
-                                links.add(link);
-                                break;
-                            }
-                            //endregion
-                            // Meet floor element, if isn't parsing a floor, then clear all nodes and links and get its scale, else break parsing
-                            //region Floor element
-                            case ELEMENT_FLOOR:
-                            {
-                                if (isParsingFloor)
-                                {
-                                    Logger.error(LOGGER_TAG, "Meet unexpected element while parsing floor. Line: " + parser
-                                            .getLineNumber());
-                                    return null;
-                                }
-                                nodes.clear();
-                                links.clear();
-                                isParsingFloor = true;
+                                generateLink(currentNode, parser);
                                 break;
                             }
                             //endregion
@@ -240,30 +232,54 @@ public class MapParser
                         String elementName = parser.getName();
                         switch (elementName)
                         {
-                            case ELEMENT_FLOOR:
-                            {
-                                if (!isParsingFloor)
-                                {
-                                    Logger.error(LOGGER_TAG, "Meet unexpected element while parsing floor. Line: " + parser
-                                            .getLineNumber());
-                                    return null;
-                                }
-                                Floor floor = new Floor(nodes, links);
-                                floors.add(floor);
-                                nodes.clear();
-                                links.clear();
-                                isParsingFloor = false;
-                                break;
-                            }
+                            //region Map element
                             case ELEMENT_MAP:
                             {
-                                if (isParsingFloor)
+                                if (currentFloor != null || currentNode != null)
                                 {
                                     Logger.error(LOGGER_TAG, "Meet unexpected element while parsing floor. Line: " + parser
                                             .getLineNumber());
                                     return null;
                                 }
+                                return new Map(mapName, floors);
                             }
+                            //endregion
+                            //region Floor element
+                            case ELEMENT_FLOOR:
+                            {
+                                if (currentFloor == null)
+                                {
+                                    Logger.error(LOGGER_TAG, "Meet unexpected element while parsing floor. Line: " + parser
+                                            .getLineNumber());
+                                    return null;
+                                }
+                                floors.add(currentFloor);
+                                currentFloor = null;
+                                break;
+                            }
+                            //endregion
+                            //region Node element
+                            case ELEMENT_ENTRY:
+                            case ELEMENT_GUIDE:
+                            case ELEMENT_WALL:
+                            {
+                                if (currentFloor == null || currentNode == null)
+                                {
+                                    Logger.error(LOGGER_TAG, "Meet unexpected element while parsing element. Line: " + parser
+                                            .getLineNumber());
+                                    return null;
+                                }
+                                if (!parser.getName().equals(currentElement))
+                                {
+                                    Logger.error(LOGGER_TAG, "Meet unexpected element while parsing element. Line: " + parser
+                                            .getLineNumber());
+                                    return null;
+                                }
+                                currentFloor.addNode(currentNode);
+                                currentNode = null;
+                                break;
+                            }
+                            //endregion
                         }
                         break;
                     }
@@ -275,6 +291,7 @@ public class MapParser
         }
         catch (Throwable t)
         {
+            t.printStackTrace();
             Logger.error(LOGGER_TAG, "Failed to parse input stream.", t);
             return null;
         }
