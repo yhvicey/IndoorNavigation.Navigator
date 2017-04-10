@@ -1,7 +1,6 @@
 package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 
 /**
@@ -9,41 +8,53 @@ import cn.vicey.navigator.Models.Nodes.NodeType;
  */
 public class Link
 {
-    private double mDistance;
-    private NodeBase mParent;
-    private NodeType mType;
-    private int mIndex;
+    private int mEndIndex;
+    private NodeType mEndType;
+    private Floor mParent;
+    private int mStartIndex;
+    private NodeType mStartType;
 
-    public Link(@NonNull NodeBase parent, NodeType type, int index)
+    public Link(NodeType startType, int startIndex, NodeType endType, int endIndex)
     {
-        mParent = parent;
-        mType = type;
-        mIndex = index;
+        mStartType = startType;
+        mStartIndex = startIndex;
+        mEndType = endType;
+        mEndIndex = endIndex;
     }
 
     public double getDistance()
     {
-        return mDistance;
+        return mParent.getDistance(mStartType, mStartIndex, mEndType, mEndIndex);
     }
 
-    public NodeType getType()
+    public int getEndIndex()
     {
-        return mType;
+        return mEndIndex;
     }
 
-    public int getIndex()
+    public NodeType getEndType()
     {
-        return mIndex;
+        return mEndType;
     }
 
-    public void onLoadFinished()
+    public int getStartIndex()
     {
-        mDistance = mParent.getDistance(mType, mIndex);
+        return mStartIndex;
+    }
+
+    public NodeType getStartType()
+    {
+        return mStartType;
+    }
+
+    public void onAdd(final @NonNull Floor parent)
+    {
+        mParent = parent;
     }
 
     @Override
     public String toString()
     {
-        return "Link(" + mType.toString() + ", " + mIndex + ")";
+        return "Link Start(" + mStartType.toString() + ", " + mStartIndex + ") End(" + mEndType.toString() + ", " + mEndIndex + ")";
     }
 }

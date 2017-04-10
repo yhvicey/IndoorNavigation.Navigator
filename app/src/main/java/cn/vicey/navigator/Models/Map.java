@@ -1,7 +1,6 @@
 package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Share.Logger;
 
 import java.util.ArrayList;
@@ -25,11 +24,7 @@ public class Map
     public Map(@NonNull String name, @NonNull List<Floor> floors)
     {
         mName = name;
-        for (Floor floor : floors)
-        {
-            addFloor(floor);
-        }
-        onLoadFinished();
+        mFloors.addAll(floors);
     }
 
     /**
@@ -112,16 +107,6 @@ public class Map
         }
     }
 
-    public void addFloor(Floor floor)
-    {
-        mFloors.add(floor);
-    }
-
-    public void addNode(NodeBase node, int floor)
-    {
-        mFloors.get(floor).addNode(node);
-    }
-
     public void clearTags()
     {
         for (Floor floor : mFloors)
@@ -130,11 +115,9 @@ public class Map
         }
     }
 
-    public void onLoadFinished()
+    @Override
+    public String toString()
     {
-        for (Floor floor : mFloors)
-        {
-            floor.onLoadFinished();
-        }
+        return mName;
     }
 }

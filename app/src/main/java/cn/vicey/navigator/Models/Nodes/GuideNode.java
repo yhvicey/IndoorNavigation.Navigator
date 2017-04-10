@@ -1,8 +1,6 @@
 package cn.vicey.navigator.Models.Nodes;
 
 
-import cn.vicey.navigator.Models.Floor;
-
 /**
  * Guide node.
  */
@@ -17,9 +15,9 @@ public class GuideNode
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    public GuideNode(Floor parent, double x, double y)
+    public GuideNode(double x, double y)
     {
-        this(parent, x, y, null);
+        this(x, y, null);
     }
 
     /**
@@ -29,9 +27,9 @@ public class GuideNode
      * @param y    Y position of the node.
      * @param name Name of the node.
      */
-    public GuideNode(Floor parent, double x, double y, String name)
+    public GuideNode(double x, double y, String name)
     {
-        super(parent, x, y);
+        super(x, y);
         mName = name;
     }
 
@@ -56,19 +54,9 @@ public class GuideNode
         return NodeType.GUIDE_NODE;
     }
 
-    /**
-     * Sets the node's name.
-     *
-     * @param value Node's name..
-     */
-    public void setName(String value)
-    {
-        mName = value;
-    }
-
     @Override
     public String toString()
     {
-        return super.toString() + (mName == null ? "" : "Name: " + mName);
+        return super.toString() + (mName == null ? "" : " Name: " + mName);
     }
 }

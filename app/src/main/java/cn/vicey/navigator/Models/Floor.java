@@ -18,6 +18,7 @@ public class Floor
     private List<EntryNode> mEntryNodes = new ArrayList<>();
     private List<GuideNode> mGuideNodes = new ArrayList<>();
     private List<WallNode> mWallNodes = new ArrayList<>();
+    private List<Link> mLinks = new ArrayList<>();
 
     public List<EntryNode> getEntryNodes()
     {
@@ -27,6 +28,11 @@ public class Floor
     public List<GuideNode> getGuideNodes()
     {
         return mGuideNodes;
+    }
+
+    public List<Link> getLinks()
+    {
+        return mLinks;
     }
 
     public List<Tag> getTags(int floor)
@@ -57,6 +63,20 @@ public class Floor
     public List<WallNode> getWallNodes()
     {
         return mWallNodes;
+    }
+
+    public void addLink(final @NonNull Link link)
+    {
+        link.onAdd(this);
+        mLinks.add(link);
+    }
+
+    public void addLinks(final @NonNull List<Link> links)
+    {
+        for (Link link : links)
+        {
+            addLink(link);
+        }
     }
 
     public void addNode(final @NonNull NodeBase node)
@@ -141,6 +161,11 @@ public class Floor
         return result;
     }
 
+    public double getDistance(NodeType startType, int startIndex, NodeType endType, int endIndex)
+    {
+        return getNode(startType, startIndex).getDistance(getNode(endType, endIndex));
+    }
+
     public EntryNode getEntryNode(int index)
     {
         return mEntryNodes.get(index);
@@ -219,19 +244,16 @@ public class Floor
         }
     }
 
-    public void onLoadFinished()
+    public Link link(NodeType startType, int startIndex, NodeType endType, int endIndex)
     {
-        for (EntryNode node : mEntryNodes)
+        Link target;
+        for (Link link : mLinks)
         {
-            node.onLoadFinished();
+            if (link.getStartType() == startType && link.getStartIndex() == startIndex && link.getEndType() == endType && link
+                    .getEndIndex() == endIndex) return link;
         }
-        for (GuideNode node : mGuideNodes)
-        {
-            node.onLoadFinished();
-        }
-        for (WallNode node : mWallNodes)
-        {
-            node.onLoadFinished();
-        }
+        target = new Link(startType, startIndex, endType, endIndex);
+        addLink(target);
+        return target;
     }
 }

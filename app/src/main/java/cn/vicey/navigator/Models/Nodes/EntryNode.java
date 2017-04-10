@@ -1,7 +1,5 @@
 package cn.vicey.navigator.Models.Nodes;
 
-import cn.vicey.navigator.Models.Floor;
-
 public class EntryNode
         extends NodeBase
 {
@@ -9,9 +7,9 @@ public class EntryNode
     private Integer mNext;
     private Integer mPrev;
 
-    public EntryNode(Floor parent, double x, double y, String name, Integer prev, Integer next)
+    public EntryNode(double x, double y, String name, Integer prev, Integer next)
     {
-        super(parent, x, y);
+        super(x, y);
         mName = name;
         mNext = next;
         mPrev = prev;
@@ -35,5 +33,11 @@ public class EntryNode
     public NodeType getType()
     {
         return NodeType.ENTRY_NODE;
+    }
+
+    @Override
+    public String toString()
+    {
+        return super.toString() + (mName == null ? "" : (" Name: " + mName)) + (mNext == null ? "" : (" Next: " + mNext)) + (mPrev == null ? "" : (" Prev: " + mPrev));
     }
 }
