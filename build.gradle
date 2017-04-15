@@ -12,10 +12,10 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
     }
+
+    buildDir = "$rootProject.rootDir/../../build/Navigator"
 }
 
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
-
-buildDir = "../../build/Navigator"
