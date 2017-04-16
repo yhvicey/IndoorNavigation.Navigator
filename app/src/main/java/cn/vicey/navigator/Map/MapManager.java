@@ -74,14 +74,6 @@ public class MapManager
                 Logger.error(LOGGER_TAG, "Failed to get all map files.");
                 return null;
             }
-            for (File file : files)
-            {
-                if (!validateMapFile(file))
-                {
-                    deleteMapFile(file.getName());
-                    files.remove(file);
-                }
-            }
             return files;
         }
         catch (Throwable t)
@@ -98,7 +90,7 @@ public class MapManager
 
     public static boolean hasMapFile(final @NonNull String mapFileName)
     {
-        return validateMapFile(new File(mMapDirFullPath + mapFileName));
+        return new File(mMapDirFullPath + mapFileName).exists();
     }
 
     public static boolean hasTags(final @NonNull String mapName)
@@ -127,7 +119,6 @@ public class MapManager
 
     public static boolean saveMapFile(final @NonNull File src, boolean overwrite)
     {
-        if (!MapParser.validate(src)) return false;
         String fileName = src.getName();
         if (!overwrite && hasMapFile(fileName)) fileName = getAvailableDefaultMapFileName();
         return Utils.copyFile(src, new File(mMapDirFullPath + fileName), overwrite);
@@ -138,11 +129,6 @@ public class MapManager
         File file = TagSaver.save(mapName, tags);
         if (file == null) return false;
         return Utils.copyFile(file, new File(mTagDirFullPath + mapName), true);
-    }
-
-    public static boolean validateMapFile(final @NonNull File mapFile)
-    {
-        return MapParser.validate(mapFile);
     }
 
     public static boolean validateTagFile(final @NonNull File tagFile)
