@@ -10,21 +10,23 @@ public enum NodeType
     /**
      * Wall node.
      */
-    WALL_NODE,
+    WALL_NODE(0),
 
     /**
      * Entry node.
      */
-    ENTRY_NODE,
+    ENTRY_NODE(1),
 
     /**
      * Guide node.
      */
-    GUIDE_NODE;
+    GUIDE_NODE(2);
 
     private static final String ENTRY_NODE_TEXT = "EntryNode";
     private static final String GUIDE_NODE_TEXT = "GuideNode";
     private static final String WALL_NODE_TEXT = "WallNode";
+
+    private int mValue;
 
     public static NodeType parse(@NonNull String nodeType)
     {
@@ -47,5 +49,15 @@ public enum NodeType
                 throw new IllegalArgumentException("Unsupported node type.");
             }
         }
+    }
+
+    NodeType(int value)
+    {
+        mValue = value;
+    }
+
+    public int getValue()
+    {
+        return mValue;
     }
 }

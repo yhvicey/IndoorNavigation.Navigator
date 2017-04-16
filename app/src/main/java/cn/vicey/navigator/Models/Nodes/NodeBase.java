@@ -2,11 +2,37 @@ package cn.vicey.navigator.Models.Nodes;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Base class of nodes.
  */
 public abstract class NodeBase
 {
+    public static class Link
+    {
+        private double mDistance;
+        private NodeBase mTarget;
+
+        public Link(@NonNull NodeBase target, double distance)
+        {
+            mTarget = target;
+            mDistance = distance;
+        }
+
+        public double getDistance()
+        {
+            return mDistance;
+        }
+
+        public NodeBase getTarget()
+        {
+            return mTarget;
+        }
+    }
+
+    private List<Link> mLinks = new ArrayList<>();
     private String mTag;
     private int mX;
     private int mY;
@@ -21,6 +47,11 @@ public abstract class NodeBase
     {
         mX = x;
         mY = y;
+    }
+
+    public List<Link> getLinks()
+    {
+        return mLinks;
     }
 
     /**
@@ -60,14 +91,19 @@ public abstract class NodeBase
         mTag = tag;
     }
 
+    public double calcDistance(final @NonNull NodeBase other)
+    {
+        return Math.sqrt(Math.pow(mX - other.mX, 2) + Math.pow(mY - other.mY, 2));
+    }
+
     public void clearTag()
     {
         mTag = null;
     }
 
-    public double getDistance(final @NonNull NodeBase other)
+    public void link(final @NonNull NodeBase other)
     {
-        return Math.sqrt(Math.pow(mX - other.mX, 2) + Math.pow(mY - other.mY, 2));
+        mLinks.add(new Link(other, calcDistance(other)));
     }
 
     @Override

@@ -14,11 +14,13 @@ import java.util.List;
 public class Floor
 {
     private static final String LOGGER_TAG = "Floor";
+    private static final int MAP_PADDING = 50;
 
     private List<EntryNode> mEntryNodes = new ArrayList<>();
     private List<GuideNode> mGuideNodes = new ArrayList<>();
+    private int mHeight;
     private List<WallNode> mWallNodes = new ArrayList<>();
-    private List<Link> mLinks = new ArrayList<>();
+    private int mWidth;
 
     public List<EntryNode> getEntryNodes()
     {
@@ -28,11 +30,6 @@ public class Floor
     public List<GuideNode> getGuideNodes()
     {
         return mGuideNodes;
-    }
-
-    public List<Link> getLinks()
-    {
-        return mLinks;
     }
 
     public List<Tag> getTags(int floor)
@@ -67,8 +64,10 @@ public class Floor
 
     public void addLink(final @NonNull Link link)
     {
-        link.onAdd(this);
-        mLinks.add(link);
+        NodeBase start = getNode(link.getStartType(), link.getStartIndex());
+        NodeBase end = getNode(link.getEndType(), link.getEndIndex());
+        start.link(end);
+        end.link(start);
     }
 
     public void addLinks(final @NonNull List<Link> links)
@@ -81,6 +80,8 @@ public class Floor
 
     public void addNode(final @NonNull NodeBase node)
     {
+        if (node.getX() > mWidth) mWidth = node.getX() + MAP_PADDING;
+        if (node.getY() > mHeight) mHeight = node.getY() + MAP_PADDING;
         switch (node.getType())
         {
             case ENTRY_NODE:
@@ -102,14 +103,6 @@ public class Floor
             {
                 Logger.error(LOGGER_TAG, "Unexpected node type.");
             }
-        }
-    }
-
-    public void addNodes(final @NonNull List<NodeBase> nodes)
-    {
-        for (NodeBase node : nodes)
-        {
-            addNode(node);
         }
     }
 
@@ -163,7 +156,7 @@ public class Floor
 
     public double getDistance(NodeType startType, int startIndex, NodeType endType, int endIndex)
     {
-        return getNode(startType, startIndex).getDistance(getNode(endType, endIndex));
+        return getNode(startType, startIndex).calcDistance(getNode(endType, endIndex));
     }
 
     public EntryNode getEntryNode(int index)
@@ -244,16 +237,13 @@ public class Floor
         }
     }
 
-    public Link link(NodeType startType, int startIndex, NodeType endType, int endIndex)
+    public int getHeight()
     {
-        Link target;
-        for (Link link : mLinks)
-        {
-            if (link.getStartType() == startType && link.getStartIndex() == startIndex && link.getEndType() == endType && link
-                    .getEndIndex() == endIndex) return link;
-        }
-        target = new Link(startType, startIndex, endType, endIndex);
-        addLink(target);
-        return target;
+        return mHeight;
+    }
+
+    public int getWidth()
+    {
+        return mWidth;
     }
 }

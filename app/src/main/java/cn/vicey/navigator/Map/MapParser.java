@@ -139,6 +139,7 @@ public class MapParser
             String mapName = DEFAULT_MAP_NAME;
 
             Floor currentFloor = null;
+            List<Link> links = new ArrayList<>();
             List<Floor> floors = new ArrayList<>();
 
             XmlPullParser parser = Xml.newPullParser();
@@ -230,7 +231,7 @@ public class MapParser
                                         Logger.error(LOGGER_TAG, "Failed in building link. Line:" + parser.getLineNumber());
                                         return null;
                                     }
-                                    currentFloor.addLink(link);
+                                    links.add(link);
                                     break;
                                 }
                                 catch (Throwable t)
@@ -271,7 +272,9 @@ public class MapParser
                                             .getLineNumber());
                                     return null;
                                 }
+                                currentFloor.addLinks(links);
                                 floors.add(currentFloor);
+                                links = new ArrayList<>();
                                 currentFloor = null;
                                 break;
                             }
