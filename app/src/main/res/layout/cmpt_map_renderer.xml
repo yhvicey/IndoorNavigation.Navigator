@@ -1,0 +1,8 @@
+<cn.vicey.navigator.Components.MapRenderer
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Navigator.Component"
+        android:id="@+id/map_renderer"
+        android:orientation="vertical"
+        android:gravity="top">
+
+</cn.vicey.navigator.Components.MapRenderer>

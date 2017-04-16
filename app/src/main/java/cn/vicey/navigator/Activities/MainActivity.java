@@ -15,6 +15,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import cn.vicey.navigator.Components.MapRenderer;
 import cn.vicey.navigator.Components.MenuItem;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Models.Map;
@@ -193,6 +194,7 @@ public class MainActivity
     private ScrollView mLogView;
     private LinearLayout mMainMenu;
     private FileListAdapter mMapListAdapter;
+    private MapRenderer mMapRenderer;
     private RelativeLayout mMapsView;
     private RelativeLayout mNavigateView;
     private LinearLayout mSettingsView;
@@ -243,8 +245,10 @@ public class MainActivity
                         {
                             if (textView == null) return;
                             String mapName = textView.getText().toString();
-                            if ((mCurrentMap = MapManager.loadMapFile(mapName)) != null)
+                            Map map;
+                            if ((map = MapManager.loadMapFile(mapName)) != null)
                             {
+                                loadMap(map);
                                 alert(getString(R.string.load_succeed));
                                 switchView(VIEW_NAVIGATE);
                             }
@@ -670,8 +674,9 @@ public class MainActivity
     {
         try
         {
+            LayoutInflater inflater = getLayoutInflater();
             mLogView = (ScrollView) findViewById(R.id.log_view);
-            mMainMenu = (LinearLayout) LayoutInflater.from(this).inflate(R.layout.cmpt_main_menu, null);
+            mMainMenu = (LinearLayout) inflater.inflate(R.layout.cmpt_main_menu, null);
             mMapsView = (RelativeLayout) findViewById(R.id.maps_view);
             mNavigateView = (RelativeLayout) findViewById(R.id.navigate_view);
             mSettingsView = (LinearLayout) findViewById(R.id.settings_view);
@@ -751,6 +756,7 @@ public class MainActivity
     {
         try
         {
+            mMapRenderer = (MapRenderer) mNavigateView.findViewById(R.id.map_renderer);
         }
         catch (Throwable t)
         {
@@ -880,6 +886,7 @@ public class MainActivity
         {
             mToolbar.setTitleText(mCurrentMap.getName());
         }
+        mMapRenderer.invalidate();
     }
 
     private void flushMapsView()
@@ -948,6 +955,14 @@ public class MainActivity
     private void invoke(final Runnable runnable)
     {
         runOnUiThread(runnable);
+    }
+
+    private void loadMap(final @NonNull Map map)
+    {
+        mCurrentMap = map;
+        if (mMapRenderer != null) mMapRenderer.setMap(map);
+
+        mMapRenderer.setCurrentFloorIndex(0);
     }
 
     private void switchView(int viewIndex)
