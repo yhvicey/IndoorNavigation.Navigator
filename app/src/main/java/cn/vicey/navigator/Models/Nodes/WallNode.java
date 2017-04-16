@@ -12,7 +12,7 @@ public class WallNode
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    public WallNode(double x, double y)
+    public WallNode(int x, int y)
     {
         super(x, y);
     }

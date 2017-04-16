@@ -15,7 +15,7 @@ public class GuideNode
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    public GuideNode(double x, double y)
+    public GuideNode(int x, int y)
     {
         this(x, y, null);
     }
@@ -27,7 +27,7 @@ public class GuideNode
      * @param y    Y position of the node.
      * @param name Name of the node.
      */
-    public GuideNode(double x, double y, String name)
+    public GuideNode(int x, int y, String name)
     {
         super(x, y);
         mName = name;

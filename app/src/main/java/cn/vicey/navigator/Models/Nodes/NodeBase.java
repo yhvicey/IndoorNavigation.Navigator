@@ -8,8 +8,8 @@ import android.support.annotation.NonNull;
 public abstract class NodeBase
 {
     private String mTag;
-    private double mX;
-    private double mY;
+    private int mX;
+    private int mY;
 
     /**
      * Initialize new instance of class NodeBase.
@@ -17,7 +17,7 @@ public abstract class NodeBase
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    protected NodeBase(double x, double y)
+    protected NodeBase(int x, int y)
     {
         mX = x;
         mY = y;
@@ -40,7 +40,7 @@ public abstract class NodeBase
      *
      * @return X position.
      */
-    public double getX()
+    public int getX()
     {
         return mX;
     }
@@ -50,7 +50,7 @@ public abstract class NodeBase
      *
      * @return Y position.
      */
-    public double getY()
+    public int getY()
     {
         return mY;
     }

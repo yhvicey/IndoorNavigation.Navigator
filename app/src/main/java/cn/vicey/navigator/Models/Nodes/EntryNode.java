@@ -7,7 +7,7 @@ public class EntryNode
     private Integer mNext;
     private Integer mPrev;
 
-    public EntryNode(double x, double y, String name, Integer prev, Integer next)
+    public EntryNode(int x, int y, String name, Integer prev, Integer next)
     {
         super(x, y);
         mName = name;

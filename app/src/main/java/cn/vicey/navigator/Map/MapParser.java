@@ -75,12 +75,12 @@ public class MapParser
             Logger.error(LOGGER_TAG, "Node element must have valid type attribute. Line: " + parser.getLineNumber());
             return null;
         }
-        double x;
-        double y;
+        int x;
+        int y;
         try
         {
-            x = Double.parseDouble(parser.getAttributeValue(null, ATTR_X));
-            y = Double.parseDouble(parser.getAttributeValue(null, ATTR_Y));
+            x = Integer.parseInt(parser.getAttributeValue(null, ATTR_X));
+            y = Integer.parseInt(parser.getAttributeValue(null, ATTR_Y));
         }
         catch (Throwable t)
         {
