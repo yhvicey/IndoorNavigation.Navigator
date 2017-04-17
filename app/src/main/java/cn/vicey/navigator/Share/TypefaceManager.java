@@ -10,7 +10,7 @@ public class TypefaceManager
 
     private static Typeface mCanaroExtraBold;
 
-    public static boolean initialize(AssetManager assetManager)
+    public static boolean init(AssetManager assetManager)
     {
         try
         {

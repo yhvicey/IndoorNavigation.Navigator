@@ -9,12 +9,11 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
-import cn.vicey.navigator.Models.Nodes.EntryNode;
-import cn.vicey.navigator.Models.Nodes.NodeBase;
-import cn.vicey.navigator.Models.Nodes.NodeType;
-import cn.vicey.navigator.Models.Nodes.WallNode;
+import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Share.Settings;
 
 import java.util.List;
 
@@ -23,12 +22,12 @@ public class MapRenderer
 {
     private static final String LOGGER_TAG = "MapRenderer";
     private static final int ENTRY_COLOR = Color.GREEN;
-    private static final int ENTRY_RADIUS = 10;
-    private static final int GUIDE_COLOR = Color.GREEN;
+    private static final int NODE_RADIUS = 10;
+    private static final int GUIDE_COLOR = Color.BLUE;
     private static final int GUIDE_WIDTH = 4;
     private static final int NO_SELECTED_FLOOR = -1;
     private static final int WALL_COLOR = Color.DKGRAY;
-    private static final int WALL_WIDTH = 4;
+    private static final int WALL_WIDTH = 10;
     private static final int ZOOM_LEVEL_MAX = 5;
     private static final int ZOOM_LEVEL_MIN = 1;
     private static final int ZOOM_SPEED = 200;
@@ -40,7 +39,6 @@ public class MapRenderer
     private int mHalfHeight;
     private boolean mIsZooming;
     private Point mLookAt = new Point();
-    private Map mMap;
     private int mTouchedPointCount;
     private float mTouchPointDistance;
     private float mPrevTouchX = 0;
@@ -48,23 +46,55 @@ public class MapRenderer
     private Paint mWallPaint = new Paint();
     private float mZoomLevel = 3;
 
-    private void drawNode(@NonNull Canvas canvas, @NonNull NodeBase node)
+    private boolean valid()
+    {
+        Map map = MapManager.getCurrentMap();
+        if (map == null) return false;
+        if (mCurrentFloorIndex < 0) return false;
+        if (mCurrentFloorIndex >= map.getFloors().size()) return false;
+
+        return true;
+    }
+
+    private void drawNode(final @NonNull Canvas canvas, final @NonNull NodeBase node)
     {
         float x = getRelativeX(node.getX());
         float y = getRelativeY(node.getY());
-        if (node.getType() == NodeType.WALL_NODE) canvas.drawCircle(x, y, GUIDE_WIDTH / 2, mWallPaint);
-        else if (node.getType() == NodeType.ENTRY_NODE) canvas.drawCircle(x, y, ENTRY_RADIUS, mEntryPaint);
-        else canvas.drawCircle(x, y, GUIDE_WIDTH / 2, mGuidePaint);
+        switch (node.getType())
+        {
+            case ENTRY_NODE:
+            {
+                canvas.drawCircle(x, y, NODE_RADIUS, mEntryPaint);
+                break;
+            }
+            case GUIDE_NODE:
+            {
+                canvas.drawCircle(x, y, NODE_RADIUS, mGuidePaint);
+                break;
+            }
+            case WALL_NODE:
+            {
+                canvas.drawCircle(x, y, WALL_WIDTH / 2, mWallPaint);
+                break;
+            }
+        }
     }
 
-    private void drawEntries(@NonNull Canvas canvas)
+    private void drawEntryNodes(final @NonNull Canvas canvas)
     {
-        List<EntryNode> entryNodes = mMap.getFloors().get(mCurrentFloorIndex).getEntryNodes();
+        List<EntryNode> entryNodes = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex).getEntryNodes();
         for (EntryNode entryNode : entryNodes)
             drawNode(canvas, entryNode);
     }
 
-    private void drawLine(@NonNull Canvas canvas, @NonNull NodeBase start, @NonNull NodeBase end)
+    private void drawGuideNodes(final @NonNull Canvas canvas)
+    {
+        List<GuideNode> guideNodes = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex).getGuideNodes();
+        for (GuideNode guideNode : guideNodes)
+            drawNode(canvas, guideNode);
+    }
+
+    private void drawLine(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
         float startX = getRelativeX(start.getX());
         float startY = getRelativeY(start.getY());
@@ -75,9 +105,9 @@ public class MapRenderer
         else canvas.drawLine(startX, startY, endX, endY, mGuidePaint);
     }
 
-    private void drawWalls(@NonNull Canvas canvas)
+    private void drawWalls(final @NonNull Canvas canvas)
     {
-        List<WallNode> wallNodes = mMap.getFloors().get(mCurrentFloorIndex).getWallNodes();
+        List<WallNode> wallNodes = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex).getWallNodes();
         for (WallNode node : wallNodes)
         {
             drawNode(canvas, node);
@@ -108,10 +138,10 @@ public class MapRenderer
         return (float) Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
     }
 
-    private void initialize(AttributeSet attrs, int defStyle)
+    private void init()
     {
         mEntryPaint.setColor(ENTRY_COLOR);
-        mEntryPaint.setStrokeWidth(ENTRY_RADIUS);
+        mEntryPaint.setStrokeWidth(NODE_RADIUS);
         mGuidePaint.setColor(GUIDE_COLOR);
         mGuidePaint.setStrokeWidth(GUIDE_WIDTH);
         mWallPaint.setColor(WALL_COLOR);
@@ -120,31 +150,31 @@ public class MapRenderer
 
     private void lookAt(int x, int y)
     {
+        if (!valid()) return;
+
         mLookAt.set(x, y);
         invalidate();
     }
 
     private void moveEye(float xOffset, float yOffset)
     {
-        if (mMap == null) return;
-        if (mCurrentFloorIndex == NO_SELECTED_FLOOR) return;
+        if (!valid()) return;
 
-        mLookAt.x += xOffset / mZoomLevel;
-        mLookAt.y += yOffset / mZoomLevel;
+        int newX = mLookAt.x += xOffset / mZoomLevel;
+        int newY = mLookAt.y += yOffset / mZoomLevel;
 
-        Floor floor = mMap.getFloors().get(mCurrentFloorIndex);
-        if (mLookAt.x < 0) mLookAt.x = 0;
-        if (mLookAt.x > floor.getWidth() * mZoomLevel) mLookAt.x = (int) (floor.getWidth() * mZoomLevel);
-        if (mLookAt.y < 0) mLookAt.y = 0;
-        if (mLookAt.y > floor.getHeight() * mZoomLevel) mLookAt.y = (int) (floor.getHeight() * mZoomLevel);
+        Floor floor = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex);
+        if (newX < 0) newX = 0;
+        if (newX > floor.getWidth() * mZoomLevel) newX = (int) (floor.getWidth() * mZoomLevel);
+        if (newY < 0) newY = 0;
+        if (newY > floor.getHeight() * mZoomLevel) newY = (int) (floor.getHeight() * mZoomLevel);
 
-        invalidate();
+        lookAt(newX, newY);
     }
 
     private void zoom(float offset)
     {
-        if (mMap == null) return;
-        if (mCurrentFloorIndex == NO_SELECTED_FLOOR) return;
+        if (!valid()) return;
 
         mZoomLevel += offset / ZOOM_SPEED;
 
@@ -157,11 +187,14 @@ public class MapRenderer
     @Override
     protected void onDraw(Canvas canvas)
     {
-        if (mMap == null) return;
-        if (mCurrentFloorIndex >= mMap.getFloors().size()) mCurrentFloorIndex = NO_SELECTED_FLOOR;
-        if (mCurrentFloorIndex == NO_SELECTED_FLOOR) return;
+        if (!valid()) return;
+
         drawWalls(canvas);
-        drawEntries(canvas);
+        if (Settings.getIsDebugModeEnabled())
+        {
+            drawEntryNodes(canvas);
+            drawGuideNodes(canvas);
+        }
     }
 
     @Override
@@ -174,18 +207,13 @@ public class MapRenderer
 
     public MapRenderer(Context context)
     {
-        this(context, null, 0);
+        this(context, null);
     }
 
     public MapRenderer(Context context, AttributeSet attrs)
     {
-        this(context, attrs, 0);
-    }
-
-    public MapRenderer(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
-        initialize(attrs, defStyle);
+        super(context, attrs);
+        init();
     }
 
     public int getCurrentFloorIndex()
@@ -196,14 +224,15 @@ public class MapRenderer
     public void setCurrentFloorIndex(int currentFloorIndex)
     {
         this.mCurrentFloorIndex = currentFloorIndex;
-        lookAt(mMap.getFloors().get(currentFloorIndex).getWidth() / 2, mMap.getFloors()
-                                                                           .get(currentFloorIndex)
-                                                                           .getHeight() / 2);
-    }
-
-    public void setMap(Map mMap)
-    {
-        this.mMap = mMap;
+        if (!valid())
+        {
+            mCurrentFloorIndex = NO_SELECTED_FLOOR;
+            return;
+        }
+        lookAt(MapManager.getCurrentMap().getFloors().get(currentFloorIndex).getWidth() / 2, MapManager.getCurrentMap()
+                                                                                                       .getFloors()
+                                                                                                       .get(currentFloorIndex)
+                                                                                                       .getHeight() / 2);
     }
 
     @Override

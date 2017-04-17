@@ -16,10 +16,11 @@ public class MapManager
     private static final String MAP_DIR = "/maps/";
     private static final String TAG_DIR = "/tags/";
 
+    private static Map mCurrentMap;
     private static String mMapDirFullPath;
     private static String mTagDirFullPath;
 
-    public static boolean initialize()
+    public static boolean init()
     {
         try
         {
@@ -28,20 +29,20 @@ public class MapManager
             File mapDir = new File(mMapDirFullPath);
             if (!(mapDir.exists() || mapDir.mkdir()))
             {
-                Logger.error(LOGGER_TAG, "Failed to initialize map manager. Can not initialize map directory.");
+                Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init map directory.");
                 return false;
             }
             File tagDir = new File(mTagDirFullPath);
             if (!(tagDir.exists() || tagDir.mkdir()))
             {
-                Logger.error(LOGGER_TAG, "Failed to initialize map manager. Can not initialize tag directory.");
+                Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init tag directory.");
                 return false;
             }
             return true;
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to initialize map manager. Can not initialize map manager.", t);
+            Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init map manager.", t);
             return false;
         }
     }
@@ -49,6 +50,16 @@ public class MapManager
     private MapManager()
     {
         // no-op
+    }
+
+    public static Map getCurrentMap()
+    {
+        return mCurrentMap;
+    }
+
+    public static void setCurrentMap(final @NonNull Map map)
+    {
+        mCurrentMap = map;
     }
 
     public static boolean deleteMapFile(final @NonNull String mapFileName)

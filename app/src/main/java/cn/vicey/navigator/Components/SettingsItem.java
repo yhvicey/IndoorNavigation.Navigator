@@ -28,10 +28,10 @@ public class SettingsItem
     public SettingsItem(Context context, AttributeSet attrs, int defStyle)
     {
         super(context, attrs, defStyle);
-        initialize(attrs, defStyle);
+        init(attrs, defStyle);
     }
 
-    private void initialize(AttributeSet attrs, int defStyle)
+    private void init(AttributeSet attrs, int defStyle)
     {
         LayoutInflater.from(getContext()).inflate(R.layout.cmpt_settings_item, this, true);
         mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);

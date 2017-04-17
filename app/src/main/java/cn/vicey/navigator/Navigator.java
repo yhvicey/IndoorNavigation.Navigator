@@ -3,6 +3,7 @@ package cn.vicey.navigator;
 import android.app.Application;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Share.Settings;
 import cn.vicey.navigator.Share.TypefaceManager;
 
 import java.util.Date;
@@ -21,7 +22,7 @@ public class Navigator
     private static long mStartTime = new Date().getTime();
 
 
-    public boolean initialize()
+    public boolean init()
     {
         try
         {
@@ -80,24 +81,29 @@ public class Navigator
             // TODO: put global initialization code below.
 
             // Initialize files dir, which is important for other classes.
-            if (!initialize())
+            if (!init())
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize Navigator.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init Navigator.");
                 exitWithError(ERR_INIT);
             }
-            if (!Logger.initialize())
+            if (!Logger.init())
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize Logger.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init Logger.");
                 exitWithError(ERR_INIT);
             }
-            if (!MapManager.initialize())
+            if (!MapManager.init())
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize MapManager.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init MapManager.");
                 exitWithError(ERR_INIT);
             }
-            if (!TypefaceManager.initialize(getAssets()))
+            if (!TypefaceManager.init(getAssets()))
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not initialize TypefaceManager.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init TypefaceManager.");
+                exitWithError(ERR_INIT);
+            }
+            if (!Settings.init(this))
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init Settings.");
                 exitWithError(ERR_INIT);
             }
 
@@ -106,7 +112,7 @@ public class Navigator
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to initialize the app.", t);
+            Logger.error(LOGGER_TAG, "Failed to init the app.", t);
             exitWithError();
         }
     }

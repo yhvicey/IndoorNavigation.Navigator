@@ -23,7 +23,7 @@ public class Logger
     private static File mLogFile;
     private static FileOutputStream mLogFileStream;
 
-    public static boolean initialize()
+    public static boolean init()
     {
         try
         {
