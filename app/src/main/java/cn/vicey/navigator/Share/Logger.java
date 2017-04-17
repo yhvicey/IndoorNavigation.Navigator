@@ -133,16 +133,17 @@ public class Logger
      */
     public static void debug(String tag, String message, Throwable t)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message))
-          .append(Utils.NEW_LINE);
-        if (t != null)
-        {
-            sb.append(t).append(Utils.NEW_LINE);
-        }
-        String msg = sb.toString();
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message) + Utils.NEW_LINE;
         Log.d(tag, msg);
         write(msg);
+        if (t != null)
+        {
+            debug(tag, t.toString());
+            for (StackTraceElement stackTraceElement : t.getStackTrace())
+            {
+                debug(tag, stackTraceElement.toString());
+            }
+        }
     }
 
     /**
@@ -165,16 +166,17 @@ public class Logger
      */
     public static void info(String tag, String message, Throwable t)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message))
-          .append(Utils.NEW_LINE);
-        if (t != null)
-        {
-            sb.append(t).append(Utils.NEW_LINE);
-        }
-        String msg = sb.toString();
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message) + Utils.NEW_LINE;
         Log.i(tag, msg);
         write(msg);
+        if (t != null)
+        {
+            info(tag, t.toString());
+            for (StackTraceElement stackTraceElement : t.getStackTrace())
+            {
+                info(tag, stackTraceElement.toString());
+            }
+        }
     }
 
     /**
@@ -197,16 +199,17 @@ public class Logger
      */
     public static void error(String tag, String message, Throwable t)
     {
-        StringBuilder sb = new StringBuilder();
-        sb.append(String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message))
-          .append(Utils.NEW_LINE);
-        if (t != null)
-        {
-            sb.append(t).append(Utils.NEW_LINE);
-        }
-        String msg = sb.toString();
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message) + Utils.NEW_LINE;
         Log.e(tag, msg);
         write(msg);
+        if (t != null)
+        {
+            error(tag, t.toString());
+            for (StackTraceElement stackTraceElement : t.getStackTrace())
+            {
+                error(tag, stackTraceElement.toString());
+            }
+        }
     }
 
     public static String getLogContent()
