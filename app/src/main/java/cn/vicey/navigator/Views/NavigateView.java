@@ -1,7 +1,5 @@
 package cn.vicey.navigator.Views;
 
-import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
@@ -59,11 +57,9 @@ public class NavigateView
 
             FloatingActionButton upstairsButton = (FloatingActionButton) findViewById(R.id.nv_upstairs_button);
             upstairsButton.setOnClickListener(mUpstairsButtonOnClickListener);
-            upstairsButton.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
 
             FloatingActionButton downStairsButton = (FloatingActionButton) findViewById(R.id.nv_downstairs_button);
             downStairsButton.setOnClickListener(mDownstairsButtonOnClickListener);
-            downStairsButton.setBackgroundTintList(ColorStateList.valueOf(Color.WHITE));
 
             View placeholder = mParent.getLayoutInflater().inflate(R.layout.cmpt_placeholder, null);
 

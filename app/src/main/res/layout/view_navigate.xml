@@ -13,7 +13,8 @@
             android:layout_alignStart="@+id/nv_downstairs_button"
             android:layout_marginBottom="@dimen/small_spacing"
             app:fabSize="mini"
-            app:srcCompat="@drawable/ic_upstairs"/>
+            app:srcCompat="@drawable/ic_upstairs"
+            app:backgroundTint="@android:color/white"/>
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/nv_downstairs_button"
             android:layout_width="wrap_content"
@@ -24,7 +25,8 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             app:fabSize="mini"
-            app:srcCompat="@drawable/ic_downstairs"/>
+            app:srcCompat="@drawable/ic_downstairs"
+            app:backgroundTint="@android:color/white"/>
     <ViewFlipper
             style="@style/Navigator.Component"
             android:id="@+id/nv_view_flipper"/>
