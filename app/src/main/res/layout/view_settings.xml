@@ -16,8 +16,7 @@
             <TextView
                     android:id="@+id/sv_general_header"
                     style="@style/Navigator.SettingsView.Header"
-                    android:text="@string/general"
-                    android:onClick="onEnableDebugModeClick"/>
+                    android:text="@string/general"/>
             <cn.vicey.navigator.Components.SettingsItem
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/middle_item_height"
@@ -36,8 +35,7 @@
             <TextView
                     android:id="@+id/sv_debug_show_log"
                     style="@style/Navigator.SettingsView.Item"
-                    android:text="@string/show_log"
-                    android:onClick="onShowLogClick"/>
+                    android:text="@string/show_log"/>
             <cn.vicey.navigator.Components.SettingsItem
                     android:layout_width="match_parent"
                     android:layout_height="@dimen/middle_item_height"

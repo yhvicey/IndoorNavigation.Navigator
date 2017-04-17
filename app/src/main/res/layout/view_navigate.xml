@@ -1,9 +1,32 @@
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        style="@style/Navigator.Component"
+        xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/Navigator.Component"
         android:id="@+id/navigate_view">
 
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/nv_upstairs_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_above="@+id/nv_downstairs_button"
+            android:layout_alignStart="@+id/nv_downstairs_button"
+            android:layout_marginBottom="@dimen/small_padding"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_upstairs"/>
+    <android.support.design.widget.FloatingActionButton
+            android:id="@+id/nv_downstairs_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:layout_marginEnd="@dimen/small_padding"
+            android:layout_marginBottom="@dimen/middle_padding"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentEnd="true"
+            app:fabSize="mini"
+            app:srcCompat="@drawable/ic_downstairs"/>
     <cn.vicey.navigator.Components.MapRenderer
             style="@style/Navigator.Component"
-            android:id="@+id/nv_map_renderer"/>
+            android:id="@+id/nv_map_renderer"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentStart="true"/>
 </RelativeLayout>
