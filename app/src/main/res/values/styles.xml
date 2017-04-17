@@ -28,17 +28,17 @@
     <style name="Navigator.Component.List">
         <item name="android:gravity">start|center</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:paddingTop">@dimen/middle_padding</item>
-        <item name="android:paddingBottom">@dimen/middle_padding</item>
+        <item name="android:paddingTop">@dimen/middle_spacing</item>
+        <item name="android:paddingBottom">@dimen/middle_spacing</item>
         <item name="android:textSize">@dimen/middle_font_size</item>
     </style>
     <style name="Navigator.Component.List.Header">
-        <item name="android:paddingStart">@dimen/small_padding</item>
-        <item name="android:paddingEnd">@dimen/small_padding</item>
+        <item name="android:paddingStart">@dimen/small_spacing</item>
+        <item name="android:paddingEnd">@dimen/small_spacing</item>
     </style>
     <style name="Navigator.Component.List.Item">
-        <item name="android:paddingStart">@dimen/middle_padding</item>
-        <item name="android:paddingEnd">@dimen/middle_padding</item>
+        <item name="android:paddingStart">@dimen/middle_spacing</item>
+        <item name="android:paddingEnd">@dimen/middle_spacing</item>
     </style>
 
     <style name="Navigator.SettingsView">
@@ -47,13 +47,13 @@
         <item name="android:gravity">start|center</item>
     </style>
     <style name="Navigator.SettingsView.Header">
-        <item name="android:paddingStart">@dimen/small_padding</item>
-        <item name="android:paddingEnd">@dimen/small_padding</item>
+        <item name="android:paddingStart">@dimen/small_spacing</item>
+        <item name="android:paddingEnd">@dimen/small_spacing</item>
         <item name="android:textSize">@dimen/middle_font_size</item>
     </style>
     <style name="Navigator.SettingsView.Item">
-        <item name="android:paddingStart">@dimen/middle_padding</item>
-        <item name="android:paddingEnd">@dimen/middle_padding</item>
+        <item name="android:paddingStart">@dimen/middle_spacing</item>
+        <item name="android:paddingEnd">@dimen/middle_spacing</item>
         <item name="android:textSize">@dimen/small_font_size</item>
     </style>
 
@@ -68,11 +68,11 @@
     </style>
     <style name="Navigator.Menu.FileChooser.Header">
         <item name="android:layout_alignParentTop">true</item>
-        <item name="android:paddingStart">@dimen/small_padding</item>
-        <item name="android:paddingEnd">@dimen/small_padding</item>
+        <item name="android:paddingStart">@dimen/small_spacing</item>
+        <item name="android:paddingEnd">@dimen/small_spacing</item>
     </style>
     <style name="Navigator.Menu.FileChooser.Item">
-        <item name="android:paddingStart">@dimen/middle_padding</item>
-        <item name="android:paddingEnd">@dimen/middle_padding</item>
+        <item name="android:paddingStart">@dimen/middle_spacing</item>
+        <item name="android:paddingEnd">@dimen/middle_spacing</item>
     </style>
 </resources>

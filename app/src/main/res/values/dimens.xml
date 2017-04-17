@@ -1,7 +1,7 @@
 <resources>
-    <dimen name="small_padding">8dp</dimen>
-    <dimen name="middle_padding">16dp</dimen>
-    <dimen name="large_padding">24dp</dimen>
+    <dimen name="small_spacing">8dp</dimen>
+    <dimen name="middle_spacing">16dp</dimen>
+    <dimen name="large_spacing">24dp</dimen>
 
     <dimen name="small_item_height">30dp</dimen>
     <dimen name="middle_item_height">50dp</dimen>

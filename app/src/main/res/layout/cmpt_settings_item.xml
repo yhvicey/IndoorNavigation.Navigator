@@ -9,8 +9,8 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:paddingStart="@dimen/middle_padding"
-            android:paddingEnd="@dimen/middle_padding"
+            android:paddingStart="@dimen/middle_spacing"
+            android:paddingEnd="@dimen/middle_spacing"
             android:gravity="start|center"
             android:text=""/>
     <CheckBox

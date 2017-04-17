@@ -12,8 +12,8 @@
             android:id="@+id/fli_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="@dimen/large_padding"
-            android:paddingEnd="@dimen/large_padding"
+            android:paddingStart="@dimen/large_spacing"
+            android:paddingEnd="@dimen/large_spacing"
             android:gravity="start|center"
             android:textSize="@dimen/middle_font_size"/>
 

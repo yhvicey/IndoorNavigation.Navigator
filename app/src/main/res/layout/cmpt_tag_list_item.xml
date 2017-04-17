@@ -7,8 +7,8 @@
             android:id="@+id/tli_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/middle_padding"
-            android:paddingEnd="@dimen/middle_padding"
+            android:paddingStart="@dimen/middle_spacing"
+            android:paddingEnd="@dimen/middle_spacing"
             android:gravity="start|center"
             android:textSize="@dimen/middle_font_size"/>
 
@@ -16,8 +16,8 @@
             android:id="@+id/tli_sub_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="@dimen/middle_padding"
-            android:paddingEnd="@dimen/middle_padding"
+            android:paddingStart="@dimen/middle_spacing"
+            android:paddingEnd="@dimen/middle_spacing"
             android:gravity="start|center"
             android:textSize="@dimen/small_font_size"/>
 

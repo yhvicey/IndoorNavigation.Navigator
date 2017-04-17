@@ -1,10 +1,10 @@
 <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         style="@style/Navigator.Component"
-        android:paddingStart="@dimen/middle_padding"
-        android:paddingEnd="@dimen/middle_padding"
-        android:paddingTop="@dimen/middle_padding"
-        android:paddingBottom="@dimen/middle_padding"
+        android:paddingStart="@dimen/middle_spacing"
+        android:paddingEnd="@dimen/middle_spacing"
+        android:paddingTop="@dimen/middle_spacing"
+        android:paddingBottom="@dimen/middle_spacing"
         android:orientation="horizontal">
 
     <ImageView
@@ -16,8 +16,8 @@
             android:id="@+id/mi_text"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:paddingStart="@dimen/large_padding"
-            android:paddingEnd="@dimen/large_padding"
+            android:paddingStart="@dimen/large_spacing"
+            android:paddingEnd="@dimen/large_spacing"
             android:gravity="start|center"
             android:textSize="@dimen/small_font_size"/>
 
