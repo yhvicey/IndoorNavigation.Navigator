@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        style="@style/Navigator.Component"
+        android:gravity="center">
+    <TextView
+            android:id="@+id/nv_placeholder_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/no_current_floor"
+            android:textSize="@dimen/large_font_size"/>
+    <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/nv_placeholder_header"
+            android:layout_marginTop="@dimen/middle_spacing"
+            android:gravity="center"
+            android:text="@string/click_to_switch_floor"
+            android:textSize="@dimen/small_font_size"/>
+</RelativeLayout>

@@ -6,13 +6,13 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
-import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Models.Floor;
-import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Navigator;
+import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Settings;
 
 import java.util.List;
@@ -25,35 +25,53 @@ public class MapRenderer
     private static final int NODE_RADIUS = 10;
     private static final int GUIDE_COLOR = Color.BLUE;
     private static final int GUIDE_WIDTH = 4;
-    private static final int NO_SELECTED_FLOOR = -1;
     private static final int WALL_COLOR = Color.DKGRAY;
     private static final int WALL_WIDTH = 10;
     private static final int ZOOM_LEVEL_MAX = 5;
     private static final int ZOOM_LEVEL_MIN = 1;
     private static final int ZOOM_SPEED = 200;
 
-    private int mCurrentFloorIndex = NO_SELECTED_FLOOR;
     private Paint mEntryPaint = new Paint();
     private Paint mGuidePaint = new Paint();
     private int mHalfWidth;
     private int mHalfHeight;
     private boolean mIsZooming;
     private Point mLookAt = new Point();
-    private int mTouchedPointCount;
-    private float mTouchPointDistance;
     private float mPrevTouchX = 0;
     private float mPrevTouchY = 0;
+    private int mTouchedPointCount;
+    private float mTouchPointDistance;
     private Paint mWallPaint = new Paint();
     private float mZoomLevel = 3;
 
     private boolean valid()
     {
-        Map map = MapManager.getCurrentMap();
-        if (map == null) return false;
-        if (mCurrentFloorIndex < 0) return false;
-        if (mCurrentFloorIndex >= map.getFloors().size()) return false;
+        return MapManager.getCurrentFloor() != null;
+    }
 
-        return true;
+    private void drawEntryNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
+    {
+        List<EntryNode> entryNodes = floor.getEntryNodes();
+        for (EntryNode entryNode : entryNodes)
+            drawNode(canvas, entryNode);
+    }
+
+    private void drawGuideNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
+    {
+        List<GuideNode> guideNodes = floor.getGuideNodes();
+        for (GuideNode guideNode : guideNodes)
+            drawNode(canvas, guideNode);
+    }
+
+    private void drawLine(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
+    {
+        float startX = getRelativeX(start.getX());
+        float startY = getRelativeY(start.getY());
+        float endX = getRelativeX(end.getX());
+        float endY = getRelativeY(end.getY());
+        if (start.getType() == NodeType.WALL_NODE && end.getType() == NodeType.WALL_NODE)
+            canvas.drawLine(startX, startY, endX, endY, mWallPaint);
+        else canvas.drawLine(startX, startY, endX, endY, mGuidePaint);
     }
 
     private void drawNode(final @NonNull Canvas canvas, final @NonNull NodeBase node)
@@ -80,34 +98,9 @@ public class MapRenderer
         }
     }
 
-    private void drawEntryNodes(final @NonNull Canvas canvas)
+    private void drawWalls(final @NonNull Canvas canvas, final @NonNull Floor floor)
     {
-        List<EntryNode> entryNodes = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex).getEntryNodes();
-        for (EntryNode entryNode : entryNodes)
-            drawNode(canvas, entryNode);
-    }
-
-    private void drawGuideNodes(final @NonNull Canvas canvas)
-    {
-        List<GuideNode> guideNodes = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex).getGuideNodes();
-        for (GuideNode guideNode : guideNodes)
-            drawNode(canvas, guideNode);
-    }
-
-    private void drawLine(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
-    {
-        float startX = getRelativeX(start.getX());
-        float startY = getRelativeY(start.getY());
-        float endX = getRelativeX(end.getX());
-        float endY = getRelativeY(end.getY());
-        if (start.getType() == NodeType.WALL_NODE && end.getType() == NodeType.WALL_NODE)
-            canvas.drawLine(startX, startY, endX, endY, mWallPaint);
-        else canvas.drawLine(startX, startY, endX, endY, mGuidePaint);
-    }
-
-    private void drawWalls(final @NonNull Canvas canvas)
-    {
-        List<WallNode> wallNodes = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex).getWallNodes();
+        List<WallNode> wallNodes = floor.getWallNodes();
         for (WallNode node : wallNodes)
         {
             drawNode(canvas, node);
@@ -140,12 +133,22 @@ public class MapRenderer
 
     private void init()
     {
-        mEntryPaint.setColor(ENTRY_COLOR);
-        mEntryPaint.setStrokeWidth(NODE_RADIUS);
-        mGuidePaint.setColor(GUIDE_COLOR);
-        mGuidePaint.setStrokeWidth(GUIDE_WIDTH);
-        mWallPaint.setColor(WALL_COLOR);
-        mWallPaint.setStrokeWidth(WALL_WIDTH);
+        try
+        {
+            mEntryPaint.setColor(ENTRY_COLOR);
+            mEntryPaint.setStrokeWidth(NODE_RADIUS);
+
+            mGuidePaint.setColor(GUIDE_COLOR);
+            mGuidePaint.setStrokeWidth(GUIDE_WIDTH);
+
+            mWallPaint.setColor(WALL_COLOR);
+            mWallPaint.setStrokeWidth(WALL_WIDTH);
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to init map renderer.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+        }
     }
 
     private void lookAt(int x, int y)
@@ -163,7 +166,7 @@ public class MapRenderer
         int newX = mLookAt.x += xOffset / mZoomLevel;
         int newY = mLookAt.y += yOffset / mZoomLevel;
 
-        Floor floor = MapManager.getCurrentMap().getFloors().get(mCurrentFloorIndex);
+        Floor floor = MapManager.getCurrentFloor();
         if (newX < 0) newX = 0;
         if (newX > floor.getWidth() * mZoomLevel) newX = (int) (floor.getWidth() * mZoomLevel);
         if (newY < 0) newY = 0;
@@ -187,13 +190,14 @@ public class MapRenderer
     @Override
     protected void onDraw(Canvas canvas)
     {
-        if (!valid()) return;
+        Floor floor = MapManager.getCurrentFloor();
+        if (floor == null) return;
 
-        drawWalls(canvas);
+        drawWalls(canvas, floor);
         if (Settings.getIsDebugModeEnabled())
         {
-            drawEntryNodes(canvas);
-            drawGuideNodes(canvas);
+            drawEntryNodes(canvas, floor);
+            drawGuideNodes(canvas, floor);
         }
     }
 
@@ -207,32 +211,8 @@ public class MapRenderer
 
     public MapRenderer(Context context)
     {
-        this(context, null);
-    }
-
-    public MapRenderer(Context context, AttributeSet attrs)
-    {
-        super(context, attrs);
+        super(context);
         init();
-    }
-
-    public int getCurrentFloorIndex()
-    {
-        return mCurrentFloorIndex;
-    }
-
-    public void setCurrentFloorIndex(int currentFloorIndex)
-    {
-        this.mCurrentFloorIndex = currentFloorIndex;
-        if (!valid())
-        {
-            mCurrentFloorIndex = NO_SELECTED_FLOOR;
-            return;
-        }
-        lookAt(MapManager.getCurrentMap().getFloors().get(currentFloorIndex).getWidth() / 2, MapManager.getCurrentMap()
-                                                                                                       .getFloors()
-                                                                                                       .get(currentFloorIndex)
-                                                                                                       .getHeight() / 2);
     }
 
     @Override

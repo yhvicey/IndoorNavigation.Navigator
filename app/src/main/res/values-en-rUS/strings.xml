@@ -44,6 +44,10 @@
     <string name="cant_open_folder">Can\'t open folder</string>
     <string name="no_loaded_map">No loaded map</string>
     <string name="no_tag">No tag</string>
+    <string name="already_top_floor">Already the top floor</string>
+    <string name="already_ground_floor">Already the ground floor</string>
+    <string name="no_current_floor">No current floor</string>
+    <string name="click_to_switch_floor">Click direction button to switch floor</string>
 
     <!--   Unformatted texts   -->
     <string name="debug_mode_notification" formatted="false">%d more clicks to enable debug mode</string>

@@ -1,6 +1,7 @@
 package cn.vicey.navigator.Map;
 
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
@@ -16,6 +17,9 @@ public class MapManager
     private static final String MAP_DIR = "/maps/";
     private static final String TAG_DIR = "/tags/";
 
+    public static final int NO_SELECTED_FLOOR = -1;
+
+    private static int mCurrentFloorIndex = NO_SELECTED_FLOOR;
     private static Map mCurrentMap;
     private static String mMapDirFullPath;
     private static String mTagDirFullPath;
@@ -50,6 +54,19 @@ public class MapManager
     private MapManager()
     {
         // no-op
+    }
+
+    public static Floor getCurrentFloor()
+    {
+        if (mCurrentMap == null) return null;
+        if (mCurrentFloorIndex == NO_SELECTED_FLOOR || mCurrentFloorIndex >= mCurrentMap.getFloors().size())
+            return null;
+        return mCurrentMap.getFloors().get(mCurrentFloorIndex);
+    }
+
+    public static int getCurrentFloorIndex()
+    {
+        return mCurrentFloorIndex;
     }
 
     public static Map getCurrentMap()
@@ -97,6 +114,22 @@ public class MapManager
     public static String getAvailableDefaultMapFileName()
     {
         return Utils.getAvailableDefaultName(new File(mMapDirFullPath), ".xml");
+    }
+
+    public static boolean goDownstairs()
+    {
+        if (mCurrentMap == null) return false;
+        if (mCurrentFloorIndex == NO_SELECTED_FLOOR) return false;
+        mCurrentFloorIndex--;
+        return true;
+    }
+
+    public static boolean goUpstairs()
+    {
+        if (mCurrentMap == null) return false;
+        if (mCurrentFloorIndex >= mCurrentMap.getFloors().size() - 1) return false;
+        mCurrentFloorIndex++;
+        return true;
     }
 
     public static boolean hasMapFile(final @NonNull String mapFileName)

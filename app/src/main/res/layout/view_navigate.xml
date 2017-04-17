@@ -1,6 +1,7 @@
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto" style="@style/Navigator.Component"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        style="@style/Navigator.Component"
         android:id="@+id/navigate_view">
 
     <android.support.design.widget.FloatingActionButton
@@ -24,9 +25,7 @@
             android:layout_alignParentEnd="true"
             app:fabSize="mini"
             app:srcCompat="@drawable/ic_downstairs"/>
-    <cn.vicey.navigator.Components.MapRenderer
+    <ViewFlipper
             style="@style/Navigator.Component"
-            android:id="@+id/nv_map_renderer"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true"/>
+            android:id="@+id/nv_view_flipper"/>
 </RelativeLayout>
