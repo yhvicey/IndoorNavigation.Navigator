@@ -22,8 +22,7 @@
                 android:layout_weight="1"
                 style="?borderlessButtonStyle"
                 android:text="@string/load_tags"
-                android:textSize="@dimen/small_font_size"
-                android:onClick="onTagsViewButtonClick"/>
+                android:textSize="@dimen/small_font_size"/>
         <Button
                 android:id="@+id/tv_save_tags"
                 android:layout_width="0dp"
@@ -31,8 +30,7 @@
                 android:layout_weight="1"
                 style="?borderlessButtonStyle"
                 android:text="@string/save_tags"
-                android:textSize="@dimen/small_font_size"
-                android:onClick="onTagsViewButtonClick"/>
+                android:textSize="@dimen/small_font_size"/>
     </LinearLayout>
 
 </RelativeLayout>

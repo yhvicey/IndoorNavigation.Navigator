@@ -3,6 +3,7 @@
         style="@style/Navigator.Component"
         android:id="@+id/navigate_view">
 
-    <include layout="@layout/cmpt_map_renderer"/>
-
+    <cn.vicey.navigator.Components.MapRenderer
+            style="@style/Navigator.Component"
+            android:id="@+id/nv_map_renderer"/>
 </RelativeLayout>

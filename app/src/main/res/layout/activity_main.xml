@@ -26,12 +26,6 @@
                 tools:context="cn.vicey.navigator.Activities.MainActivity"
                 android:layout_below="@id/toolbar">
 
-            <include layout="@layout/view_navigate"/>
-            <include layout="@layout/view_maps"/>
-            <include layout="@layout/view_tags"/>
-            <include layout="@layout/view_settings"/>
-            <include layout="@layout/view_log"/>
-
         </ViewFlipper>
 
     </RelativeLayout>
