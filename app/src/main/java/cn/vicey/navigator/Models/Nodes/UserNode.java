@@ -9,7 +9,7 @@ public class UserNode
 
     private static UserNode mInstance;
 
-    public UserNode getInstance()
+    public static UserNode getInstance()
     {
         if (mInstance == null)
         {
