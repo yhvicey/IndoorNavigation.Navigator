@@ -1,4 +1,4 @@
-# IndoorNavigator.MapEditor
+# IndoorNavigator.Navigator
 
 ## Project homepage
 [IndoorNavigator](http://github.com/yhvicey/IndoorNavigator)
