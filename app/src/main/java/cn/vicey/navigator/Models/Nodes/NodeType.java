@@ -11,16 +11,15 @@ public enum NodeType
      * Wall node.
      */
     WALL_NODE(0),
-
     /**
      * Entry node.
      */
     ENTRY_NODE(1),
-
     /**
      * Guide node.
      */
-    GUIDE_NODE(2);
+    GUIDE_NODE(2),
+    USER_NODE(3);
 
     private static final String ENTRY_NODE_TEXT = "EntryNode";
     private static final String GUIDE_NODE_TEXT = "GuideNode";
