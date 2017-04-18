@@ -276,12 +276,13 @@ public class MainActivity
                         if (mCurrentToast != null) mCurrentToast.cancel();
                         mCurrentToast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
                         mCurrentToast.show();
+                        final Toast toastToCancel = mCurrentToast;
                         new Handler().postDelayed(new Runnable()
                         {
                             @Override
                             public void run()
                             {
-                                mCurrentToast.cancel();
+                                toastToCancel.cancel();
                             }
                         }, duration);
                     }
