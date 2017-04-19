@@ -4,12 +4,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-    <ListView
+    <cn.vicey.navigator.Components.FileList
             style="@style/Navigator.Component"
-            android:id="@+id/mv_list_view"
+            android:id="@+id/mv_file_list"
             android:layout_above="@+id/mv_list_bottom"
             android:orientation="vertical">
-    </ListView>
+    </cn.vicey.navigator.Components.FileList>
     <LinearLayout
             android:id="@+id/mv_list_bottom"
             android:layout_width="match_parent"

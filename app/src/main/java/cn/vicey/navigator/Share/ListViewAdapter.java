@@ -50,7 +50,7 @@ public class ListViewAdapter<T>
     }
 
     @Override
-    public Object getItem(int i)
+    public T getItem(int i)
     {
         return mItems.get(i);
     }

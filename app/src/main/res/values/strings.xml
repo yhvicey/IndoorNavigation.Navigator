@@ -22,7 +22,6 @@
     <string name="load_tags">载入标签</string>
     <string name="save_tags">保存标签</string>
     <string name="show_log">显示日志</string>
-    <string name="confirm_to_delete">是否要删除该文件？</string>
 
     <!--   Notification texts   -->
     <string name="load_succeed">加载成功</string>
@@ -47,6 +46,7 @@
     <string name="already_top_floor">已是最顶层</string>
     <string name="already_ground_floor">已是最底层</string>
     <string name="no_current_floor">没有当前楼层</string>
+    <string name="confirm_to_delete">是否要删除该文件？</string>
     <string name="click_to_switch_floor">点击方向键以切换楼层</string>
 
     <!--   Unformatted texts   -->

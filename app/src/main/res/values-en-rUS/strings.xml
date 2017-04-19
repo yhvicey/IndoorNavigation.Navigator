@@ -22,7 +22,6 @@
     <string name="load_tags">Load tags</string>
     <string name="save_tags">Save tags</string>
     <string name="show_log">Show log</string>
-    <string name="confirm_to_delete">Are you sure about deleting this file?</string>
 
     <!--   Notification texts   -->
     <string name="load_succeed">Load succeed</string>
@@ -47,6 +46,7 @@
     <string name="already_top_floor">Already the top floor</string>
     <string name="already_ground_floor">Already the ground floor</string>
     <string name="no_current_floor">No current floor</string>
+    <string name="confirm_to_delete">Are you sure about deleting this file?</string>
     <string name="click_to_switch_floor">Click direction button to switch floor</string>
 
     <!--   Unformatted texts   -->

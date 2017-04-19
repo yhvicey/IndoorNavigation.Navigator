@@ -195,7 +195,7 @@ public final class Utils
         return getCurrentDateString() + " " + getCurrentTimeString();
     }
 
-    public static List<File> getDirs(final @NonNull File dir)
+    public static List<File> getDirs(final @NonNull File dir, boolean includeParent)
     {
         if (!dir.isDirectory()) return null;
         try
@@ -214,7 +214,7 @@ public final class Utils
                     return file1.getName().compareTo(file2.getName());
                 }
             });
-            if (dir.getParent() != null) result.add(0, new File(".."));
+            if (dir.getParent() != null && includeParent) result.add(0, new File(".."));
             return result;
         }
         catch (Throwable t)
@@ -234,13 +234,13 @@ public final class Utils
         return new Date().getTime() - Navigator.getStartTime();
     }
 
-    public static List<File> getEntries(final @NonNull File dir)
+    public static List<File> getEntries(final @NonNull File dir, boolean includeParent)
     {
         if (!dir.isDirectory()) return null;
         try
         {
             List<File> result = new ArrayList<>();
-            result.addAll(getDirs(dir));
+            result.addAll(getDirs(dir, includeParent));
             result.addAll(getFiles(dir));
             return result;
         }
