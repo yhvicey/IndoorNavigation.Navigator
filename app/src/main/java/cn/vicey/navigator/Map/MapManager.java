@@ -92,7 +92,9 @@ public class MapManager
 
     public static void setCurrentMap(final @NonNull Map map)
     {
+        mCurrentFloorIndex = NO_SELECTED_FLOOR;
         mCurrentMap = map;
+        goUpstairs();
     }
 
     public static boolean deleteMapFile(final @NonNull String mapFileName)
