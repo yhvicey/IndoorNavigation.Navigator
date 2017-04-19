@@ -7,7 +7,7 @@ import android.widget.TextView;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
-import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Utils.Logger;
 
 public class LogView
         extends ScrollView

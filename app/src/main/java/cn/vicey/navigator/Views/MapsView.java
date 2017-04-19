@@ -12,12 +12,12 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.FileList;
-import cn.vicey.navigator.Map.MapManager;
+import cn.vicey.navigator.Managers.MapManager;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Tools;
+import cn.vicey.navigator.Utils.Logger;
+import cn.vicey.navigator.Utils.Tools;
 
 import java.io.File;
 

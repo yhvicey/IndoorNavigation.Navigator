@@ -1,10 +1,10 @@
 package cn.vicey.navigator;
 
 import android.app.Application;
-import cn.vicey.navigator.Map.MapManager;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Settings;
+import cn.vicey.navigator.Managers.MapManager;
+import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Share.TypefaceManager;
+import cn.vicey.navigator.Utils.Logger;
 
 import java.util.Date;
 
@@ -101,9 +101,9 @@ public class Navigator
                 Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init TypefaceManager.");
                 exitWithError(ERR_INIT);
             }
-            if (!Settings.init(this))
+            if (!SettingsManager.init(this))
             {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init Settings.");
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init SettingsManager.");
                 exitWithError(ERR_INIT);
             }
 

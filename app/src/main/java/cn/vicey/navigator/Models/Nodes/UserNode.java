@@ -1,6 +1,6 @@
 package cn.vicey.navigator.Models.Nodes;
 
-import cn.vicey.navigator.Navigate.NavigateManager;
+import cn.vicey.navigator.Managers.NavigateManager;
 
 public class UserNode
         extends NodeBase

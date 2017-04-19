@@ -6,10 +6,10 @@ import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import cn.vicey.navigator.Activities.MainActivity;
+import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Settings;
+import cn.vicey.navigator.Utils.Logger;
 
 public class SettingsView
         extends ScrollView
@@ -56,6 +56,6 @@ public class SettingsView
     {
         mParent.setTitleText(R.string.settings);
         View debugView = findViewById(R.id.sv_debug_view);
-        debugView.setVisibility(Settings.getIsDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
+        debugView.setVisibility(SettingsManager.getIsDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
     }
 }

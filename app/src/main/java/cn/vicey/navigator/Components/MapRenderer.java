@@ -9,15 +9,15 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import cn.vicey.navigator.Map.MapManager;
+import cn.vicey.navigator.Managers.MapManager;
+import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Navigator;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Settings;
+import cn.vicey.navigator.Utils.Logger;
 
 public class MapRenderer
         extends View
@@ -70,7 +70,7 @@ public class MapRenderer
                 drawLink(canvas, wallNode, link.getTarget());
             }
         }
-        if (!Settings.getIsDebugModeEnabled()) return;
+        if (!SettingsManager.getIsDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
         {
             for (NodeBase.Link link : guideNode.getLinks())
@@ -105,7 +105,7 @@ public class MapRenderer
         {
             drawNode(canvas, wallNode);
         }
-        if (!Settings.getIsDebugModeEnabled()) return;
+        if (!SettingsManager.getIsDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
         {
             drawNode(canvas, guideNode);
@@ -138,7 +138,7 @@ public class MapRenderer
         {
             mGuidePaint = new Paint();
             mGuidePaint.setColor(GUIDE_COLOR);
-            
+
             mWallPaint = new Paint();
             mWallPaint.setColor(WALL_COLOR);
 

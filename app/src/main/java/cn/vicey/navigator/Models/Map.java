@@ -1,7 +1,7 @@
 package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;

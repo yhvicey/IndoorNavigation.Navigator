@@ -1,15 +1,16 @@
-package cn.vicey.navigator.Share;
+package cn.vicey.navigator.Managers;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Utils.Logger;
 
-public class Settings
+public class SettingsManager
 {
-    private static final String LOGGER_TAG = "Settings";
+    private static final String LOGGER_TAG = "SettingsManager";
     private static final String DEFAULT_INT = "0";
     private static final String DEFAULT_STRING = "";
-    private static final String PREFERENCE_NAME = "Settings";
+    private static final String PREFERENCE_NAME = "SettingsManager";
     private static final String LINE_WIDTH = "LineWidth";
 
     private static boolean mIsDebugModeEnabled;
@@ -93,7 +94,7 @@ public class Settings
         mIsDebugModeEnabled = true;
     }
 
-    private Settings()
+    private SettingsManager()
     {
         // no-op
     }

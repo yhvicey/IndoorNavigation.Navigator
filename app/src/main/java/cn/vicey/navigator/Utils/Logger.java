@@ -1,7 +1,8 @@
-package cn.vicey.navigator.Share;
+package cn.vicey.navigator.Utils;
 
 
 import android.util.Log;
+import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
 
 import java.io.*;
@@ -133,7 +134,7 @@ public class Logger
      */
     public static void debug(String tag, String message, Throwable t)
     {
-        if (!Settings.getIsDebugModeEnabled()) return;
+        if (!SettingsManager.getIsDebugModeEnabled()) return;
         String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), DEBUG_HEADER, message) + Tools.NEW_LINE;
         Log.d(tag, msg);
         write(msg);

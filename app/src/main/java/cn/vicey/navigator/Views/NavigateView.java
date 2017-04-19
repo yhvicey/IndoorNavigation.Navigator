@@ -8,10 +8,10 @@ import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
-import cn.vicey.navigator.Map.MapManager;
+import cn.vicey.navigator.Managers.MapManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
-import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Utils.Logger;
 
 public class NavigateView
         extends RelativeLayout

@@ -1,12 +1,15 @@
-package cn.vicey.navigator.Map;
+package cn.vicey.navigator.Managers;
 
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Map.MapParser;
+import cn.vicey.navigator.Map.TagParser;
+import cn.vicey.navigator.Map.TagSaver;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Tools;
+import cn.vicey.navigator.Utils.Logger;
+import cn.vicey.navigator.Utils.Tools;
 
 import java.io.File;
 import java.util.List;

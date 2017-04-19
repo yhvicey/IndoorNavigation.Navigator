@@ -2,6 +2,7 @@ package cn.vicey.navigator.Share;
 
 import android.content.res.AssetManager;
 import android.graphics.Typeface;
+import cn.vicey.navigator.Utils.Logger;
 
 public class TypefaceManager
 {

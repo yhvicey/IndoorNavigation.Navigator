@@ -13,10 +13,10 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Components.MenuItem;
+import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Settings;
+import cn.vicey.navigator.Utils.Logger;
 import cn.vicey.navigator.Views.*;
 import com.yalantis.guillotine.animation.GuillotineAnimation;
 import com.yalantis.guillotine.interfaces.GuillotineListener;
@@ -95,7 +95,7 @@ public class MainActivity
         @Override
         public void onClick(View view)
         {
-            if (Settings.getIsDebugModeEnabled()) return;
+            if (SettingsManager.getIsDebugModeEnabled()) return;
             if (view.getId() != R.id.t_title) return;
             if (new Date().getTime() - mLastClickTime > 2 * 1000)
             {
@@ -106,7 +106,7 @@ public class MainActivity
             mClickCount++;
             if (mClickCount > 5)
             {
-                Settings.enableDebugMode();
+                SettingsManager.enableDebugMode();
                 Logger.debug(LOGGER_TAG, "Debug mode enabled");
                 alert(R.string.debug_mode_enabled);
                 flush();

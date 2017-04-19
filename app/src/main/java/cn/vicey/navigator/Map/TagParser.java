@@ -4,8 +4,8 @@ import android.support.annotation.NonNull;
 import android.util.Xml;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Tag;
-import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Tools;
+import cn.vicey.navigator.Utils.Logger;
+import cn.vicey.navigator.Utils.Tools;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;

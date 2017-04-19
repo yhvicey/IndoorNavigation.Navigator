@@ -9,12 +9,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import cn.vicey.navigator.Activities.MainActivity;
-import cn.vicey.navigator.Map.MapManager;
+import cn.vicey.navigator.Managers.MapManager;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.ListViewAdapter;
-import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Utils.Logger;
 
 import java.util.List;
 
