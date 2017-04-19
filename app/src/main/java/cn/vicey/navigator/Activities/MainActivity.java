@@ -16,6 +16,7 @@ import cn.vicey.navigator.Components.MenuItem;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.Logger;
+import cn.vicey.navigator.Share.Settings;
 import cn.vicey.navigator.Views.*;
 import com.yalantis.guillotine.animation.GuillotineAnimation;
 import com.yalantis.guillotine.interfaces.GuillotineListener;
@@ -45,10 +46,12 @@ public class MainActivity
 
     //region Variables
 
+    private int mClickCount;
     private Toast mCurrentToast;
     private int mCurrentView = VIEW_NAVIGATE;
     private boolean mIsMenuOpened;
     private long mLastBackPressedTime;
+    private long mLastClickTime;
 
     //endregion
 
@@ -85,6 +88,33 @@ public class MainActivity
         public void onGuillotineClosed()
         {
             mIsMenuOpened = false;
+        }
+    };
+    private View.OnClickListener mOnTitleClickListener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            if (Settings.getIsDebugModeEnabled()) return;
+            if (view.getId() != R.id.t_title) return;
+            if (new Date().getTime() - mLastClickTime > 2 * 1000)
+            {
+                mLastClickTime = new Date().getTime();
+                mClickCount = 1;
+                return;
+            }
+            mClickCount++;
+            if (mClickCount > 5)
+            {
+                Settings.enableDebugMode();
+                Logger.info(LOGGER_TAG, "Debug mode enabled");
+                alert(R.string.debug_mode_enabled);
+                flush();
+            }
+            else if (mClickCount > 3)
+            {
+                alert(getString(R.string.debug_mode_notification, 5 - mClickCount + 1));
+            }
         }
     };
 
@@ -154,6 +184,8 @@ public class MainActivity
 
             mToolbar = (cn.vicey.navigator.Components.Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(mToolbar);
+            View titleTextView = mToolbar.findViewById(R.id.t_title);
+            titleTextView.setOnClickListener(mOnTitleClickListener);
 
             mGuillotineAnimation = new GuillotineAnimation.GuillotineBuilder(mMainMenu, mMainMenu.findViewById(R.id.t_menu_icon), mToolbar
                     .findViewById(R.id.t_menu_icon)).setStartDelay(RIPPLE_DURATION)
