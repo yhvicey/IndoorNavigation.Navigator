@@ -20,21 +20,16 @@ public class MenuItem
 
     public MenuItem(Context context)
     {
-        this(context, null, 0);
+        this(context, null);
     }
 
     public MenuItem(Context context, AttributeSet attrs)
     {
-        this(context, attrs, 0);
+        super(context, attrs);
+        init(attrs);
     }
 
-    public MenuItem(Context context, AttributeSet attrs, int defStyle)
-    {
-        super(context, attrs, defStyle);
-        init(attrs, defStyle);
-    }
-
-    private void init(AttributeSet attrs, int defStyle)
+    private void init(AttributeSet attrs)
     {
         LayoutInflater.from(getContext()).inflate(R.layout.cmpt_menu_item, this, true);
         mImageView = (ImageView) findViewById(R.id.mi_icon);
@@ -43,7 +38,7 @@ public class MenuItem
 
         if (attrs == null) return;
 
-        final TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Navigator_MenuItem, defStyle, 0);
+        final TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.Navigator_MenuItem);
         Drawable icon = typedArray.getDrawable(R.styleable.Navigator_MenuItem_icon);
         if (icon != null) setIcon(icon);
         CharSequence text = typedArray.getText(R.styleable.Navigator_MenuItem_text);

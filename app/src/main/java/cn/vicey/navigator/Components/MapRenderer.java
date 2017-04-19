@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import cn.vicey.navigator.Map.MapManager;
@@ -121,7 +122,7 @@ public class MapRenderer
         return (float) Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
     }
 
-    private void init()
+    private void init(AttributeSet attrs)
     {
         try
         {
@@ -197,8 +198,13 @@ public class MapRenderer
 
     public MapRenderer(Context context)
     {
+        this(context, null);
+    }
+
+    public MapRenderer(Context context, AttributeSet attrs)
+    {
         super(context);
-        init();
+        init(attrs);
     }
 
     @Override
