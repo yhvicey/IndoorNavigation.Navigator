@@ -14,7 +14,7 @@ import cn.vicey.navigator.Utils.Tools;
 import java.io.File;
 import java.util.List;
 
-public class MapManager
+public final class MapManager
 {
     private static final String LOGGER_TAG = "MapManager";
     private static final String MAP_DIR = "/maps";

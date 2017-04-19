@@ -10,7 +10,7 @@ import java.util.Locale;
 /**
  * Logger class.
  */
-public class Logger
+public final class Logger
 {
     private static final String LOGGER_TAG = "Logger";
     private static final String DEBUG_HEADER = "DEBUG";

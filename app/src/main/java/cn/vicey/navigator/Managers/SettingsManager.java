@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import cn.vicey.navigator.Utils.Logger;
 
-public class SettingsManager
+public final class SettingsManager
 {
     private static final String LOGGER_TAG = "SettingsManager";
     private static final String DEFAULT_INT = "0";

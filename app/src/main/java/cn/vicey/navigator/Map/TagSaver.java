@@ -12,7 +12,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
-public class TagSaver
+public final class TagSaver
 {
     private static final String LOGGER_TAG = "TagSaver";
     private static final String ATTR_FLOOR = "Floor";

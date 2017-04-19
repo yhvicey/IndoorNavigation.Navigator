@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TagParser
+public final class TagParser
 {
     private static final String LOGGER_TAG = "TagParser";
     private static final String ATTR_FLOOR = "Floor";

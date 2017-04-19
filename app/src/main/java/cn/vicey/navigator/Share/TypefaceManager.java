@@ -4,7 +4,7 @@ import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import cn.vicey.navigator.Utils.Logger;
 
-public class TypefaceManager
+public final class TypefaceManager
 {
     private static final String LOGGER_TAG = "TypefaceManager";
     private static final String CANARO_EXTRA_BOLD_PATH = "fonts/canaro_extra_bold.otf";

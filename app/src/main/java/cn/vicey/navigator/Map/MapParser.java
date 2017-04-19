@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * MapParser class for parsing map file and tag file.
  */
-public class MapParser
+public final class MapParser
 {
     private static final String LOGGER_TAG = "MapParser";
     private static final String ATTR_END_INDEX = "EndIndex";
