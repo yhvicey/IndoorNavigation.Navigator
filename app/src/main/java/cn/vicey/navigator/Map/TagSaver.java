@@ -15,21 +15,16 @@ import java.util.List;
 public class TagSaver
 {
     private static final String LOGGER_TAG = "TagSaver";
-    private static final String SUPPORTED_VERSION = "1.1";
-    private static final String ATTR_VERSION = "Version";
     private static final String ATTR_FLOOR = "Floor";
     private static final String ATTR_INDEX = "Index";
     private static final String ATTR_TYPE = "Type";
     private static final String ATTR_VALUE = "Value";
-    private static final String ELEMENT_TAGS = "Tags";
+    private static final String ATTR_VERSION = "Version";
     private static final String ELEMENT_TAG = "Tag";
+    private static final String ELEMENT_TAGS = "Tags";
+    private static final String SUPPORTED_VERSION = "1.1";
     private static final String TYPE_GUIDE = "GuideNode";
     private static final String TYPE_WALL = "WallNode";
-
-    private TagSaver()
-    {
-        // no-op
-    }
 
     private static void saveTag(final @NonNull Tag tag, XmlSerializer serializer)
     {
@@ -98,5 +93,10 @@ public class TagSaver
             Logger.error(LOGGER_TAG, "Failed to save tags.", t);
             return null;
         }
+    }
+
+    private TagSaver()
+    {
+        // no-op
     }
 }

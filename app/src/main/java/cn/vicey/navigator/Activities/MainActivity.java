@@ -32,15 +32,15 @@ public class MainActivity
     private static final long RIPPLE_DURATION = 250;
     private static final Object SYNC_LOCK = new Object();
 
+    public static final long LONG_TOAST_DURATION = 3500;
+    public static final long MIDDLE_TOAST_DURATION = 2000;
+    public static final int REQ_STORAGE = 1;
+    public static final long SHORT_TOAST_DURATION = 1000;
     public static final int VIEW_NAVIGATE = 0;
     public static final int VIEW_MAPS = 1;
     public static final int VIEW_TAGS = 2;
     public static final int VIEW_SETTINGS = 3;
     public static final int VIEW_LOG = 4;
-    public static final int REQ_STORAGE = 1;
-    public static final long LONG_TOAST_DURATION = 3500;
-    public static final long MIDDLE_TOAST_DURATION = 2000;
-    public static final long SHORT_TOAST_DURATION = 1000;
 
     //endregion
 
@@ -337,12 +337,6 @@ public class MainActivity
         runOnUiThread(runnable);
     }
 
-    public void switchView(int viewIndex)
-    {
-        mCurrentView = viewIndex;
-        flush();
-    }
-
     public void requestPermission(int requestCode, String permission)
     {
         ActivityCompat.requestPermissions(this, new String[]{permission}, requestCode);
@@ -356,6 +350,12 @@ public class MainActivity
     public void setTitleText(int resId)
     {
         mToolbar.setTitleText(resId);
+    }
+
+    public void switchView(int viewIndex)
+    {
+        mCurrentView = viewIndex;
+        flush();
     }
 
     //endregion

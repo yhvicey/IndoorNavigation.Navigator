@@ -19,27 +19,26 @@ public enum NodeType
 
     private static final String GUIDE_NODE_TEXT = "GuideNode";
     private static final String WALL_NODE_TEXT = "WallNode";
-
-    private int mValue;
+    private static final String USER_NODE_TEXT = "UserNode";
 
     public static NodeType parse(@NonNull String nodeType)
     {
         switch (nodeType)
         {
             case GUIDE_NODE_TEXT:
-            {
                 return GUIDE_NODE;
-            }
             case WALL_NODE_TEXT:
-            {
                 return WALL_NODE;
-            }
+            case USER_NODE_TEXT:
+                return USER_NODE;
             default:
             {
                 throw new IllegalArgumentException("Unsupported node type.");
             }
         }
     }
+
+    private int mValue;
 
     NodeType(int value)
     {
@@ -49,5 +48,20 @@ public enum NodeType
     public int getValue()
     {
         return mValue;
+    }
+
+    @Override
+    public String toString()
+    {
+        switch (this)
+        {
+            case GUIDE_NODE:
+                return GUIDE_NODE_TEXT;
+            case WALL_NODE:
+                return WALL_NODE_TEXT;
+            case USER_NODE:
+                return USER_NODE_TEXT;
+        }
+        return null;
     }
 }

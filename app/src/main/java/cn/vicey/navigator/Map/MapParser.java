@@ -43,11 +43,6 @@ public class MapParser
     private static final String ELEMENT_WALL = "WallNode";
     private static final String SUPPORTED_VERSION = "1.1";
 
-    private MapParser()
-    {
-        // no-op
-    }
-
     private static Link generateLink(final @NonNull XmlPullParser parser)
     {
         try
@@ -310,5 +305,10 @@ public class MapParser
             Logger.error(LOGGER_TAG, "Failed to parse map file. File path:" + file.getPath(), t);
             return null;
         }
+    }
+
+    private MapParser()
+    {
+        // no-op
     }
 }

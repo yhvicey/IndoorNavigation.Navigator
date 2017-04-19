@@ -29,28 +29,19 @@ public class Floor
         return mGuideNodes;
     }
 
-    public List<Tag> getTags(int floor)
+    public int getHeight()
     {
-        List<Tag> tags = new ArrayList<>();
-        int index = 0;
-        for (NodeBase node : mGuideNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.GUIDE_NODE, tagValue));
-            index++;
-        }
-        for (NodeBase node : mWallNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.WALL_NODE, tagValue));
-            index++;
-        }
-        return tags;
+        return mHeight;
     }
 
     public List<WallNode> getWallNodes()
     {
         return mWallNodes;
+    }
+
+    public int getWidth()
+    {
+        return mWidth;
     }
 
     public void addLink(final @NonNull Link link)
@@ -92,6 +83,11 @@ public class Floor
         }
     }
 
+    public double calcDistance(NodeType startType, int startIndex, NodeType endType, int endIndex)
+    {
+        return getNode(startType, startIndex).calcDistance(getNode(endType, endIndex));
+    }
+
     public void clearTags()
     {
         for (NodeBase node : mGuideNodes)
@@ -116,11 +112,6 @@ public class Floor
         return result;
     }
 
-    public double getDistance(NodeType startType, int startIndex, NodeType endType, int endIndex)
-    {
-        return getNode(startType, startIndex).calcDistance(getNode(endType, endIndex));
-    }
-
     public GuideNode getGuideNode(int index)
     {
         return mGuideNodes.get(index);
@@ -129,16 +120,6 @@ public class Floor
     public int getGuideNodeIndex(@NonNull GuideNode node)
     {
         return mGuideNodes.indexOf(node);
-    }
-
-    public WallNode getWallNode(int index)
-    {
-        return mWallNodes.get(index);
-    }
-
-    public int getWallNodeIndex(@NonNull WallNode node)
-    {
-        return mWallNodes.indexOf(node);
     }
 
     public NodeBase getNode(NodeType type, int index)
@@ -181,13 +162,32 @@ public class Floor
         }
     }
 
-    public int getHeight()
+    public List<Tag> getTags(int floor)
     {
-        return mHeight;
+        List<Tag> tags = new ArrayList<>();
+        int index = 0;
+        for (NodeBase node : mGuideNodes)
+        {
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.GUIDE_NODE, tagValue));
+            index++;
+        }
+        for (NodeBase node : mWallNodes)
+        {
+            String tagValue = node.getTag();
+            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.WALL_NODE, tagValue));
+            index++;
+        }
+        return tags;
     }
 
-    public int getWidth()
+    public WallNode getWallNode(int index)
     {
-        return mWidth;
+        return mWallNodes.get(index);
+    }
+
+    public int getWallNodeIndex(@NonNull WallNode node)
+    {
+        return mWallNodes.indexOf(node);
     }
 }

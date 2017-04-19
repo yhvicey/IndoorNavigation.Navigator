@@ -30,6 +30,30 @@ public class MapsView
     private FileList mMapList;
     private MainActivity mParent;
 
+    private FileList.OnFileListItemChooseCallback mFileListCallback = new FileList.OnFileListItemChooseCallback()
+    {
+        @Override
+        public void onChooseFile(File chosenFile)
+        {
+            if (MapManager.saveMapFile(chosenFile, true))
+            {
+                mParent.alert(R.string.load_succeed);
+                flush();
+            }
+            else mParent.alert(R.string.load_failed);
+            if (mFileChooserDialog != null)
+            {
+                mFileChooserDialog.dismiss();
+                mFileChooserDialog = null;
+            }
+        }
+
+        @Override
+        public void onOpenDirFailed()
+        {
+            mParent.alert(R.string.cant_open_folder);
+        }
+    };
     private FileList.OnFileListItemChooseCallback mMapListCallback = new FileList.OnFileListItemChooseCallback()
     {
         @Override
@@ -51,7 +75,7 @@ public class MapsView
                         case 0:
                         {
                             Map map;
-                            if ((map = MapManager.loadMapFile(chosenFile.getName())) != null)
+                            if ((map = MapManager.loadMap(chosenFile.getName())) != null)
                             {
                                 MapManager.setCurrentMap(map);
                                 mParent.alert(R.string.load_succeed);
@@ -126,30 +150,6 @@ public class MapsView
                     }
                 }
             }).show();
-        }
-
-        @Override
-        public void onOpenDirFailed()
-        {
-            mParent.alert(R.string.cant_open_folder);
-        }
-    };
-    private FileList.OnFileListItemChooseCallback mFileListCallback = new FileList.OnFileListItemChooseCallback()
-    {
-        @Override
-        public void onChooseFile(File chosenFile)
-        {
-            if (MapManager.saveMapFile(chosenFile, true))
-            {
-                mParent.alert(R.string.load_succeed);
-                flush();
-            }
-            else mParent.alert(R.string.load_failed);
-            if (mFileChooserDialog != null)
-            {
-                mFileChooserDialog.dismiss();
-                mFileChooserDialog = null;
-            }
         }
 
         @Override

@@ -1,6 +1,5 @@
 package cn.vicey.navigator.Models;
 
-import android.support.annotation.NonNull;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 
 /**
@@ -10,7 +9,6 @@ public class Link
 {
     private int mEndIndex;
     private NodeType mEndType;
-    private Floor mParent;
     private int mStartIndex;
     private NodeType mStartType;
 
@@ -20,11 +18,6 @@ public class Link
         mStartIndex = startIndex;
         mEndType = endType;
         mEndIndex = endIndex;
-    }
-
-    public double getDistance()
-    {
-        return mParent.getDistance(mStartType, mStartIndex, mEndType, mEndIndex);
     }
 
     public int getEndIndex()
@@ -45,11 +38,6 @@ public class Link
     public NodeType getStartType()
     {
         return mStartType;
-    }
-
-    public void onAdd(final @NonNull Floor parent)
-    {
-        mParent = parent;
     }
 
     @Override

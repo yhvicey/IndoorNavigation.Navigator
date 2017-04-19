@@ -22,13 +22,8 @@ public final class Tools
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String TIME_PATTERN = "HH:mm:ss";
 
-    public static final String NEW_LINE = System.getProperty("line.separator");
     public static final String FILE_ENCODING = "utf-8";
-
-    private Tools()
-    {
-        // no-op
-    }
+    public static final String NEW_LINE = System.getProperty("line.separator");
 
     public static boolean copyFile(final @NonNull File src, final @NonNull File dest, boolean overwrite)
     {
@@ -124,32 +119,6 @@ public final class Tools
         }).start();
     }
 
-    public static boolean isDoubleEqual(double left, double right)
-    {
-        return isDoubleEqual(left, right, 0.0000001);
-    }
-
-    public static boolean isDoubleEqual(double left, double right, double precision)
-    {
-        return Math.abs(left - right) < precision;
-    }
-
-    public static boolean isStringEmpty(final @NonNull String str)
-    {
-        return isStringEmpty(str, true);
-    }
-
-    public static boolean isStringEmpty(final @NonNull String str, boolean treatWhitespaceAsEmpty)
-    {
-        if (str.length() == 0) return true;
-        if (!treatWhitespaceAsEmpty) return false;
-        for (int i = 0; i < str.length(); i++)
-        {
-            if (str.charAt(i) != ' ') return false;
-        }
-        return true;
-    }
-
     public static String getAvailableDefaultName(final @NonNull File dir)
     {
         return getAvailableDefaultName(dir, "");
@@ -176,16 +145,6 @@ public final class Tools
     }
 
     /**
-     * Get current time string in a format of "HH:mm:ss"
-     *
-     * @return
-     */
-    public static String getCurrentTimeString()
-    {
-        return new SimpleDateFormat(TIME_PATTERN, Locale.getDefault()).format(new Date());
-    }
-
-    /**
      * Get current datetime string in a format of "yyyy-MM-dd HH:mm:ss"
      *
      * @return
@@ -193,6 +152,16 @@ public final class Tools
     public static String getCurrentDateTimeString()
     {
         return getCurrentDateString() + " " + getCurrentTimeString();
+    }
+
+    /**
+     * Get current time string in a format of "HH:mm:ss"
+     *
+     * @return
+     */
+    public static String getCurrentTimeString()
+    {
+        return new SimpleDateFormat(TIME_PATTERN, Locale.getDefault()).format(new Date());
     }
 
     public static List<File> getDirs(final @NonNull File dir, boolean includeParent)
@@ -277,5 +246,36 @@ public final class Tools
             Logger.error(LOGGER_TAG, "Failed to get all files under directory " + dir + ".", t);
             return null;
         }
+    }
+
+    public static boolean isDoubleEqual(double left, double right)
+    {
+        return isDoubleEqual(left, right, 0.0000001);
+    }
+
+    public static boolean isDoubleEqual(double left, double right, double precision)
+    {
+        return Math.abs(left - right) < precision;
+    }
+
+    public static boolean isStringEmpty(final @NonNull String str)
+    {
+        return isStringEmpty(str, true);
+    }
+
+    public static boolean isStringEmpty(final @NonNull String str, boolean treatWhitespaceAsEmpty)
+    {
+        if (str.length() == 0) return true;
+        if (!treatWhitespaceAsEmpty) return false;
+        for (int i = 0; i < str.length(); i++)
+        {
+            if (str.charAt(i) != ' ') return false;
+        }
+        return true;
+    }
+
+    private Tools()
+    {
+        // no-op
     }
 }

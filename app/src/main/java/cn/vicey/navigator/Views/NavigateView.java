@@ -24,17 +24,6 @@ public class NavigateView
     private MainActivity mParent;
     private ViewFlipper mViewFlipper;
 
-    private OnClickListener mUpstairsButtonOnClickListener = new OnClickListener()
-    {
-        @Override
-        public void onClick(View view)
-        {
-            if (view.getId() != R.id.nv_upstairs_button) return;
-            if (MapManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!MapManager.goUpstairs()) mParent.alert(R.string.already_top_floor);
-            flush();
-        }
-    };
     private OnClickListener mDownstairsButtonOnClickListener = new OnClickListener()
     {
         @Override
@@ -43,6 +32,17 @@ public class NavigateView
             if (view.getId() != R.id.nv_downstairs_button) return;
             if (MapManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
             else if (!MapManager.goDownstairs()) mParent.alert(R.string.already_ground_floor);
+            flush();
+        }
+    };
+    private OnClickListener mUpstairsButtonOnClickListener = new OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            if (view.getId() != R.id.nv_upstairs_button) return;
+            if (MapManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
+            else if (!MapManager.goUpstairs()) mParent.alert(R.string.already_top_floor);
             flush();
         }
     };

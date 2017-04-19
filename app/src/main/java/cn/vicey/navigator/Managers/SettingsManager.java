@@ -10,8 +10,8 @@ public class SettingsManager
     private static final String LOGGER_TAG = "SettingsManager";
     private static final String DEFAULT_INT = "0";
     private static final String DEFAULT_STRING = "";
-    private static final String PREFERENCE_NAME = "SettingsManager";
     private static final String LINE_WIDTH = "LineWidth";
+    private static final String PREFERENCE_NAME = "SettingsManager";
 
     private static boolean mIsDebugModeEnabled;
     private static int mLineWidth;
@@ -28,23 +28,6 @@ public class SettingsManager
         {
             Logger.error(LOGGER_TAG, "Failed to get setting value.", t);
             return null;
-        }
-    }
-
-    public static boolean init(Context context)
-    {
-        try
-        {
-            mSharedPreference = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
-
-            mLineWidth = Integer.parseInt(getSettingValue(LINE_WIDTH, DEFAULT_INT));
-
-            return true;
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to get shared preferences.", t);
-            return false;
         }
     }
 
@@ -65,6 +48,11 @@ public class SettingsManager
         }
     }
 
+    public static void enableDebugMode()
+    {
+        mIsDebugModeEnabled = true;
+    }
+
     public static boolean getIsDebugModeEnabled()
     {
         return mIsDebugModeEnabled;
@@ -73,6 +61,23 @@ public class SettingsManager
     public static int getLineWidth()
     {
         return mLineWidth;
+    }
+
+    public static boolean init(Context context)
+    {
+        try
+        {
+            mSharedPreference = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
+
+            mLineWidth = Integer.parseInt(getSettingValue(LINE_WIDTH, DEFAULT_INT));
+
+            return true;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to get shared preferences.", t);
+            return false;
+        }
     }
 
     public static boolean setLineWidth(int value)
@@ -87,11 +92,6 @@ public class SettingsManager
             Logger.error(LOGGER_TAG, "Failed to save settings.", t);
             return false;
         }
-    }
-
-    public static void enableDebugMode()
-    {
-        mIsDebugModeEnabled = true;
     }
 
     private SettingsManager()

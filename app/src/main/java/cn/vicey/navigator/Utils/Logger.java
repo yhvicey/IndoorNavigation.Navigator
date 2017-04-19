@@ -1,6 +1,5 @@
 package cn.vicey.navigator.Utils;
 
-
 import android.util.Log;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
@@ -14,62 +13,15 @@ import java.util.Locale;
 public class Logger
 {
     private static final String LOGGER_TAG = "Logger";
+    private static final String DEBUG_HEADER = "DEBUG";
+    private static final String ERROR_HEADER = "ERROR";
+    private static final String INFO_HEADER = "INFO";
     private static final String LOG_DIR = "/logs/";
     private static final String LOG_FILE = "Navigator.log";
     private static final String LOG_TEMPLATE = "[%s][%d][%s] %s";
-    private static final String DEBUG_HEADER = "DEBUG";
-    private static final String INFO_HEADER = "INFO";
-    private static final String ERROR_HEADER = "ERROR";
 
     private static File mLogFile;
     private static FileOutputStream mLogFileStream;
-
-    public static boolean init()
-    {
-        try
-        {
-            String logDirPath = Navigator.getFilesDirPath() + LOG_DIR;
-            String logFilePath = logDirPath + LOG_FILE;
-            File logDir = new File(logDirPath);
-            if (!(logDir.exists() || logDir.mkdir()))
-            {
-                error(LOGGER_TAG, "Failed to create log dir. File log disabled.");
-                return false;
-            }
-            mLogFile = new File(logFilePath);
-            if (!(mLogFile.exists() || mLogFile.createNewFile()))
-            {
-                error(LOGGER_TAG, "Failed to create log file. File log disabled.");
-                return false;
-            }
-            resume();
-            return true;
-        }
-        catch (Throwable t)
-        {
-            error(LOGGER_TAG, "Failed to create log file.", t);
-            return false;
-        }
-    }
-
-    private Logger()
-    {
-        // no-op
-    }
-
-    private static void write(String message)
-    {
-        if (mLogFileStream == null) return;
-        try
-        {
-            mLogFileStream.write(message.getBytes(Tools.FILE_ENCODING));
-        }
-        catch (Throwable t)
-        {
-            mLogFileStream = null;
-            error(LOGGER_TAG, "Failed to write to file. File log disabled.", t);
-        }
-    }
 
     private static void pause()
     {
@@ -100,17 +52,17 @@ public class Logger
         }
     }
 
-    public static void flush()
+    private static void write(String message)
     {
         if (mLogFileStream == null) return;
         try
         {
-            mLogFileStream.flush();
+            mLogFileStream.write(message.getBytes(Tools.FILE_ENCODING));
         }
         catch (Throwable t)
         {
             mLogFileStream = null;
-            error(LOGGER_TAG, "Failed to flush logger. File log disabled.", t);
+            error(LOGGER_TAG, "Failed to write to file. File log disabled.", t);
         }
     }
 
@@ -149,39 +101,6 @@ public class Logger
     }
 
     /**
-     * Log info messages with timestamp.
-     *
-     * @param tag     Log tag.
-     * @param message Message to log.
-     */
-    public static void info(String tag, String message)
-    {
-        info(tag, message, null);
-    }
-
-    /**
-     * Log info messages with timestamp.
-     *
-     * @param tag     Log tag.
-     * @param message Message to log.
-     * @param t       Error or exception to log.
-     */
-    public static void info(String tag, String message, Throwable t)
-    {
-        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), INFO_HEADER, message) + Tools.NEW_LINE;
-        Log.i(tag, msg);
-        write(msg);
-        if (t != null)
-        {
-            info(tag, t.toString());
-            for (StackTraceElement stackTraceElement : t.getStackTrace())
-            {
-                info(tag, stackTraceElement.toString());
-            }
-        }
-    }
-
-    /**
      * Log error messages with timestamp.
      *
      * @param tag     Log tag.
@@ -214,6 +133,20 @@ public class Logger
         }
     }
 
+    public static void flush()
+    {
+        if (mLogFileStream == null) return;
+        try
+        {
+            mLogFileStream.flush();
+        }
+        catch (Throwable t)
+        {
+            mLogFileStream = null;
+            error(LOGGER_TAG, "Failed to flush logger. File log disabled.", t);
+        }
+    }
+
     public static String getLogContent()
     {
         try
@@ -240,5 +173,71 @@ public class Logger
             resume();
             return null;
         }
+    }
+
+    /**
+     * Log info messages with timestamp.
+     *
+     * @param tag     Log tag.
+     * @param message Message to log.
+     */
+    public static void info(String tag, String message)
+    {
+        info(tag, message, null);
+    }
+
+    /**
+     * Log info messages with timestamp.
+     *
+     * @param tag     Log tag.
+     * @param message Message to log.
+     * @param t       Error or exception to log.
+     */
+    public static void info(String tag, String message, Throwable t)
+    {
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), INFO_HEADER, message) + Tools.NEW_LINE;
+        Log.i(tag, msg);
+        write(msg);
+        if (t != null)
+        {
+            info(tag, t.toString());
+            for (StackTraceElement stackTraceElement : t.getStackTrace())
+            {
+                info(tag, stackTraceElement.toString());
+            }
+        }
+    }
+
+    public static boolean init()
+    {
+        try
+        {
+            String logDirPath = Navigator.getFilesDirPath() + LOG_DIR;
+            String logFilePath = logDirPath + LOG_FILE;
+            File logDir = new File(logDirPath);
+            if (!(logDir.exists() || logDir.mkdir()))
+            {
+                error(LOGGER_TAG, "Failed to create log dir. File log disabled.");
+                return false;
+            }
+            mLogFile = new File(logFilePath);
+            if (!(mLogFile.exists() || mLogFile.createNewFile()))
+            {
+                error(LOGGER_TAG, "Failed to create log file. File log disabled.");
+                return false;
+            }
+            resume();
+            return true;
+        }
+        catch (Throwable t)
+        {
+            error(LOGGER_TAG, "Failed to create log file.", t);
+            return false;
+        }
+    }
+
+    private Logger()
+    {
+        // no-op
     }
 }

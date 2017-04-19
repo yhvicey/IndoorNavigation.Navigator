@@ -42,6 +42,24 @@ public class Map
         return mName;
     }
 
+    /**
+     * Gets map's version.
+     *
+     * @return Map's version.
+     */
+    public String getVersion()
+    {
+        return "1.0";
+    }
+
+    public void clearTags()
+    {
+        for (Floor floor : mFloors)
+        {
+            floor.clearTags();
+        }
+    }
+
     public List<Tag> getTags()
     {
         List<Tag> tags = new ArrayList<>();
@@ -52,16 +70,6 @@ public class Map
             index++;
         }
         return tags;
-    }
-
-    /**
-     * Gets map's version.
-     *
-     * @return Map's version.
-     */
-    public String getVersion()
-    {
-        return "1.0";
     }
 
     public boolean setTags(List<Tag> tags)
@@ -99,14 +107,6 @@ public class Map
         {
             Logger.error(LOGGER_TAG, "Failed to set tag.", t);
             return false;
-        }
-    }
-
-    public void clearTags()
-    {
-        for (Floor floor : mFloors)
-        {
-            floor.clearTags();
         }
     }
 

@@ -17,21 +17,16 @@ import java.util.List;
 public class TagParser
 {
     private static final String LOGGER_TAG = "TagParser";
-    private static final String SUPPORTED_VERSION = "1.1";
-    private static final String ATTR_VERSION = "Version";
     private static final String ATTR_FLOOR = "Floor";
     private static final String ATTR_INDEX = "Index";
     private static final String ATTR_TYPE = "Type";
     private static final String ATTR_VALUE = "Value";
-    private static final String ELEMENT_TAGS = "Tags";
+    private static final String ATTR_VERSION = "Version";
     private static final String ELEMENT_TAG = "Tag";
+    private static final String ELEMENT_TAGS = "Tags";
+    private static final String SUPPORTED_VERSION = "1.1";
     private static final String TYPE_GUIDE = "GuideNode";
     private static final String TYPE_WALL = "WallNode";
-
-    private TagParser()
-    {
-        // no-op
-    }
 
     private static Tag generateTag(final @NonNull XmlPullParser parser)
     {
@@ -160,35 +155,8 @@ public class TagParser
         }
     }
 
-    public static boolean validate(final @NonNull File file)
+    private TagParser()
     {
-        if (!file.exists() || !file.isFile()) return false;
-        try
-        {
-            Logger.info(LOGGER_TAG, "Validating tag file " + file + ".");
-            XmlPullParser parser = Xml.newPullParser();
-            parser.setInput(new FileInputStream(file), Tools.FILE_ENCODING);
-            int event = parser.getEventType();
-            while (event != XmlPullParser.END_DOCUMENT)
-            {
-                switch (event)
-                {
-                    case XmlPullParser.START_TAG:
-                    {
-                        boolean result = parser.getName().equals(ELEMENT_TAGS);
-                        Logger.info(LOGGER_TAG, "Finished validating tag file. Result is " + result + ".");
-                        return result;
-                    }
-                }
-                event = parser.next();
-            }
-            Logger.info(LOGGER_TAG, "Invalid tag file.");
-            return false;
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to validate file.", t);
-            return false;
-        }
+        // no-op
     }
 }

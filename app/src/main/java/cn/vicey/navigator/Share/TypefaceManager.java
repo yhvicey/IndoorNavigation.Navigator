@@ -25,13 +25,13 @@ public class TypefaceManager
         }
     }
 
+    public static Typeface getCanaroExtraBold()
+    {
+        return mCanaroExtraBold;
+    }
+
     private TypefaceManager()
     {
         // no-op
-    }
-
-    public static final Typeface getCanaroExtraBold()
-    {
-        return mCanaroExtraBold;
     }
 }

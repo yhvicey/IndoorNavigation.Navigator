@@ -16,17 +16,6 @@ public class Toolbar
     private ImageView mImageView;
     private TextView mTextView;
 
-    public Toolbar(Context context)
-    {
-        this(context, null);
-    }
-
-    public Toolbar(Context context, AttributeSet attrs)
-    {
-        super(context, attrs, 0);
-        init(attrs);
-    }
-
     private void init(AttributeSet attrs)
     {
         LayoutInflater.from(getContext()).inflate(R.layout.cmpt_toolbar, this, true);
@@ -42,6 +31,17 @@ public class Toolbar
         CharSequence title = typedArray.getText(R.styleable.Navigator_Toolbar_title);
         if (title != null) setTitleText(title);
         typedArray.recycle();
+    }
+
+    public Toolbar(Context context)
+    {
+        this(context, null);
+    }
+
+    public Toolbar(Context context, AttributeSet attrs)
+    {
+        super(context, attrs, 0);
+        init(attrs);
     }
 
     public Drawable getIcon()

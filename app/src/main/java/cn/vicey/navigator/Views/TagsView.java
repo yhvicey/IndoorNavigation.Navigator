@@ -46,8 +46,7 @@ public class TagsView
             TextView subTextView = (TextView) view.findViewById(R.id.tli_sub_text);
             if (textView != null) textView.setText(tag.getValue());
             if (subTextView != null)
-                subTextView.setText(mParent.getString(R.string.tag_metadata, tag.getFloor(), Tag.getNodeText(tag.getType()), tag
-                        .getIndex()));
+                subTextView.setText(mParent.getString(R.string.tag_metadata, tag.getFloor(), tag.getType(), tag.getIndex()));
             return view;
         }
     }

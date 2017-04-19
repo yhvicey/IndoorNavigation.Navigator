@@ -43,11 +43,6 @@ public class MapRenderer
     private Paint mWallPaint;
     private float mZoomLevel = 3;
 
-    private boolean valid()
-    {
-        return MapManager.getCurrentFloor() != null;
-    }
-
     private void drawLink(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
         mGuidePaint.setStrokeWidth(LINE_WIDTH * mZoomLevel);
@@ -173,6 +168,11 @@ public class MapRenderer
         if (newY > floor.getHeight() * mZoomLevel) newY = (int) (floor.getHeight() * mZoomLevel);
 
         lookAt(newX, newY);
+    }
+
+    private boolean valid()
+    {
+        return MapManager.getCurrentFloor() != null;
     }
 
     private void zoom(float offset)

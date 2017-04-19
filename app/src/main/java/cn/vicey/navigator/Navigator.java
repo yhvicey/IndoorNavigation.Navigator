@@ -13,29 +13,13 @@ public class Navigator
 {
     private static final String LOGGER_TAG = "Navigator";
 
+    public static final int ERR_INIT = -2;
     public static final int ERR_SUCCEED = 0;
     public static final int ERR_UNEXPECTED_ACTION = -1;
-    public static final int ERR_INIT = -2;
 
     private static String mCacheDir;
     private static String mFilesDir;
     private static long mStartTime = new Date().getTime();
-
-
-    public boolean init()
-    {
-        try
-        {
-            mCacheDir = getCacheDir().getAbsolutePath();
-            mFilesDir = getFilesDir().getAbsolutePath();
-            return true;
-        }
-        catch (Throwable t)
-        {
-            t.printStackTrace();
-            return false;
-        }
-    }
 
     public static void exit()
     {
@@ -69,6 +53,21 @@ public class Navigator
     public static long getStartTime()
     {
         return mStartTime;
+    }
+
+    public boolean init()
+    {
+        try
+        {
+            mCacheDir = getCacheDir().getAbsolutePath();
+            mFilesDir = getFilesDir().getAbsolutePath();
+            return true;
+        }
+        catch (Throwable t)
+        {
+            t.printStackTrace();
+            return false;
+        }
     }
 
     @Override

@@ -15,17 +15,6 @@ public class SettingsItem
     private CheckBox mCheckBox = null;
     private TextView mTextView = null;
 
-    public SettingsItem(Context context)
-    {
-        this(context, null);
-    }
-
-    public SettingsItem(Context context, AttributeSet attrs)
-    {
-        super(context, attrs, 0);
-        init(attrs);
-    }
-
     private void init(AttributeSet attrs)
     {
         LayoutInflater.from(getContext()).inflate(R.layout.cmpt_settings_item, this, true);
@@ -40,6 +29,17 @@ public class SettingsItem
         CharSequence text = typedArray.getText(R.styleable.Navigator_SettingsItem_text);
         if (text != null) setText(text);
         typedArray.recycle();
+    }
+
+    public SettingsItem(Context context)
+    {
+        this(context, null);
+    }
+
+    public SettingsItem(Context context, AttributeSet attrs)
+    {
+        super(context, attrs, 0);
+        init(attrs);
     }
 
     public boolean getChecked()

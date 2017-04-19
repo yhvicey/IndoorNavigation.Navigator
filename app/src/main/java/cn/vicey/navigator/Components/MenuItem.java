@@ -18,17 +18,6 @@ public class MenuItem
     private ImageView mImageView;
     private TextView mTextView;
 
-    public MenuItem(Context context)
-    {
-        this(context, null);
-    }
-
-    public MenuItem(Context context, AttributeSet attrs)
-    {
-        super(context, attrs, 0);
-        init(attrs);
-    }
-
     private void init(AttributeSet attrs)
     {
         LayoutInflater.from(getContext()).inflate(R.layout.cmpt_menu_item, this, true);
@@ -46,6 +35,17 @@ public class MenuItem
         boolean highlighted = typedArray.getBoolean(R.styleable.Navigator_MenuItem_highlighted, false);
         setHighlighted(highlighted);
         typedArray.recycle();
+    }
+
+    public MenuItem(Context context)
+    {
+        this(context, null);
+    }
+
+    public MenuItem(Context context, AttributeSet attrs)
+    {
+        super(context, attrs, 0);
+        init(attrs);
     }
 
     public boolean getHighlighted()

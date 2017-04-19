@@ -52,9 +52,40 @@ public class MapManager
         }
     }
 
-    private MapManager()
+    public static boolean deleteMapFile(final @NonNull String mapFileName)
     {
-        // no-op
+        File map = new File(mMapDir + "/" + mapFileName);
+        return !map.exists() || map.delete();
+    }
+
+    public static boolean deleteTagFile(final @NonNull String tagFileName)
+    {
+        File tag = new File(mMapDir + "/" + tagFileName);
+        return !tag.exists() || tag.delete();
+    }
+
+    public static List<File> getAllMapFiles()
+    {
+        try
+        {
+            List<File> files = Tools.getFiles(mMapDir);
+            if (files == null)
+            {
+                Logger.error(LOGGER_TAG, "Failed to get all map files.");
+                return null;
+            }
+            return files;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to get all map files.", t);
+            return null;
+        }
+    }
+
+    public static String getAvailableDefaultMapFileName()
+    {
+        return Tools.getAvailableDefaultName(mMapDir, ".xml");
     }
 
     public static Floor getCurrentFloor()
@@ -93,49 +124,6 @@ public class MapManager
         return mTagDir;
     }
 
-    public static void setCurrentMap(final @NonNull Map map)
-    {
-        mCurrentFloorIndex = NO_SELECTED_FLOOR;
-        mCurrentMap = map;
-        goUpstairs();
-    }
-
-    public static boolean deleteMapFile(final @NonNull String mapFileName)
-    {
-        File map = new File(mMapDir + "/" + mapFileName);
-        return !map.exists() || map.delete();
-    }
-
-    public static boolean deleteTagFile(final @NonNull String tagFileName)
-    {
-        File tag = new File(mMapDir + "/" + tagFileName);
-        return !tag.exists() || tag.delete();
-    }
-
-    public static List<File> getAllMapFiles()
-    {
-        try
-        {
-            List<File> files = Tools.getFiles(mMapDir);
-            if (files == null)
-            {
-                Logger.error(LOGGER_TAG, "Failed to get all map files.");
-                return null;
-            }
-            return files;
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to get all map files.", t);
-            return null;
-        }
-    }
-
-    public static String getAvailableDefaultMapFileName()
-    {
-        return Tools.getAvailableDefaultName(mMapDir, ".xml");
-    }
-
     public static boolean goDownstairs()
     {
         if (mCurrentMap == null) return false;
@@ -152,19 +140,19 @@ public class MapManager
         return true;
     }
 
-    public static boolean hasMapFile(final @NonNull String mapFileName)
+    public static boolean hasMapFile(final @NonNull String mapName)
     {
-        return new File(mMapDir + "/" + mapFileName).exists();
+        return new File(mMapDir + "/" + mapName).exists();
     }
 
     public static boolean hasTags(final @NonNull String mapName)
     {
-        return validateTagFile(new File(mTagDir + "/" + mapName));
+        return new File(mTagDir + "/" + mapName).exists();
     }
 
-    public static Map loadMapFile(final @NonNull String mapFileName)
+    public static Map loadMap(final @NonNull String mapName)
     {
-        return MapParser.parse(new File(mMapDir + "/" + mapFileName));
+        return MapParser.parse(new File(mMapDir + "/" + mapName));
     }
 
     public static List<Tag> loadTags(final @NonNull String mapName)
@@ -181,6 +169,13 @@ public class MapManager
         return map.renameTo(new File(mMapDir + "/" + newMapName));
     }
 
+    public static void setCurrentMap(final @NonNull Map map)
+    {
+        mCurrentFloorIndex = NO_SELECTED_FLOOR;
+        mCurrentMap = map;
+        goUpstairs();
+    }
+
     public static boolean saveMapFile(final @NonNull File src, boolean overwrite)
     {
         String fileName = src.getName();
@@ -195,8 +190,8 @@ public class MapManager
         return Tools.copyFile(file, new File(mTagDir + "/" + mapName), true);
     }
 
-    public static boolean validateTagFile(final @NonNull File tagFile)
+    private MapManager()
     {
-        return TagParser.validate(tagFile);
+        // no-op
     }
 }
