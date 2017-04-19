@@ -5,7 +5,7 @@ import android.util.Xml;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 import org.xmlpull.v1.XmlSerializer;
 
 import java.io.File;
@@ -79,8 +79,8 @@ public class TagSaver
             }
             FileOutputStream fos = new FileOutputStream(file);
             XmlSerializer serializer = Xml.newSerializer();
-            serializer.setOutput(fos, Utils.FILE_ENCODING);
-            serializer.startDocument(Utils.FILE_ENCODING, true);
+            serializer.setOutput(fos, Tools.FILE_ENCODING);
+            serializer.startDocument(Tools.FILE_ENCODING, true);
             serializer.startTag(null, ELEMENT_TAGS);
             serializer.attribute(null, ATTR_VERSION, SUPPORTED_VERSION);
             for (Tag tag : tags)

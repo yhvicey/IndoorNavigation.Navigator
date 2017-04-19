@@ -51,7 +51,7 @@ public class Navigator
 
     public static void exitWithError(int errorCode)
     {
-        Logger.error(LOGGER_TAG, "Utils.exitWithError(int errorCode) has been called. Error code: " + errorCode);
+        Logger.error(LOGGER_TAG, "Tools.exitWithError(int errorCode) has been called. Error code: " + errorCode);
         Logger.flush();
         System.exit(errorCode);
     }

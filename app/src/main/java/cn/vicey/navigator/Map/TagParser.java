@@ -5,7 +5,7 @@ import android.util.Xml;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class TagParser
     private static Tag generateTag(final @NonNull XmlPullParser parser)
     {
         String type = parser.getAttributeValue(null, ATTR_TYPE);
-        if (Utils.isStringEmpty(type, true))
+        if (Tools.isStringEmpty(type, true))
         {
             Logger.error(LOGGER_TAG, "Tag element must have valid type attribute. Line: " + parser.getLineNumber());
             return null;
@@ -84,7 +84,7 @@ public class TagParser
             List<Tag> tagList = new ArrayList<>();
 
             XmlPullParser parser = Xml.newPullParser();
-            parser.setInput(stream, Utils.FILE_ENCODING);
+            parser.setInput(stream, Tools.FILE_ENCODING);
             int event = parser.getEventType();
             while (event != XmlPullParser.END_DOCUMENT)
             {
@@ -167,7 +167,7 @@ public class TagParser
         {
             Logger.info(LOGGER_TAG, "Validating tag file " + file + ".");
             XmlPullParser parser = Xml.newPullParser();
-            parser.setInput(new FileInputStream(file), Utils.FILE_ENCODING);
+            parser.setInput(new FileInputStream(file), Tools.FILE_ENCODING);
             int event = parser.getEventType();
             while (event != XmlPullParser.END_DOCUMENT)
             {

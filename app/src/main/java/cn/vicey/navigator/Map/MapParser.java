@@ -10,7 +10,7 @@ import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
@@ -140,7 +140,7 @@ public class MapParser
             List<Floor> floors = new ArrayList<>();
 
             XmlPullParser parser = Xml.newPullParser();
-            parser.setInput(stream, Utils.FILE_ENCODING);
+            parser.setInput(stream, Tools.FILE_ENCODING);
             int event = parser.getEventType();
             while (event != XmlPullParser.END_DOCUMENT)
             {
@@ -163,7 +163,7 @@ public class MapParser
                                     return null;
                                 }
                                 String mapNameStr = parser.getAttributeValue(null, ATTR_NAME);
-                                if (Utils.isStringEmpty(mapNameStr, true))
+                                if (Tools.isStringEmpty(mapNameStr, true))
                                 {
                                     Logger.info(LOGGER_TAG, "Map does not have a name. Will use default name.");
                                 }

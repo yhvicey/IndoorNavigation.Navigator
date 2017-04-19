@@ -6,7 +6,7 @@ import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 
 import java.io.File;
 import java.util.List;
@@ -113,7 +113,7 @@ public class MapManager
     {
         try
         {
-            List<File> files = Utils.getFiles(mMapDir);
+            List<File> files = Tools.getFiles(mMapDir);
             if (files == null)
             {
                 Logger.error(LOGGER_TAG, "Failed to get all map files.");
@@ -130,7 +130,7 @@ public class MapManager
 
     public static String getAvailableDefaultMapFileName()
     {
-        return Utils.getAvailableDefaultName(mMapDir, ".xml");
+        return Tools.getAvailableDefaultName(mMapDir, ".xml");
     }
 
     public static boolean goDownstairs()
@@ -182,14 +182,14 @@ public class MapManager
     {
         String fileName = src.getName();
         if (!overwrite && hasMapFile(fileName)) fileName = getAvailableDefaultMapFileName();
-        return Utils.copyFile(src, new File(mMapDir + "/" + fileName), overwrite);
+        return Tools.copyFile(src, new File(mMapDir + "/" + fileName), overwrite);
     }
 
     public static boolean saveTags(final @NonNull String mapName, List<Tag> tags)
     {
         File file = TagSaver.save(mapName, tags);
         if (file == null) return false;
-        return Utils.copyFile(file, new File(mTagDir + "/" + mapName), true);
+        return Tools.copyFile(file, new File(mTagDir + "/" + mapName), true);
     }
 
     public static boolean validateTagFile(final @NonNull File tagFile)

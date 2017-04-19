@@ -17,7 +17,7 @@ import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 
 import java.io.File;
 
@@ -178,7 +178,7 @@ public class MapsView
                         {
                             String url = editor.getText().toString();
                             mParent.alert(R.string.downloading);
-                            Utils.downloadFile(url, new Utils.DownloadCallback()
+                            Tools.downloadFile(url, new Tools.DownloadCallback()
                             {
                                 @Override
                                 public void onDownloadSucceed(@NonNull String filePath)

@@ -6,7 +6,7 @@ import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Share.Logger;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -106,7 +106,7 @@ public class Floor
 
     public List<GuideNode> findGuideNode(final @NonNull String pattern)
     {
-        if (Utils.isStringEmpty(pattern, true)) return new ArrayList<>();
+        if (Tools.isStringEmpty(pattern, true)) return new ArrayList<>();
         List<GuideNode> result = new ArrayList<>();
         for (GuideNode node : mGuideNodes)
         {

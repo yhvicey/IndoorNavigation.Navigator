@@ -9,7 +9,7 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public final class Utils
+public final class Tools
 {
     public interface DownloadCallback
     {
@@ -18,14 +18,14 @@ public final class Utils
         void onDownloadFailed();
     }
 
-    private static final String LOGGER_TAG = "Utils";
+    private static final String LOGGER_TAG = "Tools";
     private static final String DATE_PATTERN = "yyyy-MM-dd";
     private static final String TIME_PATTERN = "HH:mm:ss";
 
     public static final String NEW_LINE = System.getProperty("line.separator");
     public static final String FILE_ENCODING = "utf-8";
 
-    private Utils()
+    private Tools()
     {
         // no-op
     }
@@ -86,11 +86,11 @@ public final class Utils
                     URL url = new URL(urlString);
                     String fileName = url.getFile();
                     File dir = new File(Navigator.getCacheDirPath());
-                    if (Utils.isStringEmpty(fileName))
+                    if (Tools.isStringEmpty(fileName))
                     {
                         int index = urlString.lastIndexOf('/');
                         if (index == -1 || index == urlString.length() - 1)
-                            fileName = Utils.getAvailableDefaultName(dir);
+                            fileName = Tools.getAvailableDefaultName(dir);
                         else fileName = urlString.substring(index + 1);
                     }
                     File file = new File(dir + fileName);
@@ -107,10 +107,10 @@ public final class Utils
                     String tmp;
                     while ((tmp = reader.readLine()) != null)
                     {
-                        stringBuilder.append(tmp).append(Utils.NEW_LINE);
+                        stringBuilder.append(tmp).append(Tools.NEW_LINE);
                     }
                     FileOutputStream fos = new FileOutputStream(file, false);
-                    fos.write(stringBuilder.toString().getBytes(Utils.FILE_ENCODING));
+                    fos.write(stringBuilder.toString().getBytes(Tools.FILE_ENCODING));
                     fos.close();
                     Logger.info(LOGGER_TAG, "Finished download " + urlString + ". Total time: " + (new Date().getTime() - startTime) + " ms.");
                     realCallback.onDownloadSucceed(file.getAbsolutePath());

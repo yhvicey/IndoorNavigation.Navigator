@@ -61,7 +61,7 @@ public class Logger
         if (mLogFileStream == null) return;
         try
         {
-            mLogFileStream.write(message.getBytes(Utils.FILE_ENCODING));
+            mLogFileStream.write(message.getBytes(Tools.FILE_ENCODING));
         }
         catch (Throwable t)
         {
@@ -134,7 +134,7 @@ public class Logger
     public static void debug(String tag, String message, Throwable t)
     {
         if (!Settings.getIsDebugModeEnabled()) return;
-        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message) + Utils.NEW_LINE;
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), DEBUG_HEADER, message) + Tools.NEW_LINE;
         Log.d(tag, msg);
         write(msg);
         if (t != null)
@@ -167,7 +167,7 @@ public class Logger
      */
     public static void info(String tag, String message, Throwable t)
     {
-        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), INFO_HEADER, message) + Utils.NEW_LINE;
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), INFO_HEADER, message) + Tools.NEW_LINE;
         Log.i(tag, msg);
         write(msg);
         if (t != null)
@@ -200,7 +200,7 @@ public class Logger
      */
     public static void error(String tag, String message, Throwable t)
     {
-        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), ERROR_HEADER, message) + Utils.NEW_LINE;
+        String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), ERROR_HEADER, message) + Tools.NEW_LINE;
         Log.e(tag, msg);
         write(msg);
         if (t != null)
@@ -225,7 +225,7 @@ public class Logger
             StringBuilder stringBuilder = new StringBuilder();
             while ((str = reader.readLine()) != null)
             {
-                stringBuilder.append(str).append(Utils.NEW_LINE);
+                stringBuilder.append(str).append(Tools.NEW_LINE);
             }
             reader.close();
             inputReader.close();

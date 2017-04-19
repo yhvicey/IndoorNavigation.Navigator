@@ -11,7 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.ListViewAdapter;
-import cn.vicey.navigator.Share.Utils;
+import cn.vicey.navigator.Share.Tools;
 
 import java.io.File;
 import java.util.List;
@@ -95,7 +95,7 @@ public class FileList
     public void setDirectory(final File value)
     {
         if (value == null) return;
-        List<File> entries = Utils.getEntries(value, false);
+        List<File> entries = Tools.getEntries(value, false);
         if (entries == null)
         {
             if (mCallback != null) mCallback.onOpenDirFailed();
