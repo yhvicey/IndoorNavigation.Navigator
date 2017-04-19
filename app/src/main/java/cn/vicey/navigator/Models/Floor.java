@@ -1,7 +1,10 @@
 package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.NodeType;
+import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 
@@ -16,16 +19,10 @@ public class Floor
     private static final String LOGGER_TAG = "Floor";
     private static final int MAP_PADDING = 50;
 
-    private List<EntryNode> mEntryNodes = new ArrayList<>();
     private List<GuideNode> mGuideNodes = new ArrayList<>();
     private int mHeight;
     private List<WallNode> mWallNodes = new ArrayList<>();
     private int mWidth;
-
-    public List<EntryNode> getEntryNodes()
-    {
-        return mEntryNodes;
-    }
 
     public List<GuideNode> getGuideNodes()
     {
@@ -36,12 +33,6 @@ public class Floor
     {
         List<Tag> tags = new ArrayList<>();
         int index = 0;
-        for (NodeBase node : mEntryNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floor, index, NodeType.ENTRY_NODE, tagValue));
-            index++;
-        }
         for (NodeBase node : mGuideNodes)
         {
             String tagValue = node.getTag();
@@ -84,11 +75,6 @@ public class Floor
         if (node.getY() > mHeight) mHeight = node.getY() + MAP_PADDING;
         switch (node.getType())
         {
-            case ENTRY_NODE:
-            {
-                mEntryNodes.add((EntryNode) node);
-                return;
-            }
             case GUIDE_NODE:
             {
                 mGuideNodes.add((GuideNode) node);
@@ -108,10 +94,6 @@ public class Floor
 
     public void clearTags()
     {
-        for (NodeBase node : mEntryNodes)
-        {
-            node.clearTag();
-        }
         for (NodeBase node : mGuideNodes)
         {
             node.clearTag();
@@ -120,18 +102,6 @@ public class Floor
         {
             node.clearTag();
         }
-    }
-
-    public List<EntryNode> findEntryNode(final @NonNull String pattern)
-    {
-        if (Utils.isStringEmpty(pattern, true)) return new ArrayList<>();
-        List<EntryNode> result = new ArrayList<>();
-        for (EntryNode node : mEntryNodes)
-        {
-            if (node.getName() == null) continue;
-            if (pattern.matches(node.getName())) result.add(node);
-        }
-        return result;
     }
 
     public List<GuideNode> findGuideNode(final @NonNull String pattern)
@@ -146,27 +116,9 @@ public class Floor
         return result;
     }
 
-    public List<NodeBase> findNode(final @NonNull String pattern)
-    {
-        List<NodeBase> result = new ArrayList<>();
-        result.addAll(findEntryNode(pattern));
-        result.addAll(findGuideNode(pattern));
-        return result;
-    }
-
     public double getDistance(NodeType startType, int startIndex, NodeType endType, int endIndex)
     {
         return getNode(startType, startIndex).calcDistance(getNode(endType, endIndex));
-    }
-
-    public EntryNode getEntryNode(int index)
-    {
-        return mEntryNodes.get(index);
-    }
-
-    public int getEntryNodeIndex(@NonNull EntryNode node)
-    {
-        return mEntryNodes.indexOf(node);
     }
 
     public GuideNode getGuideNode(int index)
@@ -193,10 +145,6 @@ public class Floor
     {
         switch (type)
         {
-            case ENTRY_NODE:
-            {
-                return getEntryNode(index);
-            }
             case GUIDE_NODE:
             {
                 return getGuideNode(index);
@@ -217,10 +165,6 @@ public class Floor
     {
         switch (node.getType())
         {
-            case ENTRY_NODE:
-            {
-                return getEntryNodeIndex((EntryNode) node);
-            }
             case GUIDE_NODE:
             {
                 return getGuideNodeIndex((GuideNode) node);

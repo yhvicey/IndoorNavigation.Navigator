@@ -8,6 +8,8 @@ public class GuideNode
         extends NodeBase
 {
     private String mName;
+    private Integer mNext;
+    private Integer mPrev;
 
     /**
      * Initial new instance of class GuideNode.
@@ -15,22 +17,12 @@ public class GuideNode
      * @param x X position of the node.
      * @param y Y position of the node.
      */
-    public GuideNode(int x, int y)
-    {
-        this(x, y, null);
-    }
-
-    /**
-     * Initial new instance of class GuideNode.
-     *
-     * @param x    X position of the node.
-     * @param y    Y position of the node.
-     * @param name Name of the node.
-     */
-    public GuideNode(int x, int y, String name)
+    public GuideNode(int x, int y, String name, Integer prev, Integer next)
     {
         super(x, y);
         mName = name;
+        mNext = next;
+        mPrev = prev;
     }
 
     /**
@@ -41,6 +33,16 @@ public class GuideNode
     public String getName()
     {
         return mName;
+    }
+
+    public Integer getNext()
+    {
+        return mNext;
+    }
+
+    public Integer getPrev()
+    {
+        return mPrev;
     }
 
     /**
@@ -57,6 +59,7 @@ public class GuideNode
     @Override
     public String toString()
     {
-        return super.toString() + (mName == null ? "" : " Name: " + mName);
+        return super.toString() + (getName() == null ? "" : (" Name: " + getName())) + (mNext == null ? "" : (" Next: " + mNext)) + (mPrev == null ? "" : (" Prev: " + mPrev));
+
     }
 }

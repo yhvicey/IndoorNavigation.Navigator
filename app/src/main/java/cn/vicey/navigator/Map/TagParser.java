@@ -17,7 +17,7 @@ import java.util.List;
 public class TagParser
 {
     private static final String LOGGER_TAG = "TagParser";
-    private static final String SUPPORTED_VERSION = "1.0";
+    private static final String SUPPORTED_VERSION = "1.1";
     private static final String ATTR_VERSION = "Version";
     private static final String ATTR_FLOOR = "Floor";
     private static final String ATTR_INDEX = "Index";
@@ -25,9 +25,8 @@ public class TagParser
     private static final String ATTR_VALUE = "Value";
     private static final String ELEMENT_TAGS = "Tags";
     private static final String ELEMENT_TAG = "Tag";
-    private static final String TYPE_ENTRY = "Entry";
-    private static final String TYPE_GUIDE = "Guide";
-    private static final String TYPE_WALL = "Wall";
+    private static final String TYPE_GUIDE = "GuideNode";
+    private static final String TYPE_WALL = "WallNode";
 
     private TagParser()
     {
@@ -62,10 +61,6 @@ public class TagParser
         }
         switch (type)
         {
-            case TYPE_ENTRY:
-            {
-                return new Tag(floor, index, NodeType.ENTRY_NODE, value);
-            }
             case TYPE_GUIDE:
             {
                 return new Tag(floor, index, NodeType.GUIDE_NODE, value);

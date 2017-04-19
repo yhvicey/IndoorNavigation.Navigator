@@ -76,11 +76,6 @@ public class Map
                 String value = tag.getValue();
                 switch (tag.getType())
                 {
-                    case ENTRY_NODE:
-                    {
-                        mFloors.get(floor).getEntryNodes().get(index).setTag(value);
-                        continue;
-                    }
                     case GUIDE_NODE:
                     {
                         mFloors.get(floor).getGuideNodes().get(index).setTag(value);

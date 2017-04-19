@@ -15,7 +15,7 @@ import java.util.List;
 public class TagSaver
 {
     private static final String LOGGER_TAG = "TagSaver";
-    private static final String SUPPORTED_VERSION = "1.0";
+    private static final String SUPPORTED_VERSION = "1.1";
     private static final String ATTR_VERSION = "Version";
     private static final String ATTR_FLOOR = "Floor";
     private static final String ATTR_INDEX = "Index";
@@ -23,9 +23,8 @@ public class TagSaver
     private static final String ATTR_VALUE = "Value";
     private static final String ELEMENT_TAGS = "Tags";
     private static final String ELEMENT_TAG = "Tag";
-    private static final String TYPE_ENTRY = "Entry";
-    private static final String TYPE_GUIDE = "Guide";
-    private static final String TYPE_WALL = "Wall";
+    private static final String TYPE_GUIDE = "GuideNode";
+    private static final String TYPE_WALL = "WallNode";
 
     private TagSaver()
     {
@@ -42,11 +41,6 @@ public class TagSaver
             String type;
             switch (tag.getType())
             {
-                case ENTRY_NODE:
-                {
-                    type = TYPE_ENTRY;
-                    break;
-                }
                 case GUIDE_NODE:
                 {
                     type = TYPE_GUIDE;

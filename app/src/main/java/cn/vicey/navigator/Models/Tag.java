@@ -14,10 +14,6 @@ public class Tag
     {
         switch (type)
         {
-            case ENTRY_NODE:
-            {
-                return ENTRY_NODE_TEXT;
-            }
             case GUIDE_NODE:
             {
                 return GUIDE_NODE_TEXT;

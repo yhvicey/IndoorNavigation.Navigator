@@ -34,8 +34,8 @@ public abstract class NodeBase
 
     private List<Link> mLinks = new ArrayList<>();
     private String mTag;
-    private int mX;
-    private int mY;
+    protected int mX;
+    protected int mY;
 
     /**
      * Initialize new instance of class NodeBase.

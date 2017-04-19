@@ -74,6 +74,14 @@ public class MapManager
         return mCurrentMap;
     }
 
+    public static Floor getFloor(int floorIndex)
+    {
+        if (mCurrentMap == null) return null;
+        if (floorIndex < 0) return null;
+        if (floorIndex > mCurrentMap.getFloors().size() - 1) return null;
+        return mCurrentMap.getFloors().get(floorIndex);
+    }
+
     public static void setCurrentMap(final @NonNull Map map)
     {
         mCurrentMap = map;

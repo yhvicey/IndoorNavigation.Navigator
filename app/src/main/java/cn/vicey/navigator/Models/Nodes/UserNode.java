@@ -17,16 +17,18 @@ public class UserNode
             {
                 if (mInstance == null)
                 {
-                    mInstance = new UserNode(NavigateManager.getCurrentLocation().x, NavigateManager.getCurrentLocation().y);
+                    mInstance = new UserNode();
                 }
             }
         }
+        mInstance.mX = NavigateManager.getCurrentLocation().x;
+        mInstance.mY = NavigateManager.getCurrentLocation().y;
         return mInstance;
     }
 
-    private UserNode(int x, int y)
+    private UserNode()
     {
-        super(x, y);
+        super(0, 0);
     }
 
     @Override

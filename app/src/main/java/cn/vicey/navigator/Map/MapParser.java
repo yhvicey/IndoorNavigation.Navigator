@@ -5,7 +5,10 @@ import android.util.Xml;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Link;
 import cn.vicey.navigator.Models.Map;
-import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.NodeType;
+import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Utils;
 import org.xmlpull.v1.XmlPullParser;
@@ -33,13 +36,12 @@ public class MapParser
     private static final String ATTR_X = "X";
     private static final String ATTR_Y = "Y";
     private static final String DEFAULT_MAP_NAME = "Untitled";
-    private static final String ELEMENT_ENTRY = "EntryNode";
     private static final String ELEMENT_FLOOR = "Floor";
     private static final String ELEMENT_GUIDE = "GuideNode";
     private static final String ELEMENT_LINK = "Link";
     private static final String ELEMENT_MAP = "Map";
     private static final String ELEMENT_WALL = "WallNode";
-    private static final String SUPPORTED_VERSION = "1.0";
+    private static final String SUPPORTED_VERSION = "1.1";
 
     private MapParser()
     {
@@ -89,7 +91,7 @@ public class MapParser
         }
         switch (type)
         {
-            case ENTRY_NODE:
+            case GUIDE_NODE:
             {
                 String name = parser.getAttributeValue(null, ATTR_NAME);
                 Integer prev;
@@ -107,12 +109,7 @@ public class MapParser
                             .getLineNumber(), t);
                     return null;
                 }
-                return new EntryNode(x, y, name, prev, next);
-            }
-            case GUIDE_NODE:
-            {
-                String name = parser.getAttributeValue(null, ATTR_NAME);
-                return new GuideNode(x, y, name);
+                return new GuideNode(x, y, name, prev, next);
             }
             case WALL_NODE:
             {
@@ -193,7 +190,6 @@ public class MapParser
                             //endregion
                             // Meet node element, if is parsing a floor, then add the node to the floor, else break the parsing
                             //region Node element
-                            case ELEMENT_ENTRY:
                             case ELEMENT_GUIDE:
                             case ELEMENT_WALL:
                             {

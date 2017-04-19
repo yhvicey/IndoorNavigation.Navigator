@@ -10,7 +10,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import cn.vicey.navigator.Map.MapManager;
 import cn.vicey.navigator.Models.Floor;
-import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.NodeType;
+import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Settings;
@@ -31,7 +34,6 @@ public class MapRenderer
     private static final int ZOOM_LEVEL_MIN = 1;
     private static final int ZOOM_SPEED = 200;
 
-    private Paint mEntryPaint = new Paint();
     private Paint mGuidePaint = new Paint();
     private int mHalfWidth;
     private int mHalfHeight;
@@ -47,13 +49,6 @@ public class MapRenderer
     private boolean valid()
     {
         return MapManager.getCurrentFloor() != null;
-    }
-
-    private void drawEntryNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
-    {
-        List<EntryNode> entryNodes = floor.getEntryNodes();
-        for (EntryNode entryNode : entryNodes)
-            drawNode(canvas, entryNode);
     }
 
     private void drawGuideNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
@@ -80,11 +75,6 @@ public class MapRenderer
         float y = getRelativeY(node.getY());
         switch (node.getType())
         {
-            case ENTRY_NODE:
-            {
-                canvas.drawCircle(x, y, NODE_RADIUS, mEntryPaint);
-                break;
-            }
             case GUIDE_NODE:
             {
                 canvas.drawCircle(x, y, NODE_RADIUS, mGuidePaint);
@@ -135,9 +125,6 @@ public class MapRenderer
     {
         try
         {
-            mEntryPaint.setColor(ENTRY_COLOR);
-            mEntryPaint.setStrokeWidth(NODE_RADIUS);
-
             mGuidePaint.setColor(GUIDE_COLOR);
             mGuidePaint.setStrokeWidth(GUIDE_WIDTH);
 
@@ -196,7 +183,6 @@ public class MapRenderer
         drawWalls(canvas, floor);
         if (Settings.getIsDebugModeEnabled())
         {
-            drawEntryNodes(canvas, floor);
             drawGuideNodes(canvas, floor);
         }
     }
