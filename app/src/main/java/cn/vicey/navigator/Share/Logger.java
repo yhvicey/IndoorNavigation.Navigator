@@ -133,6 +133,7 @@ public class Logger
      */
     public static void debug(String tag, String message, Throwable t)
     {
+        if (!Settings.getIsDebugModeEnabled()) return;
         String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Utils.getCurrentDateTimeString(), Utils.getElapsedTime(), DEBUG_HEADER, message) + Utils.NEW_LINE;
         Log.d(tag, msg);
         write(msg);

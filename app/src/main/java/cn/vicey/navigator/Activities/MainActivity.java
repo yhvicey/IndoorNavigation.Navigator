@@ -107,7 +107,7 @@ public class MainActivity
             if (mClickCount > 5)
             {
                 Settings.enableDebugMode();
-                Logger.info(LOGGER_TAG, "Debug mode enabled");
+                Logger.debug(LOGGER_TAG, "Debug mode enabled");
                 alert(R.string.debug_mode_enabled);
                 flush();
             }
