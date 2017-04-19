@@ -19,32 +19,28 @@ import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Share.Logger;
 import cn.vicey.navigator.Share.Settings;
 
-import java.util.List;
-
 public class MapRenderer
         extends View
 {
     private static final String LOGGER_TAG = "MapRenderer";
-    private static final int ENTRY_COLOR = Color.GREEN;
-    private static final int NODE_RADIUS = 10;
-    private static final int GUIDE_COLOR = Color.BLUE;
-    private static final int GUIDE_WIDTH = 4;
+    private static final int GUIDE_COLOR = Color.GREEN;
+    private static final int LINE_WIDTH = 8;
+    private static final int NODE_RADIUS = 4;
     private static final int WALL_COLOR = Color.DKGRAY;
-    private static final int WALL_WIDTH = 10;
     private static final int ZOOM_LEVEL_MAX = 5;
     private static final int ZOOM_LEVEL_MIN = 1;
     private static final int ZOOM_SPEED = 200;
 
-    private Paint mGuidePaint = new Paint();
+    private Paint mGuidePaint;
     private int mHalfWidth;
     private int mHalfHeight;
     private boolean mIsZooming;
-    private Point mLookAt = new Point();
+    private Point mLookAt;
     private float mPrevTouchX = 0;
     private float mPrevTouchY = 0;
     private int mTouchedPointCount;
     private float mTouchPointDistance;
-    private Paint mWallPaint = new Paint();
+    private Paint mWallPaint;
     private float mZoomLevel = 3;
 
     private boolean valid()
@@ -52,15 +48,10 @@ public class MapRenderer
         return MapManager.getCurrentFloor() != null;
     }
 
-    private void drawGuideNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
+    private void drawLink(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
-        List<GuideNode> guideNodes = floor.getGuideNodes();
-        for (GuideNode guideNode : guideNodes)
-            drawNode(canvas, guideNode);
-    }
-
-    private void drawLine(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
-    {
+        mGuidePaint.setStrokeWidth(LINE_WIDTH * mZoomLevel);
+        mWallPaint.setStrokeWidth(LINE_WIDTH * mZoomLevel);
         float startX = getRelativeX(start.getX());
         float startY = getRelativeY(start.getY());
         float endX = getRelativeX(end.getX());
@@ -68,6 +59,25 @@ public class MapRenderer
         if (start.getType() == NodeType.WALL_NODE && end.getType() == NodeType.WALL_NODE)
             canvas.drawLine(startX, startY, endX, endY, mWallPaint);
         else canvas.drawLine(startX, startY, endX, endY, mGuidePaint);
+    }
+
+    private void drawLinks(final @NonNull Canvas canvas, final @NonNull Floor floor)
+    {
+        for (WallNode wallNode : floor.getWallNodes())
+        {
+            for (NodeBase.Link link : wallNode.getLinks())
+            {
+                drawLink(canvas, wallNode, link.getTarget());
+            }
+        }
+        if (!Settings.getIsDebugModeEnabled()) return;
+        for (GuideNode guideNode : floor.getGuideNodes())
+        {
+            for (NodeBase.Link link : guideNode.getLinks())
+            {
+                drawLink(canvas, guideNode, link.getTarget());
+            }
+        }
     }
 
     private void drawNode(final @NonNull Canvas canvas, final @NonNull NodeBase node)
@@ -78,27 +88,27 @@ public class MapRenderer
         {
             case GUIDE_NODE:
             {
-                canvas.drawCircle(x, y, NODE_RADIUS, mGuidePaint);
+                canvas.drawCircle(x, y, NODE_RADIUS * mZoomLevel, mGuidePaint);
                 break;
             }
             case WALL_NODE:
             {
-                canvas.drawCircle(x, y, WALL_WIDTH / 2, mWallPaint);
+                canvas.drawCircle(x, y, NODE_RADIUS * mZoomLevel, mWallPaint);
                 break;
             }
         }
     }
 
-    private void drawWalls(final @NonNull Canvas canvas, final @NonNull Floor floor)
+    private void drawNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
     {
-        List<WallNode> wallNodes = floor.getWallNodes();
-        for (WallNode node : wallNodes)
+        for (WallNode wallNode : floor.getWallNodes())
         {
-            drawNode(canvas, node);
-            for (NodeBase.Link link : node.getLinks())
-            {
-                drawLine(canvas, node, link.getTarget());
-            }
+            drawNode(canvas, wallNode);
+        }
+        if (!Settings.getIsDebugModeEnabled()) return;
+        for (GuideNode guideNode : floor.getGuideNodes())
+        {
+            drawNode(canvas, guideNode);
         }
     }
 
@@ -126,11 +136,13 @@ public class MapRenderer
     {
         try
         {
+            mGuidePaint = new Paint();
             mGuidePaint.setColor(GUIDE_COLOR);
-            mGuidePaint.setStrokeWidth(GUIDE_WIDTH);
-
+            
+            mWallPaint = new Paint();
             mWallPaint.setColor(WALL_COLOR);
-            mWallPaint.setStrokeWidth(WALL_WIDTH);
+
+            mLookAt = new Point();
         }
         catch (Throwable t)
         {
@@ -181,11 +193,8 @@ public class MapRenderer
         Floor floor = MapManager.getCurrentFloor();
         if (floor == null) return;
 
-        drawWalls(canvas, floor);
-        if (Settings.getIsDebugModeEnabled())
-        {
-            drawGuideNodes(canvas, floor);
-        }
+        drawNodes(canvas, floor);
+        drawLinks(canvas, floor);
     }
 
     @Override
