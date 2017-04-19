@@ -22,7 +22,7 @@ public class SettingsItem
 
     public SettingsItem(Context context, AttributeSet attrs)
     {
-        super(context, attrs);
+        super(context, attrs, 0);
         init(attrs);
     }
 

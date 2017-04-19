@@ -203,7 +203,7 @@ public class MapRenderer
 
     public MapRenderer(Context context, AttributeSet attrs)
     {
-        super(context);
+        super(context, attrs, 0);
         init(attrs);
     }
 

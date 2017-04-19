@@ -25,7 +25,7 @@ public class MenuItem
 
     public MenuItem(Context context, AttributeSet attrs)
     {
-        super(context, attrs);
+        super(context, attrs, 0);
         init(attrs);
     }
 
