@@ -20,10 +20,6 @@ public final class MapManager
     private static final String MAP_DIR = "/maps";
     private static final String TAG_DIR = "/tags";
 
-    public static final int NO_SELECTED_FLOOR = -1;
-
-    private static int mCurrentFloorIndex = NO_SELECTED_FLOOR;
-    private static Map mCurrentMap;
     private static File mMapDir;
     private static File mTagDir;
 
@@ -88,32 +84,6 @@ public final class MapManager
         return Tools.getAvailableDefaultName(mMapDir, ".xml");
     }
 
-    public static Floor getCurrentFloor()
-    {
-        if (mCurrentMap == null) return null;
-        if (mCurrentFloorIndex == NO_SELECTED_FLOOR || mCurrentFloorIndex >= mCurrentMap.getFloors().size())
-            return null;
-        return mCurrentMap.getFloors().get(mCurrentFloorIndex);
-    }
-
-    public static int getCurrentFloorIndex()
-    {
-        return mCurrentFloorIndex;
-    }
-
-    public static Map getCurrentMap()
-    {
-        return mCurrentMap;
-    }
-
-    public static Floor getFloor(int floorIndex)
-    {
-        if (mCurrentMap == null) return null;
-        if (floorIndex < 0) return null;
-        if (floorIndex > mCurrentMap.getFloors().size() - 1) return null;
-        return mCurrentMap.getFloors().get(floorIndex);
-    }
-
     public static File getMapDir()
     {
         return mMapDir;
@@ -122,22 +92,6 @@ public final class MapManager
     public static File getTagDir()
     {
         return mTagDir;
-    }
-
-    public static boolean goDownstairs()
-    {
-        if (mCurrentMap == null) return false;
-        if (mCurrentFloorIndex == NO_SELECTED_FLOOR) return false;
-        mCurrentFloorIndex--;
-        return true;
-    }
-
-    public static boolean goUpstairs()
-    {
-        if (mCurrentMap == null) return false;
-        if (mCurrentFloorIndex >= mCurrentMap.getFloors().size() - 1) return false;
-        mCurrentFloorIndex++;
-        return true;
     }
 
     public static boolean hasMapFile(final @NonNull String mapName)
@@ -169,13 +123,6 @@ public final class MapManager
         return map.renameTo(new File(mMapDir + "/" + newMapName));
     }
 
-    public static void setCurrentMap(final @NonNull Map map)
-    {
-        mCurrentFloorIndex = NO_SELECTED_FLOOR;
-        mCurrentMap = map;
-        goUpstairs();
-    }
-
     public static boolean saveMapFile(final @NonNull File src, boolean overwrite)
     {
         String fileName = src.getName();
@@ -186,8 +133,7 @@ public final class MapManager
     public static boolean saveTags(final @NonNull String mapName, List<Tag> tags)
     {
         File file = TagSaver.save(mapName, tags);
-        if (file == null) return false;
-        return Tools.copyFile(file, new File(mTagDir + "/" + mapName), true);
+        return file != null && Tools.copyFile(file, new File(mTagDir + "/" + mapName), true);
     }
 
     private MapManager()
