@@ -91,6 +91,11 @@ public class Path
         return mNodes.indexOf(node);
     }
 
+    public boolean isEnd(NodeBase target)
+    {
+        return !mNodes.isEmpty() && mNodes.get(mNodes.size() - 1) == target;
+    }
+
     public Path fork()
     {
         Path newPath = new Path(null);
