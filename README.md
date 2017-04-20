@@ -1,4 +1,5 @@
 # IndoorNavigator.Navigator
+[![Build Status](https://travis-ci.org/yhvicey/IndoorNavigator.Navigator.svg?branch=master)](https://travis-ci.org/yhvicey/IndoorNavigator.Navigator)
 
 ## Project homepage
 [IndoorNavigator](http://github.com/yhvicey/IndoorNavigator)
