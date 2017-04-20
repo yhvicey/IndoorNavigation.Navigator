@@ -47,9 +47,9 @@ public class FileList
 
     public interface OnFileListItemChooseCallback
     {
-        void onChooseFile(File chosenFile);
+        void OnChooseFile(File chosenFile);
 
-        void onOpenDirFailed();
+        void OnOpenDirFailed();
     }
 
     private FileListAdapter mAdapter;
@@ -66,7 +66,7 @@ public class FileList
             String currentEntryName = textView.getText().toString();
             File nextEntry = currentEntryName.equals("..") ? mCurrentDir.getParentFile() : new File(mCurrentDir + "/" + currentEntryName);
             if (nextEntry.isDirectory()) setDirectory(nextEntry);
-            else if (mCallback != null) mCallback.onChooseFile(nextEntry);
+            else if (mCallback != null) mCallback.OnChooseFile(nextEntry);
         }
     };
 
@@ -99,7 +99,7 @@ public class FileList
         List<File> entries = Tools.getEntries(value, false);
         if (entries == null)
         {
-            if (mCallback != null) mCallback.onOpenDirFailed();
+            if (mCallback != null) mCallback.OnOpenDirFailed();
             return;
         }
         if (!mHideParent) entries.add(0, new File(".."));

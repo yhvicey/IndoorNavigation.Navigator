@@ -33,7 +33,7 @@ public class MapsView
     private FileList.OnFileListItemChooseCallback mFileListCallback = new FileList.OnFileListItemChooseCallback()
     {
         @Override
-        public void onChooseFile(File chosenFile)
+        public void OnChooseFile(File chosenFile)
         {
             if (MapManager.saveMapFile(chosenFile, true))
             {
@@ -49,7 +49,7 @@ public class MapsView
         }
 
         @Override
-        public void onOpenDirFailed()
+        public void OnOpenDirFailed()
         {
             mParent.alert(R.string.cant_open_folder);
         }
@@ -57,7 +57,7 @@ public class MapsView
     private FileList.OnFileListItemChooseCallback mMapListCallback = new FileList.OnFileListItemChooseCallback()
     {
         @Override
-        public void onChooseFile(final File chosenFile)
+        public void OnChooseFile(final File chosenFile)
         {
             new AlertDialog.Builder(mParent).setTitle(R.string.manage).setItems(new String[]{
                     mParent.getString(R.string.load),
@@ -153,7 +153,7 @@ public class MapsView
         }
 
         @Override
-        public void onOpenDirFailed()
+        public void OnOpenDirFailed()
         {
             mParent.alert(R.string.cant_open_folder);
         }
