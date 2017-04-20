@@ -13,7 +13,7 @@ public final class SettingsManager
     private static final String LINE_WIDTH = "LineWidth";
     private static final String PREFERENCE_NAME = "SettingsManager";
 
-    private static boolean mIsDebugModeEnabled;
+    private static boolean mDebugModeEnabled;
     private static int mLineWidth;
     private static SharedPreferences mSharedPreference;
 
@@ -50,18 +50,18 @@ public final class SettingsManager
 
     public static boolean isDebugModeEnabled()
     {
-        return mIsDebugModeEnabled;
+        return mDebugModeEnabled;
     }
 
     public static void disableDebugMode()
     {
         Logger.debug(LOGGER_TAG, "Debug mode disabled.");
-        mIsDebugModeEnabled = false;
+        mDebugModeEnabled = false;
     }
 
     public static void enableDebugMode()
     {
-        mIsDebugModeEnabled = true;
+        mDebugModeEnabled = true;
         Logger.debug(LOGGER_TAG, "Debug mode enabled.");
     }
 
