@@ -1,6 +1,7 @@
 package cn.vicey.navigator.Models.Nodes;
 
-import cn.vicey.navigator.Managers.NavigateManager;
+import cn.vicey.navigator.Debug.LocationProvider;
+import cn.vicey.navigator.Managers.DebugManager;
 
 public class UserNode
         extends NodeBase
@@ -21,8 +22,6 @@ public class UserNode
                 }
             }
         }
-        mInstance.mX = NavigateManager.getCurrentLocation().x;
-        mInstance.mY = NavigateManager.getCurrentLocation().y;
         return mInstance;
     }
 
@@ -34,6 +33,22 @@ public class UserNode
     @Override
     public NodeType getType()
     {
-        return NodeType.USER_NODE;
+        _ return NodeType.USER_NODE;
+    }
+
+    @Override
+    public int getX()
+    {
+        // TODO: Integrate location module and use its position here
+        int x = 0;
+        return DebugManager.isUseFakeLocation() ? LocationProvider.getCurrentLocation().x : x;
+    }
+
+    @Override
+    public int getY()
+    {
+        // TODO: Integrate location module and use its position here
+        int y = 0;
+        return DebugManager.isUseFakeLocation() ? LocationProvider.getCurrentLocation().y : y;
     }
 }
