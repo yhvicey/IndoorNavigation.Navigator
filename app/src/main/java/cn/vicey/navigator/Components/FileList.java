@@ -2,6 +2,7 @@ package cn.vicey.navigator.Components;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,7 +38,7 @@ public class FileList
             File file = mItems.get(i);
             ImageView imageView = (ImageView) view.findViewById(R.id.fli_icon);
             if (imageView != null)
-                imageView.setImageDrawable(getContext().getDrawable(file.isFile() ? R.drawable.ic_file : R.drawable.ic_folder));
+                imageView.setImageDrawable(ContextCompat.getDrawable(getContext(), file.isFile() ? R.drawable.ic_file : R.drawable.ic_folder));
             TextView textView = (TextView) view.findViewById(R.id.fli_text);
             if (textView != null) textView.setText(file.getName());
             return view;
