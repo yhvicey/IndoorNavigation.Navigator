@@ -9,7 +9,7 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import cn.vicey.navigator.Managers.MapManager;
+import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
@@ -161,7 +161,7 @@ public class MapRenderer
         int newX = mLookAt.x += xOffset / mZoomLevel;
         int newY = mLookAt.y += yOffset / mZoomLevel;
 
-        Floor floor = MapManager.getCurrentFloor();
+        Floor floor = NavigateManager.getCurrentFloor();
         if (newX < 0) newX = 0;
         if (newX > floor.getWidth() * mZoomLevel) newX = (int) (floor.getWidth() * mZoomLevel);
         if (newY < 0) newY = 0;
@@ -172,7 +172,7 @@ public class MapRenderer
 
     private boolean valid()
     {
-        return MapManager.getCurrentFloor() != null;
+        return NavigateManager.getCurrentFloor() != null;
     }
 
     private void zoom(float offset)
@@ -190,7 +190,7 @@ public class MapRenderer
     @Override
     protected void onDraw(Canvas canvas)
     {
-        Floor floor = MapManager.getCurrentFloor();
+        Floor floor = NavigateManager.getCurrentFloor();
         if (floor == null) return;
 
         drawNodes(canvas, floor);

@@ -8,7 +8,7 @@ import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
-import cn.vicey.navigator.Managers.MapManager;
+import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
@@ -30,8 +30,8 @@ public class NavigateView
         public void onClick(View view)
         {
             if (view.getId() != R.id.nv_downstairs_button) return;
-            if (MapManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!MapManager.goDownstairs()) mParent.alert(R.string.already_ground_floor);
+            if (NavigateManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
+            else if (!NavigateManager.goDownstairs()) mParent.alert(R.string.already_ground_floor);
             flush();
         }
     };
@@ -41,8 +41,8 @@ public class NavigateView
         public void onClick(View view)
         {
             if (view.getId() != R.id.nv_upstairs_button) return;
-            if (MapManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!MapManager.goUpstairs()) mParent.alert(R.string.already_top_floor);
+            if (NavigateManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
+            else if (!NavigateManager.goUpstairs()) mParent.alert(R.string.already_top_floor);
             flush();
         }
     };
@@ -93,16 +93,16 @@ public class NavigateView
 
     public void flush()
     {
-        if (MapManager.getCurrentFloorIndex() == MapManager.NO_SELECTED_FLOOR)
+        if (NavigateManager.getCurrentFloorIndex() == NavigateManager.NO_SELECTED_FLOOR)
         {
             mParent.setTitleText(R.string.navigate);
             if (mViewFlipper.getDisplayedChild() != PLACEHOLDER_INDEX) showPlaceholder();
         }
         else
         {
-            String titleText = MapManager.getCurrentMap().getName();
-            int floorIndex = MapManager.getCurrentFloorIndex();
-            if (floorIndex != MapManager.NO_SELECTED_FLOOR) titleText = titleText + " - " + (floorIndex + 1) + "F";
+            String titleText = NavigateManager.getCurrentMap().getName();
+            int floorIndex = NavigateManager.getCurrentFloorIndex();
+            if (floorIndex != NavigateManager.NO_SELECTED_FLOOR) titleText = titleText + " - " + (floorIndex + 1) + "F";
             mParent.setTitleText(titleText);
             if (mViewFlipper.getDisplayedChild() != MAP_RENDERER_INDEX) showRenderer();
         }

@@ -13,6 +13,7 @@ import android.widget.RelativeLayout;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.FileList;
 import cn.vicey.navigator.Managers.MapManager;
+import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -77,7 +78,7 @@ public class MapsView
                             Map map;
                             if ((map = MapManager.loadMap(chosenFile.getName())) != null)
                             {
-                                MapManager.setCurrentMap(map);
+                                NavigateManager.setCurrentMap(map);
                                 mParent.alert(R.string.load_succeed);
                                 mParent.switchView(MainActivity.VIEW_NAVIGATE);
                             }

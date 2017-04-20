@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Managers.MapManager;
+import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -63,17 +64,17 @@ public class TagsView
         {
             if (view.getId() != R.id.tv_load_tags) return;
             //region Load tags
-            if (MapManager.getCurrentMap() == null)
+            if (NavigateManager.getCurrentMap() == null)
             {
                 mParent.alert(R.string.no_loaded_map);
                 return;
             }
-            String mapName = MapManager.getCurrentMap().getName();
+            String mapName = NavigateManager.getCurrentMap().getName();
             List<Tag> tags = MapManager.loadTags(mapName);
             if (tags == null) mParent.alert(R.string.no_tag);
             else
             {
-                if (MapManager.getCurrentMap().setTags(tags)) mParent.alert(R.string.load_succeed);
+                if (NavigateManager.getCurrentMap().setTags(tags)) mParent.alert(R.string.load_succeed);
                 else mParent.alert(R.string.load_failed);
             }
             //endregion
@@ -85,7 +86,7 @@ public class TagsView
         public void onClick(View view)
         {
             //region Save tags
-            if (MapManager.getCurrentMap() == null)
+            if (NavigateManager.getCurrentMap() == null)
             {
                 mParent.alert(R.string.no_loaded_map);
                 return;
@@ -96,7 +97,8 @@ public class TagsView
                 mParent.alert(R.string.no_tag);
                 return;
             }
-            if (MapManager.saveTags(MapManager.getCurrentMap().getName(), tags)) mParent.alert(R.string.save_succeed);
+            if (MapManager.saveTags(NavigateManager.getCurrentMap().getName(), tags))
+                mParent.alert(R.string.save_succeed);
             else mParent.alert(R.string.save_failed);
             //endregion
         }
@@ -226,9 +228,9 @@ public class TagsView
     public void flush()
     {
         mParent.setTitleText(R.string.tags);
-        if (MapManager.getCurrentMap() != null)
+        if (NavigateManager.getCurrentMap() != null)
         {
-            List<Tag> tags = MapManager.getCurrentMap().getTags();
+            List<Tag> tags = NavigateManager.getCurrentMap().getTags();
             mTagListAdapter.replace(tags);
         }
         else

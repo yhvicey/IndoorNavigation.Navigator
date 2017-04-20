@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import cn.vicey.navigator.Map.MapParser;
 import cn.vicey.navigator.Map.TagParser;
 import cn.vicey.navigator.Map.TagSaver;
-import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
