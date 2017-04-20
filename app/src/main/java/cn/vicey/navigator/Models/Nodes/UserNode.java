@@ -33,7 +33,7 @@ public class UserNode
     @Override
     public NodeType getType()
     {
-        _ return NodeType.USER_NODE;
+        return NodeType.USER_NODE;
     }
 
     @Override
