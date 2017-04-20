@@ -36,10 +36,10 @@
                     android:id="@+id/sv_debug_show_log"
                     style="@style/Navigator.SettingsView.Item"
                     android:text="@string/show_log"/>
-            <cn.vicey.navigator.Components.SettingsItem
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/middle_item_height"
-                    app:text="Settings 1"/>
+            <TextView
+                    android:id="@+id/sv_debug_disable_debug_mode"
+                    style="@style/Navigator.SettingsView.Item"
+                    android:text="@string/disable_debug_mode"/>
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

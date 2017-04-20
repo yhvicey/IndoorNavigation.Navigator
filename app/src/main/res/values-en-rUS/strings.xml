@@ -22,6 +22,7 @@
     <string name="load_tags">Load tags</string>
     <string name="save_tags">Save tags</string>
     <string name="show_log">Show log</string>
+    <string name="disable_debug_mode">Disable debug mode</string>
 
     <!--   Notification texts   -->
     <string name="load_succeed">Load succeed</string>
@@ -35,7 +36,8 @@
     <string name="download_failed">Download failed</string>
     <string name="save_succeed">Save succeed</string>
     <string name="save_failed">Save failed</string>
-    <string name="debug_mode_enabled">Debug mode already enabled</string>
+    <string name="debug_mode_enabled">Debug mode enabled</string>
+    <string name="debug_mode_disabled">Debug mode disabled</string>
     <string name="unknown_error">Unknown error</string>
     <string name="no_permission">No needed permissions</string>
     <string name="sdcard_not_found">SD card not found</string>

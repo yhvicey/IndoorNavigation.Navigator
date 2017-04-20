@@ -22,6 +22,7 @@
     <string name="load_tags">载入标签</string>
     <string name="save_tags">保存标签</string>
     <string name="show_log">显示日志</string>
+    <string name="disable_debug_mode">关闭开发者模式</string>
 
     <!--   Notification texts   -->
     <string name="load_succeed">加载成功</string>
@@ -36,6 +37,7 @@
     <string name="save_succeed">保存成功</string>
     <string name="save_failed">保存失败</string>
     <string name="debug_mode_enabled">开发者模式已开启</string>
+    <string name="debug_mode_disabled">开发者模式已关闭</string>
     <string name="unknown_error">未知错误</string>
     <string name="no_permission">没有所需的权限</string>
     <string name="sdcard_not_found">未发现 SD 卡</string>

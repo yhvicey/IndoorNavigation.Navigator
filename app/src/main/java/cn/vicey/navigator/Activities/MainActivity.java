@@ -95,7 +95,7 @@ public class MainActivity
         @Override
         public void onClick(View view)
         {
-            if (SettingsManager.getIsDebugModeEnabled()) return;
+            if (SettingsManager.isDebugModeEnabled()) return;
             if (view.getId() != R.id.t_title) return;
             if (new Date().getTime() - mLastClickTime > 2 * 1000)
             {
@@ -107,7 +107,6 @@ public class MainActivity
             if (mClickCount > 5)
             {
                 SettingsManager.enableDebugMode();
-                Logger.debug(LOGGER_TAG, "Debug mode enabled");
                 alert(R.string.debug_mode_enabled);
                 flush();
             }

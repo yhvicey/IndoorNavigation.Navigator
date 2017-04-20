@@ -65,7 +65,7 @@ public class MapRenderer
                 drawLink(canvas, wallNode, link.getTarget());
             }
         }
-        if (!SettingsManager.getIsDebugModeEnabled()) return;
+        if (!SettingsManager.isDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
         {
             for (NodeBase.Link link : guideNode.getLinks())
@@ -100,7 +100,7 @@ public class MapRenderer
         {
             drawNode(canvas, wallNode);
         }
-        if (!SettingsManager.getIsDebugModeEnabled()) return;
+        if (!SettingsManager.isDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
         {
             drawNode(canvas, guideNode);

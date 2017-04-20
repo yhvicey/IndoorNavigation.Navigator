@@ -86,7 +86,7 @@ public final class Logger
      */
     public static void debug(String tag, String message, Throwable t)
     {
-        if (!SettingsManager.getIsDebugModeEnabled()) return;
+        if (!SettingsManager.isDebugModeEnabled()) return;
         String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), DEBUG_HEADER, message) + Tools.NEW_LINE;
         Log.d(tag, msg);
         write(msg);

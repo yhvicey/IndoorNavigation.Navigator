@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ScrollView;
-import android.widget.TextView;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
@@ -18,6 +17,16 @@ public class SettingsView
 
     private MainActivity mParent;
 
+    private OnClickListener mOnDisableDebugModeTextViewClick = new OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            SettingsManager.disableDebugMode();
+            mParent.alert(R.string.debug_mode_disabled);
+            flush();
+        }
+    };
     private OnClickListener mOnShowLogTextViewClick = new OnClickListener()
     {
         @Override
@@ -34,7 +43,10 @@ public class SettingsView
         {
             LayoutInflater.from(mParent).inflate(R.layout.view_settings, this, true);
 
-            TextView showLogTextView = (TextView) findViewById(R.id.sv_debug_show_log);
+            View disableDebugModeTextView = findViewById(R.id.sv_debug_disable_debug_mode);
+            disableDebugModeTextView.setOnClickListener(mOnDisableDebugModeTextViewClick);
+
+            View showLogTextView = findViewById(R.id.sv_debug_show_log);
             showLogTextView.setOnClickListener(mOnShowLogTextViewClick);
         }
         catch (Throwable t)
@@ -56,6 +68,6 @@ public class SettingsView
     {
         mParent.setTitleText(R.string.settings);
         View debugView = findViewById(R.id.sv_debug_view);
-        debugView.setVisibility(SettingsManager.getIsDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
+        debugView.setVisibility(SettingsManager.isDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
     }
 }

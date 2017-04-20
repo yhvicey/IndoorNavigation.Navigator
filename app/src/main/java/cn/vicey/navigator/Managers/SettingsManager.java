@@ -48,14 +48,21 @@ public final class SettingsManager
         }
     }
 
+    public static boolean isDebugModeEnabled()
+    {
+        return mIsDebugModeEnabled;
+    }
+
+    public static void disableDebugMode()
+    {
+        Logger.debug(LOGGER_TAG, "Debug mode disabled.");
+        mIsDebugModeEnabled = false;
+    }
+
     public static void enableDebugMode()
     {
         mIsDebugModeEnabled = true;
-    }
-
-    public static boolean getIsDebugModeEnabled()
-    {
-        return mIsDebugModeEnabled;
+        Logger.debug(LOGGER_TAG, "Debug mode enabled.");
     }
 
     public static int getLineWidth()
