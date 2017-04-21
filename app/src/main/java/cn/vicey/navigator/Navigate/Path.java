@@ -1,6 +1,7 @@
 package cn.vicey.navigator.Navigate;
 
 import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.PathNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class Path
     private static final String LOGGER_TAG = "Path";
 
     private double mLength;
-    private List<NodeBase> mNodes = new ArrayList<>();
+    private List<PathNode> mNodes = new ArrayList<>();
 
     public Path(NodeBase startNode)
     {
@@ -27,7 +28,7 @@ public class Path
     {
         if (mNodes.isEmpty())
         {
-            mNodes.add(node);
+            mNodes.add(new PathNode(node));
             return this;
         }
         NodeBase head = mNodes.get(0);
@@ -35,7 +36,7 @@ public class Path
         {
             if (link.getTarget() == node)
             {
-                mNodes.add(0, node);
+                mNodes.add(0, new PathNode(node));
                 mLength += link.getDistance();
                 return this;
             }
@@ -56,7 +57,7 @@ public class Path
     {
         if (mNodes.isEmpty())
         {
-            mNodes.add(node);
+            mNodes.add(new PathNode(node));
             return this;
         }
         NodeBase tail = mNodes.get(mNodes.size() - 1);
@@ -64,7 +65,7 @@ public class Path
         {
             if (link.getTarget() == node)
             {
-                mNodes.add(node);
+                mNodes.add(new PathNode(node));
                 mLength += link.getDistance();
                 return this;
             }
@@ -84,16 +85,6 @@ public class Path
     public boolean contains(NodeBase node)
     {
         return mNodes.contains(node);
-    }
-
-    public int indexOf(NodeBase node)
-    {
-        return mNodes.indexOf(node);
-    }
-
-    public boolean isEnd(NodeBase target)
-    {
-        return !mNodes.isEmpty() && mNodes.get(mNodes.size() - 1) == target;
     }
 
     public Path fork()
@@ -117,6 +108,16 @@ public class Path
             }
         }
         return result;
+    }
+
+    public int indexOf(NodeBase node)
+    {
+        return mNodes.indexOf(node);
+    }
+
+    public boolean isEnd(NodeBase target)
+    {
+        return !mNodes.isEmpty() && mNodes.get(mNodes.size() - 1) == target;
     }
 
     public Path removeHead()
