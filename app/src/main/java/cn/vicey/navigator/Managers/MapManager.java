@@ -2,40 +2,90 @@ package cn.vicey.navigator.Managers;
 
 import android.support.annotation.NonNull;
 import cn.vicey.navigator.Map.MapParser;
-import cn.vicey.navigator.Map.TagParser;
-import cn.vicey.navigator.Map.TagSaver;
 import cn.vicey.navigator.Models.Map;
-import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Utils.Logger;
 import cn.vicey.navigator.Utils.Tools;
 
 import java.io.File;
-import java.util.List;
 
+/**
+ * Map manager, provides a set of methods to help manage map files
+ */
 public final class MapManager
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "MapManager";
-    private static final String MAP_DIR = "/maps";
-    private static final String TAG_DIR = "/tags";
 
-    private static File mMapDir;
-    private static File mTagDir;
+    private static final String MAP_DIR = "/maps"; // Map file directory name
 
+    //endregion
+
+    //region Static fields
+
+    private static File mMapDir; // Map file directory
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Delete specified map file
+     *
+     * @param mapFileName Map file name to delete
+     * @return Whether the deletion is succeed or not
+     */
+    public static boolean deleteMapFile(final @NonNull String mapFileName)
+    {
+        File map = new File(mMapDir + "/" + mapFileName);
+        return !map.exists() || map.delete();
+    }
+
+    /**
+     * Gets available default map file name
+     *
+     * @return Available default map file name
+     */
+    public static String getAvailableDefaultMapFileName()
+    {
+        return Tools.getAvailableDefaultName(mMapDir, ".xml");
+    }
+
+    /**
+     * Gets map directory
+     *
+     * @return Map directory
+     */
+    public static File getMapDir()
+    {
+        return mMapDir;
+    }
+
+    /**
+     * Check specified map file is exist or not
+     *
+     * @param mapFileName Name of the map file to check
+     * @return Whether specified map is exist
+     */
+    public static boolean hasMapFile(final @NonNull String mapFileName)
+    {
+        return new File(mMapDir + "/" + mapFileName).exists();
+    }
+
+    /**
+     * Initialize manager
+     *
+     * @return Whether the initialization is succeed or not
+     */
     public static boolean init()
     {
         try
         {
             mMapDir = new File(Navigator.getFilesDirPath() + MAP_DIR);
-            mTagDir = new File(Navigator.getFilesDirPath() + TAG_DIR);
             if (!(mMapDir.exists() || mMapDir.mkdir()))
             {
                 Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init map directory.");
-                return false;
-            }
-            if (!(mTagDir.exists() || mTagDir.mkdir()))
-            {
-                Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init tag directory.");
                 return false;
             }
             return true;
@@ -47,81 +97,39 @@ public final class MapManager
         }
     }
 
-    public static boolean deleteMapFile(final @NonNull String mapFileName)
+    /**
+     * Load specified map file
+     *
+     * @param mapFileName Map file name to load
+     * @return Map object, or null if failed to load
+     */
+    public static Map loadMap(final @NonNull String mapFileName)
     {
+        return MapParser.parse(new File(mMapDir + "/" + mapFileName));
+    }
+
+    /**
+     * Rename specified map file
+     *
+     * @param mapFileName    Map file to rename
+     * @param newMapFileName New file name
+     * @return Whether the renaming is succeed or not
+     */
+    public static boolean renameMapFile(final @NonNull String mapFileName, final @NonNull String newMapFileName)
+    {
+        if (!hasMapFile(mapFileName)) return false;
+        if (hasMapFile(newMapFileName)) return false;
         File map = new File(mMapDir + "/" + mapFileName);
-        return !map.exists() || map.delete();
+        return map.renameTo(new File(mMapDir + "/" + newMapFileName));
     }
 
-    public static boolean deleteTagFile(final @NonNull String tagFileName)
-    {
-        File tag = new File(mMapDir + "/" + tagFileName);
-        return !tag.exists() || tag.delete();
-    }
-
-    public static List<File> getAllMapFiles()
-    {
-        try
-        {
-            List<File> files = Tools.getFiles(mMapDir);
-            if (files == null)
-            {
-                Logger.error(LOGGER_TAG, "Failed to get all map files.");
-                return null;
-            }
-            return files;
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to get all map files.", t);
-            return null;
-        }
-    }
-
-    public static String getAvailableDefaultMapFileName()
-    {
-        return Tools.getAvailableDefaultName(mMapDir, ".xml");
-    }
-
-    public static File getMapDir()
-    {
-        return mMapDir;
-    }
-
-    public static File getTagDir()
-    {
-        return mTagDir;
-    }
-
-    public static boolean hasMapFile(final @NonNull String mapName)
-    {
-        return new File(mMapDir + "/" + mapName).exists();
-    }
-
-    public static boolean hasTags(final @NonNull String mapName)
-    {
-        return new File(mTagDir + "/" + mapName).exists();
-    }
-
-    public static Map loadMap(final @NonNull String mapName)
-    {
-        return MapParser.parse(new File(mMapDir + "/" + mapName));
-    }
-
-    public static List<Tag> loadTags(final @NonNull String mapName)
-    {
-        if (!hasTags(mapName)) return null;
-        return TagParser.parse(new File(mTagDir + "/" + mapName));
-    }
-
-    public static boolean renameMapFile(final @NonNull String mapName, final @NonNull String newMapName)
-    {
-        if (!hasMapFile(mapName)) return false;
-        if (hasMapFile(newMapName)) return false;
-        File map = new File(mMapDir + "/" + mapName);
-        return map.renameTo(new File(mMapDir + "/" + newMapName));
-    }
-
+    /**
+     * Save specified file to map file directory
+     *
+     * @param src       Source file
+     * @param overwrite Whether the file with same name should be overwritten
+     * @return Whether the saving is succeed or not
+     */
     public static boolean saveMapFile(final @NonNull File src, boolean overwrite)
     {
         String fileName = src.getName();
@@ -129,14 +137,17 @@ public final class MapManager
         return Tools.copyFile(src, new File(mMapDir + "/" + fileName), overwrite);
     }
 
-    public static boolean saveTags(final @NonNull String mapName, List<Tag> tags)
-    {
-        File file = TagSaver.save(mapName, tags);
-        return file != null && Tools.copyFile(file, new File(mTagDir + "/" + mapName), true);
-    }
+    //endregion
 
+    //region Constructor
+
+    /**
+     * Hidden for static class design pattern
+     */
     private MapManager()
     {
         // no-op
     }
+
+    //endregion
 }
