@@ -15,50 +15,29 @@ import java.util.List;
 public final class TagSaver
 {
     private static final String LOGGER_TAG = "TagSaver";
-    private static final String ATTR_FLOOR = "Floor";
-    private static final String ATTR_INDEX = "Index";
-    private static final String ATTR_TYPE = "Type";
     private static final String ATTR_VALUE = "Value";
     private static final String ATTR_VERSION = "Version";
     private static final String ELEMENT_TAG = "Tag";
     private static final String ELEMENT_TAGS = "Tags";
     private static final String SUPPORTED_VERSION = "1.1";
-    private static final String TYPE_GUIDE = "GuideNode";
-    private static final String TYPE_WALL = "WallNode";
 
     private static void saveTag(final @NonNull Tag tag, XmlSerializer serializer)
+    private static final String ATTR_FLOOR_INDEX  = "FloorIndex"; // Floor index attribute name
+    private static final String ATTR_NODE_INDEX   = "NodeIndex";  // Node index attribute name
+    private static final String ATTR_NODE_TYPE    = "NodeType";   // Node type attribute name
     {
         try
         {
             serializer.startTag(null, ELEMENT_TAG);
-            serializer.attribute(null, ATTR_FLOOR, Integer.toString(tag.getFloor()));
-            serializer.attribute(null, ATTR_INDEX, Integer.toString(tag.getIndex()));
-            String type;
-            switch (tag.getType())
-            {
-                case GUIDE_NODE:
-                {
-                    type = TYPE_GUIDE;
-                    break;
-                }
-                case WALL_NODE:
-                {
-                    type = TYPE_WALL;
-                    break;
-                }
-                default:
-                {
-                    Logger.error(LOGGER_TAG, "Unexpected tag type.");
-                    return;
-                }
-            }
-            serializer.attribute(null, ATTR_TYPE, type);
+            serializer.attribute(null, ATTR_FLOOR_INDEX, Integer.toString(tag.getFloorIndex()));
+            serializer.attribute(null, ATTR_NODE_INDEX, Integer.toString(tag.getNodeIndex()));
+            serializer.attribute(null, ATTR_NODE_TYPE, tag.getNodeType().toString());
             serializer.attribute(null, ATTR_VALUE, tag.getValue());
             serializer.endTag(null, ELEMENT_TAG);
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to save tag.");
+            Logger.error(LOGGER_TAG, "Failed to save tag.", t);
         }
     }
 

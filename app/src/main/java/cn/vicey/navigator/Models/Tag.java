@@ -5,32 +5,34 @@ import cn.vicey.navigator.Models.Nodes.NodeType;
 
 public class Tag
 {
-    private int mFloor;
-    private int mIndex;
-    private NodeType mType;
-    private String mValue;
 
     public Tag(int floor, int index, NodeType type, @NonNull String value)
+    private int      mFloorIndex; // Tag's floor index
+    private int      mNodeIndex; // Tag's node index
+    private NodeType mNodeType;  // Tag's node type
+    private String   mValue; // Tag's value
+    public Tag(int floorIndex, int nodeIndex, NodeType nodeType, @NonNull String value)
     {
-        mFloor = floor;
-        mIndex = index;
-        mType = type;
+        mFloorIndex = floorIndex;
+        mNodeIndex = nodeIndex;
+        mNodeType = nodeType;
         mValue = value;
     }
 
     public int getFloor()
+    public int getFloorIndex()
     {
-        return mFloor;
+        return mFloorIndex;
     }
 
-    public int getIndex()
+    public int getNodeIndex()
     {
-        return mIndex;
+        return mNodeIndex;
     }
 
-    public NodeType getType()
+    public NodeType getNodeType()
     {
-        return mType;
+        return mNodeType;
     }
 
     public String getValue()

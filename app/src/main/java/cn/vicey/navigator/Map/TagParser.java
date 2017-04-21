@@ -17,35 +17,43 @@ import java.util.List;
 public final class TagParser
 {
     private static final String LOGGER_TAG = "TagParser";
-    private static final String ATTR_FLOOR = "Floor";
-    private static final String ATTR_INDEX = "Index";
-    private static final String ATTR_TYPE = "Type";
     private static final String ATTR_VALUE = "Value";
     private static final String ATTR_VERSION = "Version";
     private static final String ELEMENT_TAG = "Tag";
     private static final String ELEMENT_TAGS = "Tags";
     private static final String SUPPORTED_VERSION = "1.1";
-    private static final String TYPE_GUIDE = "GuideNode";
-    private static final String TYPE_WALL = "WallNode";
 
+    private static final String ATTR_FLOOR_INDEX  = "FloorIndex"; // Floor index attribute name
+    private static final String ATTR_NODE_INDEX   = "NodeIndex";  // Node index attribute name
+    private static final String ATTR_NODE_TYPE    = "NodeType";   // Node type attribute name
     private static Tag generateTag(final @NonNull XmlPullParser parser)
     {
-        String type = parser.getAttributeValue(null, ATTR_TYPE);
-        if (Tools.isStringEmpty(type, true))
-        {
-            Logger.error(LOGGER_TAG, "Tag element must have valid type attribute. Line: " + parser.getLineNumber());
-            return null;
-        }
-        int floor;
-        int index;
+        int floorIndex;
+        int nodeIndex;
         try
         {
-            floor = Integer.parseInt(parser.getAttributeValue(null, ATTR_FLOOR));
-            index = Integer.parseInt(parser.getAttributeValue(null, ATTR_INDEX));
+            floorIndex = Integer.parseInt(parser.getAttributeValue(null, ATTR_FLOOR_INDEX));
+            nodeIndex = Integer.parseInt(parser.getAttributeValue(null, ATTR_NODE_INDEX));
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Tag element must have valid floor or index attribute. Line: " + parser.getLineNumber(), t);
+            Logger.error(LOGGER_TAG, "Tag element must have valid floor index or node index attribute. Line: " + parser.getLineNumber(), t);
+            return null;
+        }
+        String nodeTypeText = parser.getAttributeValue(null, ATTR_NODE_TYPE);
+        if (Tools.isStringEmpty(nodeTypeText, true))
+        {
+            Logger.error(LOGGER_TAG, "Tag element must have valid node type attribute. Line: " + parser.getLineNumber());
+            return null;
+        }
+        NodeType nodeType;
+        try
+        {
+            nodeType = NodeType.parse(nodeTypeText);
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Tag element must have valid node type attribute. Line: " + parser.getLineNumber(), t);
             return null;
         }
         String value = parser.getAttributeValue(null, ATTR_VALUE);
@@ -54,22 +62,7 @@ public final class TagParser
             Logger.error(LOGGER_TAG, "Tag element must have valid value attribute. Line: " + parser.getLineNumber());
             return null;
         }
-        switch (type)
-        {
-            case TYPE_GUIDE:
-            {
-                return new Tag(floor, index, NodeType.GUIDE_NODE, value);
-            }
-            case TYPE_WALL:
-            {
-                return new Tag(floor, index, NodeType.WALL_NODE, value);
-            }
-            default:
-            {
-                Logger.error(LOGGER_TAG, "Node element must have valid type attribute. Line: " + parser.getLineNumber());
-                return null;
-            }
-        }
+        return new Tag(floorIndex, nodeIndex, nodeType, value);
     }
 
     private static List<Tag> parseStream(final @NonNull InputStream stream)
