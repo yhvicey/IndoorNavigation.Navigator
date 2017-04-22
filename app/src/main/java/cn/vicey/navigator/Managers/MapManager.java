@@ -126,15 +126,15 @@ public final class MapManager
     /**
      * Save specified file to map file directory
      *
-     * @param src       Source file
-     * @param overwrite Whether the file with same name should be overwritten
+     * @param src         Source file
+     * @param overwritten Whether the existing file should be overwritten
      * @return Whether the saving is succeed or not
      */
-    public static boolean saveMapFile(final @NonNull File src, boolean overwrite)
+    public static boolean saveMapFile(final @NonNull File src, boolean overwritten)
     {
         String fileName = src.getName();
-        if (!overwrite && hasMapFile(fileName)) fileName = getAvailableDefaultMapFileName();
-        return Tools.copyFile(src, new File(mMapDir + "/" + fileName), overwrite);
+        if (!overwritten && hasMapFile(fileName)) fileName = getAvailableDefaultMapFileName();
+        return Tools.copyFile(src, new File(mMapDir + "/" + fileName), overwritten);
     }
 
     //endregion

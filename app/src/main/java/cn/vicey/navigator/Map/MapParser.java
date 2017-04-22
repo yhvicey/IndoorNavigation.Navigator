@@ -20,29 +20,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MapParser class for parsing map file and tag file.
+ * Map parser class, provides a set of methods to parse map file
  */
 public final class MapParser
 {
-    private static final String LOGGER_TAG = "MapParser";
-    private static final String ATTR_END_INDEX = "EndIndex";
-    private static final String ATTR_END_TYPE = "EndType";
-    private static final String ATTR_NAME = "Name";
-    private static final String ATTR_NEXT = "Next";
-    private static final String ATTR_PREV = "Prev";
-    private static final String ATTR_START_INDEX = "StartIndex";
-    private static final String ATTR_START_TYPE = "StartType";
-    private static final String ATTR_VERSION = "Version";
-    private static final String ATTR_X = "X";
-    private static final String ATTR_Y = "Y";
-    private static final String DEFAULT_MAP_NAME = "Untitled";
-    private static final String ELEMENT_FLOOR = "Floor";
-    private static final String ELEMENT_GUIDE = "GuideNode";
-    private static final String ELEMENT_LINK = "Link";
-    private static final String ELEMENT_MAP = "Map";
-    private static final String ELEMENT_WALL = "WallNode";
-    private static final String SUPPORTED_VERSION = "1.1";
+    //region Constants
 
+    private static final String LOGGER_TAG = "MapParser";
+
+    private static final String ATTR_END_INDEX    = "EndIndex";   // EndIndex attribute name
+    private static final String ATTR_END_TYPE     = "EndType";    // End type attribute name
+    private static final String ATTR_NAME         = "Name";       // Name attribute name
+    private static final String ATTR_NEXT         = "Next";       // Next attribute name
+    private static final String ATTR_PREV         = "Prev";       // Prev attribute name
+    private static final String ATTR_START_INDEX  = "StartIndex"; // Start index attribute name
+    private static final String ATTR_START_TYPE   = "StartType";  // Start type attribute name
+    private static final String ATTR_VERSION      = "Version";    // Version attribute name
+    private static final String ATTR_X            = "X";          // X attribute name
+    private static final String ATTR_Y            = "Y";          // Y attribute name
+    private static final String DEFAULT_MAP_NAME  = "Untitled";   // Default map name
+    private static final String ELEMENT_FLOOR     = "Floor";      // Floor element name
+    private static final String ELEMENT_GUIDE     = "GuideNode";  // GuideNode element name
+    private static final String ELEMENT_LINK      = "Link";       // Link element name
+    private static final String ELEMENT_MAP       = "Map";        // Map element name
+    private static final String ELEMENT_WALL      = "WallNode";   // WallNode element name
+    private static final String SUPPORTED_VERSION = "1.1";        // Supported version of this parser
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Generate link object from xml parser
+     *
+     * @param parser Xml parser
+     * @return New link object, or null if errors occurred
+     */
     private static Link generateLink(final @NonNull XmlPullParser parser)
     {
         try
@@ -60,6 +73,12 @@ public final class MapParser
         }
     }
 
+    /**
+     * Generate node object from xml parser
+     *
+     * @param parser Xml parser
+     * @return New node object, or null if error occurred
+     */
     private static NodeBase generateNode(final @NonNull XmlPullParser parser)
     {
         NodeType type;
@@ -119,10 +138,10 @@ public final class MapParser
     }
 
     /**
-     * Parse a map file from InputStream.
+     * Parse a map from InputStream
      *
-     * @param stream Input stream to parse.
-     * @return Parsed map file.
+     * @param stream Input stream to parse
+     * @return New map object, or null if error occurred
      */
     private static Map parseStream(final @NonNull InputStream stream)
     {
@@ -286,6 +305,12 @@ public final class MapParser
         }
     }
 
+    /**
+     * Parse a map from file
+     *
+     * @param file File to parse
+     * @return New map object, or null if error occurred
+     */
     public static Map parse(final @NonNull File file)
     {
         try
@@ -307,8 +332,17 @@ public final class MapParser
         }
     }
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Hidden for static class design pattern
+     */
     private MapParser()
     {
         // no-op
     }
+
+    //endregion
 }

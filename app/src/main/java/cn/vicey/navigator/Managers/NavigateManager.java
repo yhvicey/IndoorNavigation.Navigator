@@ -8,37 +8,88 @@ import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Navigate.FloorNavigator;
 
+/**
+ * Navigate manager, provides a set of methods to help navigate
+ */
 public final class NavigateManager
 {
-    public static final int NO_SELECTED_FLOOR = -1;
+    //region Constants
 
-    private static int mCurrentFloorIndex = NO_SELECTED_FLOOR;
-    private static Map mCurrentMap;
-    private static SparseArray<FloorNavigator> mFloorNavigators = new SparseArray<>();
+    public static final int NO_SELECTED_FLOOR = -1; // Indicates no floor is selected
 
-    public static Floor getCurrentFloor()
+    //endregion
+
+    //region Static fields
+
+    private static Map mCurrentMap; // Current map object
+
+    private static int                         mCurrentFloorIndex = NO_SELECTED_FLOOR;   // Current floor index
+    private static SparseArray<FloorNavigator> mFloorNavigators   = new SparseArray<>(); // Floor navigators
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Create navigate task for specified start node and end node
+     *
+     * @param startFloor Start floor
+     * @param startNode  Start node
+     * @param endFloor   End floor
+     * @param endNode    End node
+     */
+    public static void createNavigateTask(int startFloor, final @NonNull NodeBase startNode, int endFloor, final @NonNull NodeBase endNode)
     {
-        if (mCurrentMap == null) return null;
-        if (mCurrentFloorIndex == NO_SELECTED_FLOOR || mCurrentFloorIndex >= mCurrentMap.getFloors().size())
-            return null;
-        return mCurrentMap.getFloors().get(mCurrentFloorIndex);
+        if (startNode.getType() != NodeType.GUIDE_NODE || endNode.getType() != NodeType.GUIDE_NODE) return;
+        // TODO: judge floor and create navigate tasks here
     }
 
+    /**
+     * Gets current floor
+     *
+     * @return Current floor object, or null if no floor is selected
+     */
+    public static Floor getCurrentFloor()
+    {
+        return getFloor(mCurrentFloorIndex);
+    }
+
+    /**
+     * Gets current floor index
+     *
+     * @return Current floor index, or NO_SELECTED_FLOOR if no floor is selected
+     */
     public static int getCurrentFloorIndex()
     {
         return mCurrentFloorIndex;
     }
 
+    /**
+     * Gets current map object
+     *
+     * @return Current map object, or null if no current map is set
+     */
     public static Map getCurrentMap()
     {
         return mCurrentMap;
     }
 
+    /**
+     * Gets current floor's navigator
+     *
+     * @return Current floor's navigator, or null if no floor is selected
+     */
     public static FloorNavigator getCurrentNavigator()
     {
         return getNavigator(getCurrentFloorIndex());
     }
 
+    /**
+     * Gets specified floor
+     *
+     * @param floorIndex Specified floor index
+     * @return Specified floor object, or null if index is out of range
+     */
     public static Floor getFloor(int floorIndex)
     {
         if (mCurrentMap == null) return null;
@@ -47,6 +98,12 @@ public final class NavigateManager
         return mCurrentMap.getFloors().get(floorIndex);
     }
 
+    /**
+     * Gets specified floor's navigator
+     *
+     * @param floorIndex Specified floor index
+     * @return Specified floor's navigator object, or null if index is out of range
+     */
     public static FloorNavigator getNavigator(int floorIndex)
     {
         Floor floor = getFloor(floorIndex);
@@ -56,6 +113,11 @@ public final class NavigateManager
         return mFloorNavigators.get(floorIndex);
     }
 
+    /**
+     * Try set current floor index to lower level
+     *
+     * @return True if didn't reach the ground floor, otherwise false
+     */
     public static boolean goDownstairs()
     {
         if (mCurrentMap == null) return false;
@@ -64,6 +126,11 @@ public final class NavigateManager
         return true;
     }
 
+    /**
+     * Try set current floor index to higher level
+     *
+     * @return True if didn't reach the top floor, otherwise false
+     */
     public static boolean goUpstairs()
     {
         if (mCurrentMap == null) return false;
@@ -72,6 +139,11 @@ public final class NavigateManager
         return true;
     }
 
+    /**
+     * Set current f
+     *
+     * @param map
+     */
     public static void setCurrentMap(final @NonNull Map map)
     {
         mCurrentFloorIndex = NO_SELECTED_FLOOR;
@@ -79,14 +151,17 @@ public final class NavigateManager
         goUpstairs();
     }
 
-    public static void createNavigateTask(int startFloor, final @NonNull NodeBase startNode, int endFloor, final @NonNull NodeBase endNode)
-    {
-        if (startNode.getType() != NodeType.GUIDE_NODE || endNode.getType() != NodeType.GUIDE_NODE) return;
-        // TODO: judge floor and create navigate tasks here
-    }
+    //endregion
 
+    //region Constructors
+
+    /**
+     * Hidden for static class design pattern
+     */
     private NavigateManager()
     {
         // no-op
     }
+
+    //endregion
 }

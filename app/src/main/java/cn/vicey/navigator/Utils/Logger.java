@@ -8,27 +8,42 @@ import java.io.*;
 import java.util.Locale;
 
 /**
- * Logger class.
+ * Logger class, provides a set of methods to log message
  */
 public final class Logger
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "Logger";
-    private static final String DEBUG_HEADER = "DEBUG";
-    private static final String ERROR_HEADER = "ERROR";
-    private static final String INFO_HEADER = "INFO";
-    private static final String LOG_DIR = "/logs/";
-    private static final String LOG_FILE = "Navigator.log";
-    private static final String LOG_TEMPLATE = "[%s][%d][%s] %s";
 
-    private static File mLogFile;
-    private static FileOutputStream mLogFileStream;
+    private static final String DEBUG_HEADER = "DEBUG";           // Debug header
+    private static final String ERROR_HEADER = "ERROR";           // Error header
+    private static final String INFO_HEADER  = "INFO";            // Info header
+    private static final String LOG_DIR      = "/logs/";          // Log directory name
+    private static final String LOG_FILE     = "Navigator.log";   // Log file name
+    private static final String LOG_TEMPLATE = "[%s][%d][%s] %s"; // Log template
 
+    //endregion
+
+    //region Static fields
+
+    private static File             mLogFile;       // Log file object
+    private static FileOutputStream mLogFileStream; // Log file stream
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Pause the logger
+     */
     private static void pause()
     {
         if (mLogFileStream == null) return;
         try
         {
             flush();
+            mLogFileStream.close();
             mLogFileStream = null;
         }
         catch (Throwable t)
@@ -38,6 +53,9 @@ public final class Logger
         }
     }
 
+    /**
+     * Resume the logger
+     */
     private static void resume()
     {
         if (mLogFileStream != null) return;
@@ -52,6 +70,11 @@ public final class Logger
         }
     }
 
+    /**
+     * Write a message to log file
+     *
+     * @param message Message to write
+     */
     private static void write(String message)
     {
         if (mLogFileStream == null) return;
@@ -67,10 +90,10 @@ public final class Logger
     }
 
     /**
-     * Log debug messages with timestamp.
+     * Log debug messages with timestamp
      *
-     * @param tag     Log tag.
-     * @param message Message to log.
+     * @param tag     Log tag
+     * @param message Message to log
      */
     public static void debug(String tag, String message)
     {
@@ -78,11 +101,11 @@ public final class Logger
     }
 
     /**
-     * Log debug messages with timestamp.
+     * Log debug messages with timestamp
      *
-     * @param tag     Log tag.
-     * @param message Message to log.
-     * @param t       Error or exception to log.
+     * @param tag     Log tag
+     * @param message Message to log
+     * @param t       Error or exception to log
      */
     public static void debug(String tag, String message, Throwable t)
     {
@@ -90,21 +113,16 @@ public final class Logger
         String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), DEBUG_HEADER, message) + Tools.NEW_LINE;
         Log.d(tag, msg);
         write(msg);
-        if (t != null)
-        {
-            debug(tag, t.toString());
-            for (StackTraceElement stackTraceElement : t.getStackTrace())
-            {
-                debug(tag, stackTraceElement.toString());
-            }
-        }
+        if (t == null) return;
+        debug(tag, t.getMessage());
+        for (StackTraceElement stackTraceElement : t.getStackTrace()) debug(tag, stackTraceElement.toString());
     }
 
     /**
-     * Log error messages with timestamp.
+     * Log error messages with timestamp
      *
-     * @param tag     Log tag.
-     * @param message Message to log.
+     * @param tag     Log tag
+     * @param message Message to log
      */
     public static void error(String tag, String message)
     {
@@ -112,27 +130,25 @@ public final class Logger
     }
 
     /**
-     * Log error messages with timestamp.
+     * Log error messages with timestamp
      *
-     * @param tag     Log tag.
-     * @param message Message to log.
-     * @param t       Error or exception to log.
+     * @param tag     Log tag
+     * @param message Message to log
+     * @param t       Error or exception to log
      */
     public static void error(String tag, String message, Throwable t)
     {
         String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), ERROR_HEADER, message) + Tools.NEW_LINE;
         Log.e(tag, msg);
         write(msg);
-        if (t != null)
-        {
-            error(tag, t.toString());
-            for (StackTraceElement stackTraceElement : t.getStackTrace())
-            {
-                error(tag, stackTraceElement.toString());
-            }
-        }
+        if (t == null) return;
+        error(tag, t.getMessage());
+        for (StackTraceElement stackTraceElement : t.getStackTrace()) error(tag, stackTraceElement.toString());
     }
 
+    /**
+     * Flush the log file stream
+     */
     public static void flush()
     {
         if (mLogFileStream == null) return;
@@ -147,6 +163,11 @@ public final class Logger
         }
     }
 
+    /**
+     * Gets log content in disk
+     *
+     * @return Log content
+     */
     public static String getLogContent()
     {
         try
@@ -157,10 +178,7 @@ public final class Logger
             BufferedReader reader = new BufferedReader(inputReader);
             String str;
             StringBuilder stringBuilder = new StringBuilder();
-            while ((str = reader.readLine()) != null)
-            {
-                stringBuilder.append(str).append(Tools.NEW_LINE);
-            }
+            while ((str = reader.readLine()) != null) stringBuilder.append(str).append(Tools.NEW_LINE);
             reader.close();
             inputReader.close();
             fis.close();
@@ -176,10 +194,10 @@ public final class Logger
     }
 
     /**
-     * Log info messages with timestamp.
+     * Log info messages with timestamp
      *
-     * @param tag     Log tag.
-     * @param message Message to log.
+     * @param tag     Log tag
+     * @param message Message to log
      */
     public static void info(String tag, String message)
     {
@@ -187,27 +205,27 @@ public final class Logger
     }
 
     /**
-     * Log info messages with timestamp.
+     * Log info messages with timestamp
      *
-     * @param tag     Log tag.
-     * @param message Message to log.
-     * @param t       Error or exception to log.
+     * @param tag     Log tag
+     * @param message Message to log
+     * @param t       Error or exception to log
      */
     public static void info(String tag, String message, Throwable t)
     {
         String msg = String.format(Locale.getDefault(), LOG_TEMPLATE, Tools.getCurrentDateTimeString(), Tools.getElapsedTime(), INFO_HEADER, message) + Tools.NEW_LINE;
         Log.i(tag, msg);
         write(msg);
-        if (t != null)
-        {
-            info(tag, t.toString());
-            for (StackTraceElement stackTraceElement : t.getStackTrace())
-            {
-                info(tag, stackTraceElement.toString());
-            }
-        }
+        if (t == null) return;
+        info(tag, t.getMessage());
+        for (StackTraceElement stackTraceElement : t.getStackTrace()) info(tag, stackTraceElement.toString());
     }
 
+    /**
+     * Initialize logger
+     *
+     * @return Whether the initialization is succeed or not
+     */
     public static boolean init()
     {
         try
@@ -236,8 +254,17 @@ public final class Logger
         }
     }
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Hidden for static class design pattern
+     */
     private Logger()
     {
         // no-op
     }
+
+    //endregion
 }

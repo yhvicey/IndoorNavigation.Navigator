@@ -22,19 +22,24 @@ import cn.vicey.navigator.Utils.Tools;
 
 import java.io.File;
 
+/**
+ * Maps view, provides a view to manage all map files
+ */
 public class MapsView
         extends RelativeLayout
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "MapsView";
 
-    private DialogInterface mFileChooserDialog;
-    private FileList mMapList;
-    private MainActivity mParent;
+    //endregion
 
-    private FileList.OnFileListItemChooseCallback mFileListCallback = new FileList.OnFileListItemChooseCallback()
+    //region Listeners
+
+    private final FileList.OnItemChooseListener mOnFileListItemChooseListener        = new FileList.OnItemChooseListener() // File list item choose listener
     {
         @Override
-        public void OnChooseFile(File chosenFile)
+        public void onChooseFile(File chosenFile)
         {
             if (MapManager.saveMapFile(chosenFile, true))
             {
@@ -50,15 +55,15 @@ public class MapsView
         }
 
         @Override
-        public void OnOpenDirFailed()
+        public void onOpenDirFailed()
         {
             mParent.alert(R.string.cant_open_folder);
         }
     };
-    private FileList.OnFileListItemChooseCallback mMapListCallback = new FileList.OnFileListItemChooseCallback()
+    private final FileList.OnItemChooseListener mOnMapListItemChooseListener         = new FileList.OnItemChooseListener() // Map list item choose listener
     {
         @Override
-        public void OnChooseFile(final File chosenFile)
+        public void onChooseFile(final File chosenFile)
         {
             new AlertDialog.Builder(mParent).setTitle(R.string.manage).setItems(new String[]{
                     mParent.getString(R.string.load),
@@ -154,12 +159,12 @@ public class MapsView
         }
 
         @Override
-        public void OnOpenDirFailed()
+        public void onOpenDirFailed()
         {
             mParent.alert(R.string.cant_open_folder);
         }
     };
-    private OnClickListener mOnLoadFromNetButtonClick = new OnClickListener()
+    private final OnClickListener               mOnLoadFromNetButtonClickListener    = new OnClickListener()               // Load from net button click listener
     {
         @Override
         public void onClick(View view)
@@ -179,12 +184,12 @@ public class MapsView
                         {
                             String url = editor.getText().toString();
                             mParent.alert(R.string.downloading);
-                            Tools.downloadFile(url, new Tools.DownloadCallback()
+                            Tools.downloadFile(url, new Tools.OnDownloadListener()
                             {
                                 @Override
-                                public void onDownloadSucceed(@NonNull String filePath)
+                                public void onDownloadSucceed(@NonNull File file)
                                 {
-                                    if (MapManager.saveMapFile(new File(filePath), true))
+                                    if (MapManager.saveMapFile(file, true))
                                     {
                                         mParent.alert(R.string.download_succeed);
                                         mParent.invoke(new Runnable()
@@ -216,7 +221,7 @@ public class MapsView
             //endregion
         }
     };
-    private OnClickListener mOnLoadFromSdcardButtonClick = new OnClickListener()
+    private final OnClickListener               mOnLoadFromSdcardButtonClickListener = new OnClickListener()               // Load from sdcard button click listener
     {
         @Override
         public void onClick(View view)
@@ -237,7 +242,7 @@ public class MapsView
 
             FileList fileList = new FileList(getContext());
             fileList.setDirectory(Environment.getExternalStorageDirectory());
-            fileList.setCallback(mFileListCallback);
+            fileList.setOnItemChooseListener(mOnFileListItemChooseListener);
 
             mFileChooserDialog = new AlertDialog.Builder(mParent).setTitle(R.string.load_from_sdcard)
                                                                  .setView(fileList)
@@ -246,6 +251,37 @@ public class MapsView
         }
     };
 
+    //endregion
+
+    //region Fields
+
+    private DialogInterface mFileChooserDialog; // File chooser dialog
+    private FileList        mMapList;           // Map list
+    private MainActivity    mParent;            // Parent activity
+
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link MapsView}
+     *
+     * @param parent Parent activity
+     */
+    public MapsView(final @NonNull MainActivity parent)
+    {
+        super(parent);
+        mParent = parent;
+        init();
+    }
+
+    //endregion
+
+    //region Methods
+
+    /**
+     * Initialize view
+     */
     private void init()
     {
         try
@@ -253,15 +289,15 @@ public class MapsView
             LayoutInflater.from(mParent).inflate(R.layout.view_maps, this, true);
 
             mMapList = (FileList) findViewById(R.id.mv_file_list);
-            mMapList.setCallback(mMapListCallback);
+            mMapList.setOnItemChooseListener(mOnMapListItemChooseListener);
             mMapList.setDirectory(MapManager.getMapDir());
             mMapList.hideParent();
 
             Button loadFromNet = (Button) findViewById(R.id.mv_load_from_net);
-            loadFromNet.setOnClickListener(mOnLoadFromNetButtonClick);
+            loadFromNet.setOnClickListener(mOnLoadFromNetButtonClickListener);
 
             Button loadFromSdcard = (Button) findViewById(R.id.mv_load_from_sdcard);
-            loadFromSdcard.setOnClickListener(mOnLoadFromSdcardButtonClick);
+            loadFromSdcard.setOnClickListener(mOnLoadFromSdcardButtonClickListener);
         }
         catch (Throwable t)
         {
@@ -270,16 +306,14 @@ public class MapsView
         }
     }
 
-    public MapsView(final @NonNull MainActivity parent)
-    {
-        super(parent);
-        mParent = parent;
-        init();
-    }
-
+    /**
+     * Flush view
+     */
     public void flush()
     {
         mParent.setTitleText(R.string.maps);
         mMapList.flush();
     }
+
+    //endregion
 }

@@ -19,30 +19,94 @@ import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Utils.Logger;
 
+/**
+ * Map renderer component, provides support for drawing, scrolling and zooming map
+ */
 public class MapRenderer
         extends View
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "MapRenderer";
-    private static final int GUIDE_COLOR = Color.GREEN;
-    private static final int LINE_WIDTH = 8;
-    private static final int NODE_RADIUS = 4;
-    private static final int WALL_COLOR = Color.DKGRAY;
-    private static final int ZOOM_LEVEL_MAX = 5;
-    private static final int ZOOM_LEVEL_MIN = 1;
-    private static final int ZOOM_SPEED = 200;
 
-    private Paint mGuidePaint;
-    private int mHalfWidth;
-    private int mHalfHeight;
-    private boolean mIsZooming;
-    private Point mLookAt;
-    private float mPrevTouchX = 0;
-    private float mPrevTouchY = 0;
-    private int mTouchedPointCount;
-    private float mTouchPointDistance;
-    private Paint mWallPaint;
-    private float mZoomLevel = 3;
+    private static final int GUIDE_COLOR    = Color.GREEN;  // Guide color
+    private static final int LINE_WIDTH     = 8;            // Line width
+    private static final int NODE_RADIUS    = 4;            // Node radius
+    private static final int WALL_COLOR     = Color.DKGRAY; // Wall color
+    private static final int ZOOM_LEVEL_MAX = 5;            // Max zoom level
+    private static final int ZOOM_LEVEL_MIN = 1;            // Min zoom level
+    private static final int ZOOM_SPEED     = 200;          // Zoom speed
 
+    //endregion
+
+    //region Fields
+
+    private Paint   mGuidePaint;         // Paint for guide nodes and lines
+    private int     mHalfHeight;         // Half of the component height
+    private int     mHalfWidth;          // Half of the component width
+    private boolean mIsZooming;          // Whether the component is zooming
+    private Point   mLookAt;             // The center point of the view window in map
+    private float   mPrevTouchX;         // Previous touch point x axis
+    private float   mPrevTouchY;         // Previous touch point y axis
+    private float   mTouchPointDistance; // Distance between two touch points
+    private int     mTouchedPointCount;  // Current touch point count
+    private Paint   mWallPaint;          // Paint for wall nodes and lines
+
+    private float mZoomLevel = 3; // Current zoom level
+
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link MapRenderer}
+     *
+     * @param context Related context
+     */
+    public MapRenderer(Context context)
+    {
+        this(context, null);
+    }
+
+    /**
+     * Initialize new instance of class {@link MapRenderer}
+     *
+     * @param context Related context
+     * @param attrs   Xml file attributes
+     */
+    public MapRenderer(Context context, AttributeSet attrs)
+    {
+        super(context, attrs, 0);
+        init(attrs);
+    }
+
+    //endregion
+
+    //region Methods
+
+    /**
+     * Calculate distance between two touch points
+     *
+     * @param event Touch event
+     * @return Distance between two touch points
+     */
+    private float calcTouchPointDistance(MotionEvent event)
+    {
+        if (mTouchedPointCount != 2) return mTouchPointDistance;
+        float firstX = event.getX(0);
+        float firstY = event.getY(0);
+        float secondX = event.getX(1);
+        float secondY = event.getY(1);
+        return (float) Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
+    }
+
+    /**
+     * Draw a link between two nodes
+     *
+     * @param canvas Canvas to draw
+     * @param start  Start node
+     * @param end    End node
+     */
     private void drawLink(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
         mGuidePaint.setStrokeWidth(LINE_WIDTH * mZoomLevel);
@@ -56,6 +120,12 @@ public class MapRenderer
         else canvas.drawLine(startX, startY, endX, endY, mGuidePaint);
     }
 
+    /**
+     * Draw target floor's links
+     *
+     * @param canvas Canvas to draw
+     * @param floor  Target floor
+     */
     private void drawLinks(final @NonNull Canvas canvas, final @NonNull Floor floor)
     {
         for (WallNode wallNode : floor.getWallNodes())
@@ -75,6 +145,12 @@ public class MapRenderer
         }
     }
 
+    /**
+     * Draw a node
+     *
+     * @param canvas Canvas to draw
+     * @param node   Target node
+     */
     private void drawNode(final @NonNull Canvas canvas, final @NonNull NodeBase node)
     {
         float x = getRelativeX(node.getX());
@@ -94,6 +170,12 @@ public class MapRenderer
         }
     }
 
+    /**
+     * Draw target floor's nodes
+     *
+     * @param canvas Canvas to draw
+     * @param floor  Target floor
+     */
     private void drawNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
     {
         for (WallNode wallNode : floor.getWallNodes())
@@ -107,36 +189,46 @@ public class MapRenderer
         }
     }
 
+    /**
+     * Convert x axis from floor coordinate to view coordinate
+     *
+     * @param x X axis in floor coordinate
+     * @return X axis in view coordinate
+     */
     private float getRelativeX(int x)
     {
         return (x - mLookAt.x) * mZoomLevel + mHalfWidth;
     }
 
+    /**
+     * Convert y axis from floor coordinate to view coordinate
+     *
+     * @param y Y axis in floor coordinate
+     * @return Y axis in view coordinate
+     */
     private float getRelativeY(int y)
     {
         return (y - mLookAt.y) * mZoomLevel + mHalfHeight;
     }
 
-    private float getTouchPointDistance(MotionEvent event)
-    {
-        if (mTouchedPointCount != 2) return mTouchPointDistance;
-        float firstX = event.getX(0);
-        float firstY = event.getY(0);
-        float secondX = event.getX(1);
-        float secondY = event.getY(1);
-        return (float) Math.sqrt(Math.pow(firstX - secondX, 2) + Math.pow(firstY - secondY, 2));
-    }
-
+    /**
+     * Initialize component
+     *
+     * @param attrs Xml file attribute
+     */
     private void init(AttributeSet attrs)
     {
         try
         {
+            // mGuidePaint
             mGuidePaint = new Paint();
             mGuidePaint.setColor(GUIDE_COLOR);
 
+            // mWallPaint
             mWallPaint = new Paint();
             mWallPaint.setColor(WALL_COLOR);
 
+            // mLookAt
             mLookAt = new Point();
         }
         catch (Throwable t)
@@ -146,22 +238,32 @@ public class MapRenderer
         }
     }
 
+    /**
+     * Move "eyes" to specified location
+     *
+     * @param x X axis
+     * @param y Y axis
+     */
     private void lookAt(int x, int y)
     {
-        if (!valid()) return;
-
         mLookAt.set(x, y);
         invalidate();
     }
 
+    /**
+     * Clip the offsets and move "eyes" to specified location
+     *
+     * @param xOffset X-axis offset
+     * @param yOffset Y-axis offset
+     */
     private void moveEye(float xOffset, float yOffset)
     {
-        if (!valid()) return;
+        Floor floor;
+        if ((floor = NavigateManager.getCurrentFloor()) == null) return;
 
         int newX = mLookAt.x += xOffset / mZoomLevel;
         int newY = mLookAt.y += yOffset / mZoomLevel;
 
-        Floor floor = NavigateManager.getCurrentFloor();
         if (newX < 0) newX = 0;
         if (newX > floor.getWidth() * mZoomLevel) newX = (int) (floor.getWidth() * mZoomLevel);
         if (newY < 0) newY = 0;
@@ -170,15 +272,13 @@ public class MapRenderer
         lookAt(newX, newY);
     }
 
-    private boolean valid()
-    {
-        return NavigateManager.getCurrentFloor() != null;
-    }
-
+    /**
+     * Zoom the floor view
+     *
+     * @param offset Zoom offset
+     */
     private void zoom(float offset)
     {
-        if (!valid()) return;
-
         mZoomLevel += offset / ZOOM_SPEED;
 
         if (mZoomLevel < ZOOM_LEVEL_MIN) mZoomLevel = ZOOM_LEVEL_MIN;
@@ -187,86 +287,106 @@ public class MapRenderer
         invalidate();
     }
 
-    @Override
-    protected void onDraw(Canvas canvas)
-    {
-        Floor floor = NavigateManager.getCurrentFloor();
-        if (floor == null) return;
+    //endregion
 
-        drawNodes(canvas, floor);
-        drawLinks(canvas, floor);
+    //region Override methods
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        try
+        {
+            switch (event.getActionMasked())
+            {
+                case MotionEvent.ACTION_DOWN:
+                {
+                    mTouchedPointCount = 1;
+                    mPrevTouchX = event.getX();
+                    mPrevTouchY = event.getY();
+                    break;
+                }
+                case MotionEvent.ACTION_UP:
+                {
+                    mIsZooming = false;
+                    mTouchedPointCount = 0;
+                    break;
+                }
+                case MotionEvent.ACTION_POINTER_DOWN:
+                {
+                    mTouchedPointCount++;
+                    mIsZooming = true;
+                    mTouchPointDistance = calcTouchPointDistance(event);
+                    break;
+                }
+                case MotionEvent.ACTION_POINTER_UP:
+                {
+                    mTouchedPointCount--;
+                    mPrevTouchX = event.getX();
+                    mPrevTouchY = event.getY();
+                    break;
+                }
+                case MotionEvent.ACTION_MOVE:
+                {
+                    if (mIsZooming)
+                    {
+                        float newDistance = calcTouchPointDistance(event);
+                        float offset = newDistance - mTouchPointDistance;
+                        zoom(offset);
+                        mTouchPointDistance = newDistance;
+                    }
+                    else
+                    {
+                        float xOffset = mPrevTouchX - event.getX();
+                        float yOffset = mPrevTouchY - event.getY();
+                        moveEye(xOffset, yOffset);
+                        mPrevTouchX = event.getX();
+                        mPrevTouchY = event.getY();
+                    }
+                }
+            }
+            return true;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to handle touch event.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+            return false;
+        }
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldW, int oldH)
     {
-        mHalfWidth = w / 2;
-        mHalfHeight = h / 2;
-        mLookAt.set(mHalfWidth, mHalfHeight);
-    }
-
-    public MapRenderer(Context context)
-    {
-        this(context, null);
-    }
-
-    public MapRenderer(Context context, AttributeSet attrs)
-    {
-        super(context, attrs, 0);
-        init(attrs);
+        try
+        {
+            mHalfWidth = w / 2;
+            mHalfHeight = h / 2;
+            mLookAt.set(mHalfWidth, mHalfHeight);
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to handle size change event.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+        }
     }
 
     @Override
-    public boolean onTouchEvent(MotionEvent event)
+    protected void onDraw(Canvas canvas)
     {
-        switch (event.getActionMasked())
+        try
         {
-            case MotionEvent.ACTION_DOWN:
-            {
-                mTouchedPointCount = 1;
-                mPrevTouchX = event.getX();
-                mPrevTouchY = event.getY();
-                break;
-            }
-            case MotionEvent.ACTION_UP:
-            {
-                mIsZooming = false;
-                mTouchedPointCount = 0;
-                break;
-            }
-            case MotionEvent.ACTION_POINTER_DOWN:
-            {
-                mTouchedPointCount++;
-                mIsZooming = true;
-                mTouchPointDistance = getTouchPointDistance(event);
-                break;
-            }
-            case MotionEvent.ACTION_POINTER_UP:
-            {
-                mTouchedPointCount--;
-                mPrevTouchX = event.getX();
-                mPrevTouchY = event.getY();
-                break;
-            }
-            case MotionEvent.ACTION_MOVE:
-            {
-                if (mIsZooming)
-                {
-                    float newDistance = getTouchPointDistance(event);
-                    float offset = newDistance - mTouchPointDistance;
-                    zoom(offset);
-                    mTouchPointDistance = newDistance;
-                }
-                else
-                {
-                    float xOffset = mPrevTouchX - event.getX();
-                    float yOffset = mPrevTouchY - event.getY();
-                    moveEye(xOffset, yOffset);
-                    mPrevTouchX = event.getX();
-                    mPrevTouchY = event.getY();
-                }
-            }
+            Floor floor = NavigateManager.getCurrentFloor();
+            if (floor == null) return;
+
+            drawNodes(canvas, floor);
+            drawLinks(canvas, floor);
         }
-        return true;
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to handle draw event.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+        }
     }
+
+    //endregion
 }

@@ -1,20 +1,39 @@
 package cn.vicey.navigator.Models.Nodes;
 
-import cn.vicey.navigator.Debug.LocationProvider;
 import cn.vicey.navigator.Managers.DebugManager;
+import cn.vicey.navigator.Managers.FakeLocateManager;
+import cn.vicey.navigator.Managers.LocateManager;
 
+/**
+ * User node
+ */
 public class UserNode
         extends NodeBase
 {
-    private static final Object SYNC_ROOT = new Object();
+    //region Constants
 
-    private static UserNode mInstance;
+    private static final Object SYNC_LOCK = new Object(); // Sync lock
 
+    //endregion
+
+    //region Static fields
+
+    private static UserNode mInstance; // Singleton instance of user node class
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Gets the singleton instance of user node class
+     *
+     * @return Singleton instance of user node class
+     */
     public static UserNode getInstance()
     {
         if (mInstance == null)
         {
-            synchronized (SYNC_ROOT)
+            synchronized (SYNC_LOCK)
             {
                 if (mInstance == null)
                 {
@@ -25,30 +44,54 @@ public class UserNode
         return mInstance;
     }
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Hidden for singleton design pattern
+     */
     private UserNode()
     {
         super(0, 0);
     }
 
+    //endregion
+
+    //region Accessors
+
+    /**
+     * Gets node's type
+     *
+     * @return Node's type
+     */
     @Override
     public NodeType getType()
     {
         return NodeType.USER_NODE;
     }
 
+    /**
+     * Gets node's x axis
+     *
+     * @return X axis
+     */
     @Override
     public int getX()
     {
-        // TODO: Integrate location module and use its position here
-        int x = 0;
-        return DebugManager.isUseFakeLocation() ? LocationProvider.getCurrentLocation().x : x;
+        return DebugManager.isUseFakeLocation() ? FakeLocateManager.getCurrentLocation().x : LocateManager.getCurrentLocation().x;
     }
 
+    /**
+     * Gets node's y axis
+     *
+     * @return Y axis
+     */
     @Override
     public int getY()
     {
-        // TODO: Integrate location module and use its position here
-        int y = 0;
-        return DebugManager.isUseFakeLocation() ? LocationProvider.getCurrentLocation().y : y;
+        return DebugManager.isUseFakeLocation() ? FakeLocateManager.getCurrentLocation().y : LocateManager.getCurrentLocation().y;
     }
+
+    //endregion
 }

@@ -13,18 +13,32 @@ import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
 
+/**
+ * Navigate view, provides a view to show map and display navigation on it
+ */
 public class NavigateView
         extends RelativeLayout
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "NavigateView";
-    private static final int MAP_RENDERER_INDEX = 0;
-    private static final int PLACEHOLDER_INDEX = 1;
 
-    private MapRenderer mMapRenderer;
-    private MainActivity mParent;
-    private ViewFlipper mViewFlipper;
+    private static final int VIEW_MAP_RENDERER = 0; // Map renderer view's index
+    private static final int VIEW_PLACEHOLDER  = 1; // Placeholder view's index
 
-    private OnClickListener mDownstairsButtonOnClickListener = new OnClickListener()
+    //endregion
+
+    //region Fields
+
+    private MapRenderer  mMapRenderer; // Map renderer
+    private MainActivity mParent;      // Parent activity
+    private ViewFlipper  mViewFlipper; // View flipper
+
+    //endregion
+
+    //region Listeners
+
+    private OnClickListener mDownstairsButtonOnClickListener = new OnClickListener() // Downstairs button click listener
     {
         @Override
         public void onClick(View view)
@@ -35,7 +49,7 @@ public class NavigateView
             flush();
         }
     };
-    private OnClickListener mUpstairsButtonOnClickListener = new OnClickListener()
+    private OnClickListener mUpstairsButtonOnClickListener   = new OnClickListener() // Upstairs button click listener
     {
         @Override
         public void onClick(View view)
@@ -47,6 +61,25 @@ public class NavigateView
         }
     };
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link NavigateView}
+     *
+     * @param parent Parent activity
+     */
+    public NavigateView(final @NonNull MainActivity parent)
+    {
+        super(parent);
+        mParent = parent;
+        init();
+    }
+
+    /**
+     * Initialize view
+     */
     private void init()
     {
         try
@@ -74,29 +107,31 @@ public class NavigateView
         }
     }
 
+    /**
+     * Switch to placeholder view
+     */
     private void showPlaceholder()
     {
-        mViewFlipper.setDisplayedChild(PLACEHOLDER_INDEX);
+        mViewFlipper.setDisplayedChild(VIEW_PLACEHOLDER);
     }
 
+    /**
+     * Switch to map renderer view
+     */
     private void showRenderer()
     {
-        mViewFlipper.setDisplayedChild(MAP_RENDERER_INDEX);
+        mViewFlipper.setDisplayedChild(VIEW_MAP_RENDERER);
     }
 
-    public NavigateView(final @NonNull MainActivity parent)
-    {
-        super(parent);
-        mParent = parent;
-        init();
-    }
-
+    /**
+     * Flush view
+     */
     public void flush()
     {
         if (NavigateManager.getCurrentFloorIndex() == NavigateManager.NO_SELECTED_FLOOR)
         {
             mParent.setTitleText(R.string.navigate);
-            if (mViewFlipper.getDisplayedChild() != PLACEHOLDER_INDEX) showPlaceholder();
+            if (mViewFlipper.getDisplayedChild() != VIEW_PLACEHOLDER) showPlaceholder();
         }
         else
         {
@@ -104,8 +139,10 @@ public class NavigateView
             int floorIndex = NavigateManager.getCurrentFloorIndex();
             if (floorIndex != NavigateManager.NO_SELECTED_FLOOR) titleText = titleText + " - " + (floorIndex + 1) + "F";
             mParent.setTitleText(titleText);
-            if (mViewFlipper.getDisplayedChild() != MAP_RENDERER_INDEX) showRenderer();
+            if (mViewFlipper.getDisplayedChild() != VIEW_MAP_RENDERER) showRenderer();
         }
         mMapRenderer.invalidate();
     }
+
+    //endregion
 }

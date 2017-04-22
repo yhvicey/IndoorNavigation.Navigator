@@ -10,24 +10,37 @@ import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
 
+/**
+ * Settings view, provides a view to manage setting items
+ */
 public class SettingsView
         extends ScrollView
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "SettingsView";
 
-    private MainActivity mParent;
+    //endregion
 
-    private OnClickListener mOnDisableDebugModeTextViewClick = new OnClickListener()
+    //region Fields
+
+    private MainActivity mParent; // Parent activity
+
+    //endregion
+
+    //region Listeners
+
+    private OnClickListener mOnDisableDebugModeTextViewClick = new OnClickListener() // Disable debug mode text view click listener
     {
         @Override
         public void onClick(View view)
         {
-            SettingsManager.disableDebugMode();
+            SettingsManager.setDebugModeEnabled(false);
             mParent.alert(R.string.debug_mode_disabled);
             flush();
         }
     };
-    private OnClickListener mOnShowLogTextViewClick = new OnClickListener()
+    private OnClickListener mOnShowLogTextViewClick          = new OnClickListener() // Show log text view click listener
     {
         @Override
         public void onClick(View view)
@@ -37,6 +50,29 @@ public class SettingsView
         }
     };
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link SettingsView}
+     *
+     * @param parent Parent activity
+     */
+    public SettingsView(final @NonNull MainActivity parent)
+    {
+        super(parent);
+        mParent = parent;
+        init();
+    }
+
+    //endregion
+
+    //region Methods
+
+    /**
+     * Initialize view
+     */
     private void init()
     {
         try
@@ -57,17 +93,15 @@ public class SettingsView
 
     }
 
-    public SettingsView(final @NonNull MainActivity parent)
-    {
-        super(parent);
-        mParent = parent;
-        init();
-    }
-
+    /**
+     * Flush view
+     */
     public void flush()
     {
         mParent.setTitleText(R.string.settings);
         View debugView = findViewById(R.id.sv_debug_view);
         debugView.setVisibility(SettingsManager.isDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
     }
+
+    //endregion
 }

@@ -3,15 +3,29 @@ package cn.vicey.navigator.Models;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 
 /**
- * Link class.
+ * Link class
  */
 public class Link
 {
-    private int mEndIndex;
-    private NodeType mEndType;
-    private int mStartIndex;
-    private NodeType mStartType;
+    //region Fields
 
+    private int      mEndIndex;   // Link's end index
+    private NodeType mEndType;    // Link's end type
+    private int      mStartIndex; // Link's start index
+    private NodeType mStartType;  // Link's start type
+
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link Link}
+     *
+     * @param startType  Link's start type
+     * @param startIndex Link's start index
+     * @param endType    Link's end type
+     * @param endIndex   Link's end index
+     */
     public Link(NodeType startType, int startIndex, NodeType endType, int endIndex)
     {
         mStartType = startType;
@@ -20,25 +34,53 @@ public class Link
         mEndIndex = endIndex;
     }
 
+    //endregion
+
+    //region Accessors
+
+    /**
+     * Gets link's end index
+     *
+     * @return Link's end index
+     */
     public int getEndIndex()
     {
         return mEndIndex;
     }
 
+    /**
+     * Gets link's end type
+     *
+     * @return Link's end type
+     */
     public NodeType getEndType()
     {
         return mEndType;
     }
 
+    /**
+     * Gets link's start index
+     *
+     * @return Link's start index
+     */
     public int getStartIndex()
     {
         return mStartIndex;
     }
 
+    /**
+     * Gets link's start type
+     *
+     * @return Link's start type
+     */
     public NodeType getStartType()
     {
         return mStartType;
     }
+
+    //endregion
+
+    //region Override methods
 
     @Override
     public boolean equals(Object obj)
@@ -64,4 +106,6 @@ public class Link
     {
         return "Link Start(" + mStartType.toString() + ", " + mStartIndex + ") End(" + mEndType.toString() + ", " + mEndIndex + ")";
     }
+
+    //endregion
 }

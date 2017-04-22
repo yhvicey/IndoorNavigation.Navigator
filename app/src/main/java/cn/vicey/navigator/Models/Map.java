@@ -7,19 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Map class.
+ * Map class
  */
 public class Map
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "Map";
 
-    private List<Floor> mFloors = new ArrayList<>();
-    private String mName;
+    private static final String MAP_VERSION = "1.1";
+
+    //endregion
+
+    //region Fields
+
+    private String mName; // Map's name
+
+    private List<Floor> mFloors = new ArrayList<>(); // Map's floors
+
+    //endregion
+
+    //region Constructors
 
     /**
-     * Initialize new instance of class Map.
+     * Initialize new instance of class {@link Map}
      *
-     * @param floors Map's floors.
+     * @param floors Map's floors
      */
     public Map(@NonNull String name, @NonNull List<Floor> floors)
     {
@@ -27,39 +40,35 @@ public class Map
         mFloors.addAll(floors);
     }
 
+    //endregion
+
+    //region Accessors
+
     /**
-     * Gets map's floors.
+     * Gets map's floors
      *
-     * @return Map's floors.
+     * @return Map's floors
      */
     public List<Floor> getFloors()
     {
         return mFloors;
     }
 
+    /**
+     * Gets map's name
+     *
+     * @return Map's name
+     */
     public String getName()
     {
         return mName;
     }
 
     /**
-     * Gets map's version.
+     * Gets all tags
      *
-     * @return Map's version.
+     * @return Tags
      */
-    public String getVersion()
-    {
-        return "1.0";
-    }
-
-    public void clearTags()
-    {
-        for (Floor floor : mFloors)
-        {
-            floor.clearTags();
-        }
-    }
-
     public List<Tag> getTags()
     {
         List<Tag> tags = new ArrayList<>();
@@ -72,6 +81,12 @@ public class Map
         return tags;
     }
 
+    /**
+     * Sets tags
+     *
+     * @param tags Tags to set
+     * @return Whether the setting is succeed or not
+     */
     public boolean setTags(List<Tag> tags)
     {
         clearTags();
@@ -79,10 +94,10 @@ public class Map
         {
             for (Tag tag : tags)
             {
-                int floor = tag.getFloor();
-                int index = tag.getIndex();
+                int floor = tag.getFloorIndex();
+                int index = tag.getNodeIndex();
                 String value = tag.getValue();
-                switch (tag.getType())
+                switch (tag.getNodeType())
                 {
                     case GUIDE_NODE:
                     {
@@ -110,9 +125,30 @@ public class Map
         }
     }
 
+    //endregion
+
+    //region Methods
+
+    /**
+     * Clear all tags
+     */
+    public void clearTags()
+    {
+        for (Floor floor : mFloors)
+        {
+            floor.clearTags();
+        }
+    }
+
+    //endregion
+
+    //region Override methods
+
     @Override
     public String toString()
     {
         return mName;
     }
+
+    //endregion
 }

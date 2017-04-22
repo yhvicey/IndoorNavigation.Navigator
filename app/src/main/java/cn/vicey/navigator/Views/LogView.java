@@ -9,13 +9,45 @@ import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
 
+/**
+ * Log view, provides a view to view log content
+ */
 public class LogView
         extends ScrollView
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "LogView";
 
-    private MainActivity mParent;
+    //endregion
 
+    //region Fields
+
+    private MainActivity mParent; // Parent activity
+
+    //endregion
+
+    // region Constructors
+
+    /**
+     * Initialize new instance of class {@link LogView}
+     *
+     * @param parent Parent activity
+     */
+    public LogView(final @NonNull MainActivity parent)
+    {
+        super(parent);
+        mParent = parent;
+        init();
+    }
+
+    //endregion
+
+    //region Methods
+
+    /**
+     * Initialize view
+     */
     private void init()
     {
         try
@@ -29,17 +61,15 @@ public class LogView
         }
     }
 
-    public LogView(final @NonNull MainActivity parent)
-    {
-        super(parent);
-        mParent = parent;
-        init();
-    }
-
+    /**
+     * Flush view
+     */
     public void flush()
     {
         mParent.setTitleText(R.string.log);
         TextView textView = (TextView) findViewById(R.id.lv_text_view);
         textView.setText(Logger.getLogContent());
     }
+
+    //endregion
 }

@@ -11,6 +11,7 @@ import android.widget.*;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Managers.MapManager;
 import cn.vicey.navigator.Managers.NavigateManager;
+import cn.vicey.navigator.Managers.TagManager;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -19,21 +20,49 @@ import cn.vicey.navigator.Utils.Logger;
 
 import java.util.List;
 
+/**
+ * Tags view, provides a view to manage tags
+ */
 public class TagsView
         extends RelativeLayout
 {
+    //region Inner classes
+
+    /**
+     * Tag list adapter class
+     */
     private class TagListAdapter
             extends ListViewAdapter<Tag>
     {
+        //region Constructors
+
+        /**
+         * Initialize new instance of class {@link TagListAdapter}
+         *
+         * @param context Related context
+         */
         public TagListAdapter(Context context)
         {
             super(context);
         }
 
+        //endregion
+
+        //region Methods
+
+        /**
+         * Get all tags from list
+         *
+         * @return Tag list
+         */
         public List<Tag> getAll()
         {
             return mItems;
         }
+
+        //endregion
+
+        //region Override methods
 
         @Override
         public View getView(int i, View view, ViewGroup viewGroup)
@@ -47,17 +76,32 @@ public class TagsView
             TextView subTextView = (TextView) view.findViewById(R.id.tli_sub_text);
             if (textView != null) textView.setText(tag.getValue());
             if (subTextView != null)
-                subTextView.setText(mParent.getString(R.string.tag_metadata, tag.getFloor(), tag.getType(), tag.getIndex()));
+                subTextView.setText(mParent.getString(R.string.tag_metadata, tag.getFloorIndex(), tag.getNodeType(), tag
+                        .getNodeIndex()));
             return view;
         }
+
+        //endregion
     }
+
+    //endregion
+
+    //region Constants
 
     private static final String LOGGER_TAG = "TagsView";
 
-    private MainActivity mParent;
-    private TagListAdapter mTagListAdapter;
+    //endregion
 
-    private OnClickListener mOnLoadTagButtonClick = new OnClickListener()
+    //region Fields
+
+    private MainActivity   mParent;         // Parent activity
+    private TagListAdapter mTagListAdapter; // Tag list adapter
+
+    //endregion
+
+    //region Listeners
+
+    private OnClickListener              mOnLoadTagButtonClick       = new OnClickListener()              // Load tag button click
     {
         @Override
         public void onClick(View view)
@@ -70,7 +114,7 @@ public class TagsView
                 return;
             }
             String mapName = NavigateManager.getCurrentMap().getName();
-            List<Tag> tags = MapManager.loadTags(mapName);
+            List<Tag> tags = TagManager.loadTags(mapName);
             if (tags == null) mParent.alert(R.string.no_tag);
             else
             {
@@ -80,7 +124,7 @@ public class TagsView
             //endregion
         }
     };
-    private OnClickListener mOnSaveTagButtonClick = new OnClickListener()
+    private OnClickListener              mOnSaveTagButtonClick       = new OnClickListener()              // Save tag button click listener
     {
         @Override
         public void onClick(View view)
@@ -97,13 +141,13 @@ public class TagsView
                 mParent.alert(R.string.no_tag);
                 return;
             }
-            if (MapManager.saveTags(NavigateManager.getCurrentMap().getName(), tags))
+            if (TagManager.saveTags(NavigateManager.getCurrentMap().getName(), tags))
                 mParent.alert(R.string.save_succeed);
             else mParent.alert(R.string.save_failed);
             //endregion
         }
     };
-    private ListView.OnItemClickListener mOnTagListItemClickListener = new ListView.OnItemClickListener()
+    private ListView.OnItemClickListener mOnTagListItemClickListener = new ListView.OnItemClickListener() // Tag list item click listener
     {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
@@ -173,7 +217,7 @@ public class TagsView
                                                                             if (textView == null) return;
                                                                             String tagFileName = textView.getText()
                                                                                                          .toString();
-                                                                            if (MapManager.deleteTagFile(tagFileName))
+                                                                            if (TagManager.deleteTagFile(tagFileName))
                                                                                 mParent.alert(R.string.delete_succeed);
                                                                             else mParent.alert(R.string.delete_failed);
                                                                             flush();
@@ -192,6 +236,29 @@ public class TagsView
         }
     };
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link TagsView}
+     *
+     * @param parent Parent activity
+     */
+    public TagsView(final @NonNull MainActivity parent)
+    {
+        super(parent);
+        mParent = parent;
+        init();
+    }
+
+    //endregion
+
+    //region Methods
+
+    /**
+     * Initialize view
+     */
     private void init()
     {
         try
@@ -218,13 +285,9 @@ public class TagsView
 
     }
 
-    public TagsView(final @NonNull MainActivity parent)
-    {
-        super(parent);
-        mParent = parent;
-        init();
-    }
-
+    /**
+     * Flush view
+     */
     public void flush()
     {
         mParent.setTitleText(R.string.tags);
@@ -238,4 +301,6 @@ public class TagsView
             mParent.alert(R.string.no_loaded_map);
         }
     }
+
+    //endregion
 }

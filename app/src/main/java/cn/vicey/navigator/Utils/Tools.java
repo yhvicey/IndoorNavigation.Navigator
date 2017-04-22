@@ -9,30 +9,53 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+/**
+ * Tool class, provides a set of useful methods to use in various scenario
+ */
 public final class Tools
 {
-    public interface DownloadCallback
-    {
-        void onDownloadSucceed(final @NonNull String filePath);
+    //region Inner classes
 
+    public interface OnDownloadListener
+    {
         void onDownloadFailed();
+
+        void onDownloadSucceed(final @NonNull File file);
     }
 
+    //endregion
+
+    //region Constants
+
     private static final String LOGGER_TAG = "Tools";
-    private static final String DATE_PATTERN = "yyyy-MM-dd";
-    private static final String TIME_PATTERN = "HH:mm:ss";
 
-    public static final String FILE_ENCODING = "utf-8";
-    public static final String NEW_LINE = System.getProperty("line.separator");
+    private static final String DATE_PATTERN     = "yyyy-MM-dd"; // Date string pattern
+    private static final double DOUBLE_PRECISION = 0.0000001;    // Double equality check precision
+    private static final String TIME_PATTERN     = "HH:mm:ss";   // Time string pattern
 
-    public static boolean copyFile(final @NonNull File src, final @NonNull File dest, boolean overwrite)
+    public static final String FILE_ENCODING = "utf-8";                              // File encoding
+    public static final String NEW_LINE      = System.getProperty("line.separator"); // New line string
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Copy a file from source to destination
+     *
+     * @param src         Source file
+     * @param dest        Destination
+     * @param overwritten Whether the existing file should be overwritten
+     * @return Whether the saving is succeed or not
+     */
+    public static boolean copyFile(final @NonNull File src, final @NonNull File dest, boolean overwritten)
     {
         try
         {
             if (!(src.exists() && src.isFile())) return false;
             if (dest.exists())
             {
-                if (!(overwrite && dest.isFile())) return false;
+                if (!(overwritten && dest.isFile())) return false;
             }
             FileInputStream fis = new FileInputStream(src);
             FileOutputStream fos = new FileOutputStream(dest);
@@ -53,27 +76,19 @@ public final class Tools
         }
     }
 
-    public static void downloadFile(final @NonNull String urlString, final DownloadCallback callback)
+    /**
+     * Download a file from specified url
+     *
+     * @param urlString Url to download
+     * @param listener  Download listener
+     */
+    public static void downloadFile(final @NonNull String urlString, final OnDownloadListener listener)
     {
         new Thread(new Runnable()
         {
             @Override
             public void run()
             {
-                DownloadCallback realCallback = callback != null ? callback : new DownloadCallback()
-                {
-                    @Override
-                    public void onDownloadSucceed(@NonNull String filePath)
-                    {
-
-                    }
-
-                    @Override
-                    public void onDownloadFailed()
-                    {
-
-                    }
-                };
                 try
                 {
                     Logger.info(LOGGER_TAG, "Started trying to download " + urlString + ".");
@@ -92,7 +107,7 @@ public final class Tools
                     if (!(file.exists() || file.createNewFile()))
                     {
                         Logger.error(LOGGER_TAG, "Failed to create download file.");
-                        realCallback.onDownloadFailed();
+                        if (listener != null) listener.onDownloadFailed();
                         return;
                     }
                     HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -108,22 +123,35 @@ public final class Tools
                     fos.write(stringBuilder.toString().getBytes(Tools.FILE_ENCODING));
                     fos.close();
                     Logger.info(LOGGER_TAG, "Finished download " + urlString + ". Total time: " + (new Date().getTime() - startTime) + " ms.");
-                    realCallback.onDownloadSucceed(file.getAbsolutePath());
+                    if (listener != null) listener.onDownloadSucceed(file);
                 }
                 catch (Throwable t)
                 {
                     Logger.error(LOGGER_TAG, "Failed to download file. Url: " + urlString, t);
-                    realCallback.onDownloadFailed();
+                    if (listener != null) listener.onDownloadFailed();
                 }
             }
         }).start();
     }
 
+    /**
+     * Gets available default name in specified directory
+     *
+     * @param dir Specified directory
+     * @return Available name
+     */
     public static String getAvailableDefaultName(final @NonNull File dir)
     {
         return getAvailableDefaultName(dir, "");
     }
 
+    /**
+     * Gets available default name in specified directory
+     *
+     * @param dir        Specified directory
+     * @param fileSuffix File suffix
+     * @return Available name
+     */
     public static String getAvailableDefaultName(final @NonNull File dir, final @NonNull String fileSuffix)
     {
         int suffix = 1;
@@ -135,9 +163,9 @@ public final class Tools
     }
 
     /**
-     * Get current date string in a format of "yyyy-MM-dd".
+     * Gets current date string in a format of "yyyy-MM-dd"
      *
-     * @return Date string.
+     * @return Date string
      */
     public static String getCurrentDateString()
     {
@@ -145,9 +173,9 @@ public final class Tools
     }
 
     /**
-     * Get current datetime string in a format of "yyyy-MM-dd HH:mm:ss"
+     * Gets current datetime string in a format of "yyyy-MM-dd HH:mm:ss"
      *
-     * @return
+     * @return Datetime string
      */
     public static String getCurrentDateTimeString()
     {
@@ -155,15 +183,22 @@ public final class Tools
     }
 
     /**
-     * Get current time string in a format of "HH:mm:ss"
+     * Gets current time string in a format of "HH:mm:ss"
      *
-     * @return
+     * @return Time string
      */
     public static String getCurrentTimeString()
     {
         return new SimpleDateFormat(TIME_PATTERN, Locale.getDefault()).format(new Date());
     }
 
+    /**
+     * Gets all directories under specified directory
+     *
+     * @param dir           Specified directory
+     * @param includeParent Whether the list should include parent folder ("..")
+     * @return List of directories, or null if dir is not a directory, or error occurred
+     */
     public static List<File> getDirs(final @NonNull File dir, boolean includeParent)
     {
         if (!dir.isDirectory()) return null;
@@ -194,15 +229,22 @@ public final class Tools
     }
 
     /**
-     * Get elapsed time from application start.
+     * Gets elapsed time from application start
      *
-     * @return Elapsed time in milliseconds.
+     * @return Elapsed time in milliseconds
      */
     public static long getElapsedTime()
     {
         return new Date().getTime() - Navigator.getStartTime();
     }
 
+    /**
+     * Gets all entries under specified directory
+     *
+     * @param dir           Specified directory
+     * @param includeParent Whether the list should include parent folder ("..")
+     * @return List of entries, or null if error occurred
+     */
     public static List<File> getEntries(final @NonNull File dir, boolean includeParent)
     {
         if (!dir.isDirectory()) return null;
@@ -220,6 +262,12 @@ public final class Tools
         }
     }
 
+    /**
+     * Gets all files under specified directory
+     *
+     * @param dir Specified directory
+     * @return List of files, or null if dir is not a directory, or error occurred
+     */
     public static List<File> getFiles(final @NonNull File dir)
     {
         if (!dir.isDirectory()) return null;
@@ -248,23 +296,53 @@ public final class Tools
         }
     }
 
+    /**
+     * Check equality of two double value equal
+     *
+     * @param left  Left double value
+     * @param right Right double value
+     * @return Are these two double value equal or not
+     */
     public static boolean isDoubleEqual(double left, double right)
     {
-        return isDoubleEqual(left, right, 0.0000001);
+        return isDoubleEqual(left, right, DOUBLE_PRECISION);
     }
 
+    /**
+     * Check equality of two double value equal
+     *
+     * @param left      Left double value
+     * @param right     Right double value
+     * @param precision Equality check precision
+     * @return Are these two double value equal or not
+     */
     public static boolean isDoubleEqual(double left, double right, double precision)
     {
         return Math.abs(left - right) < precision;
     }
 
-    public static boolean isStringEmpty(final @NonNull String str)
+    /**
+     * Check whether the string is empty
+     *
+     * @param str String to check
+     * @return Whether the string is empty
+     */
+    public static boolean isStringEmpty(final String str)
     {
         return isStringEmpty(str, true);
     }
 
-    public static boolean isStringEmpty(final @NonNull String str, boolean treatWhitespaceAsEmpty)
+
+    /**
+     * Check whether the string is empty
+     *
+     * @param str                    String to check
+     * @param treatWhitespaceAsEmpty Treat whitespace string as empty string
+     * @return Whether the string is empty
+     */
+    public static boolean isStringEmpty(final String str, boolean treatWhitespaceAsEmpty)
     {
+        if (str == null) return true;
         if (str.length() == 0) return true;
         if (!treatWhitespaceAsEmpty) return false;
         for (int i = 0; i < str.length(); i++)
@@ -274,8 +352,17 @@ public final class Tools
         return true;
     }
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Hidden for static class design pattern
+     */
     private Tools()
     {
         // no-op
     }
+
+    //endregion
 }

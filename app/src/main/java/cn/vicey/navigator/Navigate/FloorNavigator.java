@@ -8,34 +8,69 @@ import cn.vicey.navigator.Models.Nodes.NodeBase;
 import java.util.HashMap;
 import java.util.HashSet;
 
+/**
+ * Navigator class, provides navigate ability for related floor
+ */
 public class FloorNavigator
 {
-    public interface OnNavigateFinishedCallback
+    //region Inner classes
+
+    /**
+     * Listener which will be invoked when navigation is finished
+     */
+    public interface OnNavigationFinishedListener
     {
-        public void OnFinished();
+        //region Methods
+
+        /**
+         * Invoked when the navigation is finished
+         */
+        void onFinished();
+
+        //endregion
     }
 
+    /**
+     * Navigate table builder
+     */
     private class Builder
             implements Runnable
     {
+        //region Constants
+
         private final Object SYNC_LOCK = new Object();
 
-        private boolean mIsBuilding;
-        private NodeBase mNode;
-        private HashMap<NodeBase, Path> mTable;
+        //endregion
 
-        public Builder(final @NonNull NodeBase node)
+        //region Fields
+
+        private boolean                 mIsBuilding; // Whether the builder is building
+        private NodeBase                mStartNode;  // Start node
+        private HashMap<NodeBase, Path> mTable;      // Built table
+
+        //endregion
+
+        //region Constructors
+
+        /**
+         * Initialize new instance of class {@link Builder}
+         *
+         * @param startNode Start node
+         */
+        public Builder(final @NonNull NodeBase startNode)
         {
-            mNode = node;
+            mStartNode = startNode;
         }
 
-        @Override
-        public void run()
-        {
-            mTable = buildTable(mNode);
-            if (mCallback != null) mCallback.OnFinished();
-        }
+        //endregion
 
+        //region Methods
+
+        /**
+         * Start building the table
+         *
+         * @return Built table, or null if the building isn't finished yet
+         */
         public HashMap<NodeBase, Path> build()
         {
             // Build already done, return result
@@ -50,30 +85,72 @@ public class FloorNavigator
             }
             return mTable;
         }
+
+        //endregion
+
+        //region Override methods
+
+        @Override
+        public void run()
+        {
+            Path path = new Path(mStartNode);
+            HashSet<NodeBase> closeTable = new HashSet<>();
+            HashMap<NodeBase, Path> table = new HashMap<>();
+            // TODO: Finish Dijkstra algorithm here
+            mTable = table;
+            if (mOnNavigationFinishedListener != null) mOnNavigationFinishedListener.onFinished();
+        }
+
+        //endregion
     }
 
-    private HashMap<NodeBase, Builder> mBuilderTable = new HashMap<>();
-    private OnNavigateFinishedCallback mCallback;
+    //endregion
 
-    private HashMap<NodeBase, Path> buildTable(final @NonNull NodeBase node)
-    {
-        Path path = new Path(node);
-        HashSet<NodeBase> closeTable = new HashSet<>();
-        HashMap<NodeBase, Path> table = new HashMap<>();
-        // TODO: Finish Dijkstra algorithm here
-        return table;
-    }
+    //region Fields
 
+    private OnNavigationFinishedListener mOnNavigationFinishedListener; // Listener for navigation finished event
+
+    private HashMap<NodeBase, Builder> mBuilderTable = new HashMap<>(); // Builder table to get built table or start building table
+
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Initialize new instance of class {@link FloorNavigator}
+     *
+     * @param floor Related floor
+     */
     public FloorNavigator(final @NonNull Floor floor)
     {
         for (GuideNode guideNode : floor.getGuideNodes()) mBuilderTable.put(guideNode, new Builder(guideNode));
     }
 
-    public void setCallback(OnNavigateFinishedCallback value)
+    //endregion
+
+    //region Accessors
+
+    /**
+     * Sets {@link OnNavigationFinishedListener} for this navigator
+     *
+     * @param value Listener to set
+     */
+    public void setOnNavigationFinishedListener(OnNavigationFinishedListener value)
     {
-        mCallback = value;
+        mOnNavigationFinishedListener = value;
     }
 
+    //endregion
+
+    //region Methods
+
+    /**
+     * Gets the shortest path from start node to end node in related floor
+     *
+     * @param start Start node
+     * @param end   End node
+     * @return The shortest path, or null if the navigate table isn't built yet
+     */
     public Path navigate(final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
         Builder builder = mBuilderTable.get(start);
@@ -84,4 +161,6 @@ public class FloorNavigator
         if (path == null) throw new IllegalArgumentException("End node doesn't belong to this navigator.");
         return path;
     }
+
+    //endregion
 }

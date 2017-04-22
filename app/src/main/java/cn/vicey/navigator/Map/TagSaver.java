@@ -12,19 +12,35 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.List;
 
+/**
+ * Tag saver class, provides a set of methods to save tags
+ */
 public final class TagSaver
 {
-    private static final String LOGGER_TAG = "TagSaver";
-    private static final String ATTR_VALUE = "Value";
-    private static final String ATTR_VERSION = "Version";
-    private static final String ELEMENT_TAG = "Tag";
-    private static final String ELEMENT_TAGS = "Tags";
-    private static final String SUPPORTED_VERSION = "1.1";
+    //region Constants
 
-    private static void saveTag(final @NonNull Tag tag, XmlSerializer serializer)
+    private static final String LOGGER_TAG = "TagSaver";
+
     private static final String ATTR_FLOOR_INDEX  = "FloorIndex"; // Floor index attribute name
     private static final String ATTR_NODE_INDEX   = "NodeIndex";  // Node index attribute name
     private static final String ATTR_NODE_TYPE    = "NodeType";   // Node type attribute name
+    private static final String ATTR_VALUE        = "Value";      // Value attribute name
+    private static final String ATTR_VERSION      = "Version";    // Version attribute name
+    private static final String ELEMENT_TAG       = "Tag";        // Tag element name
+    private static final String ELEMENT_TAGS      = "Tags";       // Tags element name
+    private static final String SUPPORTED_VERSION = "1.1";        // Supported version of this parser
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Generate tag element
+     *
+     * @param tag        Tag to save
+     * @param serializer Xml serializer
+     */
+    private static void generateTag(final @NonNull Tag tag, XmlSerializer serializer)
     {
         try
         {
@@ -41,6 +57,13 @@ public final class TagSaver
         }
     }
 
+    /**
+     * Save specified map's tags
+     *
+     * @param mapName Name of specified map
+     * @param tags    Tags to save
+     * @return New file object if saving is succeed, or null if error occurred
+     */
     public static File save(final @NonNull String mapName, final @NonNull List<Tag> tags)
     {
         try
@@ -59,7 +82,7 @@ public final class TagSaver
             serializer.attribute(null, ATTR_VERSION, SUPPORTED_VERSION);
             for (Tag tag : tags)
             {
-                if (tag != null) saveTag(tag, serializer);
+                if (tag != null) generateTag(tag, serializer);
             }
             serializer.endTag(null, ELEMENT_TAGS);
             serializer.endDocument();
@@ -74,8 +97,17 @@ public final class TagSaver
         }
     }
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Hidden for static class design pattern
+     */
     private TagSaver()
     {
         // no-op
     }
+
+    //endregion
 }

@@ -14,18 +14,34 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tag parser class, provides a set of methods to parse tag file
+ */
 public final class TagParser
 {
+    //region Constants
+
     private static final String LOGGER_TAG = "TagParser";
-    private static final String ATTR_VALUE = "Value";
-    private static final String ATTR_VERSION = "Version";
-    private static final String ELEMENT_TAG = "Tag";
-    private static final String ELEMENT_TAGS = "Tags";
-    private static final String SUPPORTED_VERSION = "1.1";
 
     private static final String ATTR_FLOOR_INDEX  = "FloorIndex"; // Floor index attribute name
     private static final String ATTR_NODE_INDEX   = "NodeIndex";  // Node index attribute name
     private static final String ATTR_NODE_TYPE    = "NodeType";   // Node type attribute name
+    private static final String ATTR_VALUE        = "Value";      // Value attribute name
+    private static final String ATTR_VERSION      = "Version";    // Version attribute name
+    private static final String ELEMENT_TAG       = "Tag";        // Tag element name
+    private static final String ELEMENT_TAGS      = "Tags";       // Tags element name
+    private static final String SUPPORTED_VERSION = "1.1";        // Supported version of this parser
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Generate tag object from xml parser
+     *
+     * @param parser Xml parser
+     * @return New tag object, or null if error occurred
+     */
     private static Tag generateTag(final @NonNull XmlPullParser parser)
     {
         int floorIndex;
@@ -65,6 +81,12 @@ public final class TagParser
         return new Tag(floorIndex, nodeIndex, nodeType, value);
     }
 
+    /**
+     * Parse tags from InputStream
+     *
+     * @param stream InputStream to parse
+     * @return New tags list object, or null if error occurred
+     */
     private static List<Tag> parseStream(final @NonNull InputStream stream)
     {
         try
@@ -127,6 +149,12 @@ public final class TagParser
         }
     }
 
+    /**
+     * Parse tags from file
+     *
+     * @param file File to parse
+     * @return New tags list object, or null if error occurred
+     */
     public static List<Tag> parse(final @NonNull File file)
     {
         try
@@ -148,8 +176,17 @@ public final class TagParser
         }
     }
 
+    //endregion
+
+    //region Constructors
+
+    /**
+     * Hidden for static class design pattern
+     */
     private TagParser()
     {
         // no-op
     }
+
+    //endregion
 }
