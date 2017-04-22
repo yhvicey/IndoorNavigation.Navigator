@@ -33,8 +33,14 @@ public final class Tools
     private static final double DOUBLE_PRECISION = 0.0000001;    // Double equality check precision
     private static final String TIME_PATTERN     = "HH:mm:ss";   // Time string pattern
 
-    public static final String FILE_ENCODING = "utf-8";                              // File encoding
-    public static final String NEW_LINE      = System.getProperty("line.separator"); // New line string
+    /**
+     * File encoding
+     */
+    public static final String FILE_ENCODING = "utf-8";
+    /**
+     * New line string
+     */
+    public static final String NEW_LINE      = System.getProperty("line.separator");
 
     //endregion
 

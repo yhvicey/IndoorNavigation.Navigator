@@ -36,15 +36,42 @@ public class MainActivity
     private static final long   RIPPLE_DURATION = 250;           // Guillotine animation duration
     private static final Object SYNC_LOCK       = new Object();  // Sync lock
 
-    public static final long LONG_TOAST_DURATION   = 3500;       // Toast duration constant
-    public static final long MIDDLE_TOAST_DURATION = 2000;       // Toast duration constant
-    public static final int  REQ_STORAGE           = 1;          // Request code for storage
-    public static final long SHORT_TOAST_DURATION  = 1000;       // Toast duration constant
-    public static final int  VIEW_LOG              = 4;          // Log view index
-    public static final int  VIEW_MAPS             = 1;          // Maps view index
-    public static final int  VIEW_NAVIGATE         = 0;          // Navigate view index
-    public static final int  VIEW_SETTINGS         = 3;          // Settings view index
-    public static final int  VIEW_TAGS             = 2;          // Tags view index
+    /**
+     * Long toast duration (3500 ms) constant
+     */
+    public static final long LONG_TOAST_DURATION   = 3500;
+    /**
+     * Middle toast duration (2000 ms) constant
+     */
+    public static final long MIDDLE_TOAST_DURATION = 2000;
+    /**
+     * Request code for storage
+     */
+    public static final int  REQ_STORAGE           = 1;
+    /**
+     * Short toast duration (1000 ms) constant
+     */
+    public static final long SHORT_TOAST_DURATION  = 1000;
+    /**
+     * Log view index
+     */
+    public static final int  VIEW_LOG              = 4;
+    /**
+     * Maps view index
+     */
+    public static final int  VIEW_MAPS             = 1;
+    /**
+     * Navigate view index
+     */
+    public static final int  VIEW_NAVIGATE         = 0;
+    /**
+     * Settings view index
+     */
+    public static final int  VIEW_SETTINGS         = 3;
+    /**
+     * Tags view index
+     */
+    public static final int  VIEW_TAGS             = 2;
 
     //endregion
 

@@ -15,7 +15,10 @@ public final class NavigateManager
 {
     //region Constants
 
-    public static final int NO_SELECTED_FLOOR = -1; // Indicates no floor is selected
+    /**
+     * Indicates no floor is selected
+     */
+    public static final int NO_SELECTED_FLOOR = -1;
 
     //endregion
 

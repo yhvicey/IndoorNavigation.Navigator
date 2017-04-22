@@ -19,9 +19,18 @@ public class Navigator
 
     private static final String LOGGER_TAG = "Navigator";
 
-    public static final int ERR_INIT              = -2; // Initialization failed error code
-    public static final int ERR_SUCCEED           = 0;  // Succeed exit error code
-    public static final int ERR_UNEXPECTED_ACTION = -1; // Unexpected action error code
+    /**
+     * Initialization failed error code
+     */
+    public static final int ERR_INIT              = -2;
+    /**
+     * Succeed exit error code
+     */
+    public static final int ERR_SUCCEED           = 0;
+    /**
+     * Unexpected action error code
+     */
+    public static final int ERR_UNEXPECTED_ACTION = -1;
 
     //endregion
 
