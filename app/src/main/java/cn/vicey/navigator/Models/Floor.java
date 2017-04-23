@@ -29,8 +29,10 @@ public class Floor
     private int mHeight; // Floor's height
     private int mWidth;  // Floor's width
 
-    private List<GuideNode> mGuideNodes = new ArrayList<>(); // Floor's guide nodes
-    private List<WallNode>  mWallNodes  = new ArrayList<>(); // Floor's wall nodes
+    private List<GuideNode> mGuideNodes     = new ArrayList<>(); // Floor's guide nodes
+    private List<GuideNode> mNextEntryNodes = new ArrayList<>(); // Floor's next floor's entry nodes
+    private List<GuideNode> mPrevEntryNodes = new ArrayList<>(); // Floor's previous floor's entry nodes
+    private List<WallNode>  mWallNodes      = new ArrayList<>(); // Floor's wall nodes
 
     //endregion
 
@@ -54,6 +56,26 @@ public class Floor
     public int getHeight()
     {
         return mHeight;
+    }
+
+    /**
+     * Gets floor's next floor's entry nodes
+     *
+     * @return Next floor's entry nodes
+     */
+    public List<GuideNode> getNextEntryNodes()
+    {
+        return mNextEntryNodes;
+    }
+
+    /**
+     * Gets floor's previous floor's entry nodes
+     *
+     * @return Previous floor's entry nodes
+     */
+    public List<GuideNode> getPrevEntryNodes()
+    {
+        return mPrevEntryNodes;
     }
 
     /**
@@ -119,7 +141,10 @@ public class Floor
         {
             case GUIDE_NODE:
             {
-                mGuideNodes.add((GuideNode) node);
+                GuideNode guideNode = (GuideNode) node;
+                mGuideNodes.add(guideNode);
+                if (guideNode.getPrev() != null) mPrevEntryNodes.add(guideNode);
+                if (guideNode.getNext() != null) mNextEntryNodes.add(guideNode);
                 return;
             }
             case WALL_NODE:
