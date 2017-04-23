@@ -157,6 +157,18 @@ public abstract class NodeBase
     //region Methods
 
     /**
+     * Calculate distance to target point
+     *
+     * @param x Target point's x axis
+     * @param y Target point's y axis
+     * @return Distance to target node
+     */
+    public double calcDistance(int x, int y)
+    {
+        return Math.sqrt(Math.pow(mX - x, 2) + Math.pow(mY - y, 2));
+    }
+
+    /**
      * Calculate distance to target node
      *
      * @param target Target node
@@ -164,7 +176,7 @@ public abstract class NodeBase
      */
     public double calcDistance(final @NonNull NodeBase target)
     {
-        return Math.sqrt(Math.pow(mX - target.mX, 2) + Math.pow(mY - target.mY, 2));
+        return calcDistance(target.mX, target.mY);
     }
 
     /**
