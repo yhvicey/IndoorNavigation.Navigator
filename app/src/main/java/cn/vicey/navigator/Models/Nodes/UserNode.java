@@ -61,6 +61,16 @@ public class UserNode
     //region Accessors
 
     /**
+     * Gets user node's current floor index
+     *
+     * @return Current floor index
+     */
+    public int getCurrentFloorIndex()
+    {
+        return DebugManager.isUseFakeLocation() ? FakeLocateManager.getCurrentFloorIndex() : LocateManager.getCurrentFloorIndex();
+    }
+
+    /**
      * Gets node's type
      *
      * @return Node's type

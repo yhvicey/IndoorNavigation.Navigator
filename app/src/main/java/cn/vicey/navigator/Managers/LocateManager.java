@@ -10,12 +10,24 @@ public final class LocateManager
     //region Static methods
 
     /**
+     * Gets current floor index provided by fake data
+     *
+     * @return Current floor index
+     */
+    public static int getCurrentFloorIndex()
+    {
+        // TODO: Integrate locate module here
+        return NavigateManager.NO_SELECTED_FLOOR;
+    }
+
+    /**
      * Gets current location provided by locate module
      *
      * @return Current location
      */
     public static Point getCurrentLocation()
     {
+        // TODO: Integrate locate module here
         return new Point();
     }
 

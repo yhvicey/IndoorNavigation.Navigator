@@ -9,6 +9,7 @@ import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
 import cn.vicey.navigator.Managers.NavigateManager;
+import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
@@ -45,7 +46,7 @@ public class NavigateView
         {
             if (view.getId() != R.id.nv_downstairs_button) return;
             if (NavigateManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!NavigateManager.goDownstairs()) mParent.alert(R.string.already_ground_floor);
+            else if (!mMapRenderer.displayDownstairs()) mParent.alert(R.string.already_ground_floor);
             flush();
         }
     };
@@ -56,7 +57,7 @@ public class NavigateView
         {
             if (view.getId() != R.id.nv_upstairs_button) return;
             if (NavigateManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!NavigateManager.goUpstairs()) mParent.alert(R.string.already_top_floor);
+            else if (!mMapRenderer.displayUpstairs()) mParent.alert(R.string.already_top_floor);
             flush();
         }
     };
@@ -128,7 +129,7 @@ public class NavigateView
      */
     public void flush()
     {
-        if (NavigateManager.getCurrentFloorIndex() == NavigateManager.NO_SELECTED_FLOOR)
+        if (UserNode.getInstance().getCurrentFloorIndex() == NavigateManager.NO_SELECTED_FLOOR)
         {
             mParent.setTitleText(R.string.navigate);
             if (mViewFlipper.getDisplayedChild() != VIEW_PLACEHOLDER) showPlaceholder();
@@ -136,7 +137,7 @@ public class NavigateView
         else
         {
             String titleText = NavigateManager.getCurrentMap().getName();
-            int floorIndex = NavigateManager.getCurrentFloorIndex();
+            int floorIndex = mMapRenderer.getCurrentDisplayingFloorIndex();
             if (floorIndex != NavigateManager.NO_SELECTED_FLOOR) titleText = titleText + " - " + (floorIndex + 1) + "F";
             mParent.setTitleText(titleText);
             if (mViewFlipper.getDisplayedChild() != VIEW_MAP_RENDERER) showRenderer();

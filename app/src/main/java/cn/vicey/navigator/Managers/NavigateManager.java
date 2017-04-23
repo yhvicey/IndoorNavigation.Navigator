@@ -4,9 +4,16 @@ import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
-import cn.vicey.navigator.Models.Nodes.NodeBase;
-import cn.vicey.navigator.Models.Nodes.NodeType;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
+import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Navigate.FloorNavigator;
+import cn.vicey.navigator.Navigate.NavigateTask;
+import cn.vicey.navigator.Navigate.Path;
+import cn.vicey.navigator.Utils.Logger;
+
+import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Navigate manager, provides a set of methods to help navigate
@@ -14,6 +21,10 @@ import cn.vicey.navigator.Navigate.FloorNavigator;
 public final class NavigateManager
 {
     //region Constants
+
+    private static final String LOGGER_TAG = "NavigateManager";
+
+    private static final long UPDATE_INTERNAL = 1000; // Update internal in milliseconds
 
     /**
      * Indicates no floor is selected
@@ -24,27 +35,120 @@ public final class NavigateManager
 
     //region Static fields
 
-    private static Map mCurrentMap; // Current map object
+    private static Path      mCurrentGuidePath; // Current guide path
+    private static Map       mCurrentMap;       // Current map object
+    private static boolean   mIsNavigating;     // Whether the manager is navigation
+    private static GuideNode mNearestNode;      // Nearest node to user node
 
-    private static int                         mCurrentFloorIndex = NO_SELECTED_FLOOR;   // Current floor index
-    private static SparseArray<FloorNavigator> mFloorNavigators   = new SparseArray<>(); // Floor navigators
+    private static SparseArray<FloorNavigator> mFloorNavigators    = new SparseArray<>();           // Floor navigators
+    private static Runnable                    mNavigateHelperTask = new Runnable()                 // Navigate task
+    {
+        @Override
+        public void run()
+        {
+            try
+            {
+                while (mIsNavigating)
+                {
+                    // Ensure internal between two updates to avoid high cpu usage
+                    Thread.sleep(UPDATE_INTERNAL);
+
+                    // Calculate nearest node
+                    updateNearestNode();
+
+                    if (mNavigateTaskQueue.isEmpty()) continue;
+
+                    // Gets the first navigate task and check it
+                    NavigateTask task = mNavigateTaskQueue.peek();
+                    if (task.getFloorIndex() != UserNode.getInstance().getCurrentFloorIndex()) continue;
+
+                    if (task.update())
+                    {
+                        // Current task finished
+                        mNavigateTaskQueue.remove();
+                        continue;
+                    }
+
+                    // Get guide path and append user node to it
+                    mCurrentGuidePath = task.getPath().appendHead(UserNode.getInstance());
+                }
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to finish navigation.", t);
+            }
+            finally
+            {
+                mIsNavigating = false;
+            }
+        }
+    };
+    private static Queue<NavigateTask>         mNavigateTaskQueue  = new ConcurrentLinkedQueue<>(); // Navigation task queue
 
     //endregion
 
     //region Static methods
 
     /**
-     * Create navigate task for specified start node and end node
+     * Find the nearest downstairs entry node to user node
      *
-     * @param startFloor Start floor
-     * @param startNode  Start node
-     * @param endFloor   End floor
-     * @param endNode    End node
+     * @return The nearest downstairs entry node to user node
      */
-    public static void createNavigateTask(int startFloor, final @NonNull NodeBase startNode, int endFloor, final @NonNull NodeBase endNode)
+    private static GuideNode findNearestDownstairsEntryNode()
     {
-        if (startNode.getType() != NodeType.GUIDE_NODE || endNode.getType() != NodeType.GUIDE_NODE) return;
-        // TODO: judge floor and create navigate tasks here
+        Floor floor = getCurrentFloor();
+        if (floor == null) return null;
+        return findNearestNode(UserNode.getInstance().getX(), UserNode.getInstance().getY(), floor.getPrevEntryNodes());
+    }
+
+    /**
+     * Find the nearest node to specified location
+     *
+     * @param x     X axis
+     * @param y     Y axis
+     * @param nodes Nodes to find
+     * @return The nearest node to specified location
+     */
+    private static GuideNode findNearestNode(int x, int y, List<GuideNode> nodes)
+    {
+        if (getCurrentFloor() == null) return null;
+        double distance = Double.MAX_VALUE;
+        GuideNode result = null;
+        for (GuideNode node : nodes)
+        {
+            double newDistance = node.calcDistance(x, y);
+            if (newDistance > distance) continue;
+            distance = newDistance;
+            result = node;
+        }
+        return result;
+    }
+
+    /**
+     * Find the nearest upstairs entry node to user node
+     *
+     * @return The nearest upstairs entry node to user node
+     */
+    private static GuideNode findNearestUpstairsEntry()
+    {
+        Floor floor = getCurrentFloor();
+        if (floor == null) return null;
+        return findNearestNode(UserNode.getInstance().getX(), UserNode.getInstance().getY(), floor.getNextEntryNodes());
+    }
+
+    /**
+     * Update nearest node
+     */
+    private static void updateNearestNode()
+    {
+        Floor floor = getCurrentFloor();
+        if (floor == null)
+        {
+            mNearestNode = null;
+            return;
+        }
+        mNearestNode = findNearestNode(UserNode.getInstance().getX(), UserNode.getInstance()
+                                                                              .getY(), floor.getGuideNodes());
     }
 
     /**
@@ -54,17 +158,7 @@ public final class NavigateManager
      */
     public static Floor getCurrentFloor()
     {
-        return getFloor(mCurrentFloorIndex);
-    }
-
-    /**
-     * Gets current floor index
-     *
-     * @return Current floor index, or NO_SELECTED_FLOOR if no floor is selected
-     */
-    public static int getCurrentFloorIndex()
-    {
-        return mCurrentFloorIndex;
+        return getFloor(UserNode.getInstance().getCurrentFloorIndex());
     }
 
     /**
@@ -84,7 +178,7 @@ public final class NavigateManager
      */
     public static FloorNavigator getCurrentNavigator()
     {
-        return getNavigator(getCurrentFloorIndex());
+        return getNavigator(UserNode.getInstance().getCurrentFloorIndex());
     }
 
     /**
@@ -117,41 +211,44 @@ public final class NavigateManager
     }
 
     /**
-     * Try set current floor index to lower level
+     * Gets the nearest node to user, or null if no floor is selected or error occurred
      *
-     * @return True if didn't reach the ground floor, otherwise false
+     * @return The nearest node to user
      */
-    public static boolean goDownstairs()
+    public static GuideNode getNearestNode()
     {
-        if (mCurrentMap == null) return false;
-        if (mCurrentFloorIndex <= 0) return false;
-        mCurrentFloorIndex--;
-        return true;
+        if (getCurrentFloor() == null) return null;
+        return mNearestNode;
     }
 
     /**
-     * Try set current floor index to higher level
+     * Set current map
      *
-     * @return True if didn't reach the top floor, otherwise false
-     */
-    public static boolean goUpstairs()
-    {
-        if (mCurrentMap == null) return false;
-        if (mCurrentFloorIndex >= mCurrentMap.getFloors().size() - 1) return false;
-        mCurrentFloorIndex++;
-        return true;
-    }
-
-    /**
-     * Set current f
-     *
-     * @param map
+     * @param map Map to set
      */
     public static void setCurrentMap(final @NonNull Map map)
     {
-        mCurrentFloorIndex = NO_SELECTED_FLOOR;
         mCurrentMap = map;
-        goUpstairs();
+    }
+
+    /**
+     * Create navigate task for specified start node and end node
+     *
+     * @param startFloor Start floor
+     * @param startNode  Start node
+     * @param endFloor   End floor
+     * @param endNode    End node
+     */
+    public static void startNavigate(int startFloor, final @NonNull GuideNode startNode, int endFloor, final @NonNull GuideNode endNode)
+    {
+        if (startFloor == endFloor)
+        {
+            mNavigateTaskQueue.add(new NavigateTask(startFloor, startNode, endNode));
+        }
+        else
+        {
+            // TODO: Finish different-floor navigation logic here
+        }
     }
 
     //endregion

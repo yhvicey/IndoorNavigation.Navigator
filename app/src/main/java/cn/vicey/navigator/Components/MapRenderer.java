@@ -52,7 +52,8 @@ public class MapRenderer
     private int     mTouchedPointCount;  // Current touch point count
     private Paint   mWallPaint;          // Paint for wall nodes and lines
 
-    private float mZoomLevel = 3; // Current zoom level
+    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR; // Current displaying floor's index
+    private float mCurrentZoomLevel            = 3;                                 // Current zoom level
 
     //endregion
 
@@ -78,6 +79,20 @@ public class MapRenderer
     {
         super(context, attrs, 0);
         init(attrs);
+    }
+
+    //endregion
+
+    //region Accessors
+
+    /**
+     * Gets current displaying floor index
+     *
+     * @return Current displaying floor index
+     */
+    public int getCurrentDisplayingFloorIndex()
+    {
+        return mCurrentDisplayingFloorIndex;
     }
 
     //endregion
@@ -109,8 +124,8 @@ public class MapRenderer
      */
     private void drawLink(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
-        mGuidePaint.setStrokeWidth(LINE_WIDTH * mZoomLevel);
-        mWallPaint.setStrokeWidth(LINE_WIDTH * mZoomLevel);
+        mGuidePaint.setStrokeWidth(LINE_WIDTH * mCurrentZoomLevel);
+        mWallPaint.setStrokeWidth(LINE_WIDTH * mCurrentZoomLevel);
         float startX = getRelativeX(start.getX());
         float startY = getRelativeY(start.getY());
         float endX = getRelativeX(end.getX());
@@ -159,12 +174,12 @@ public class MapRenderer
         {
             case GUIDE_NODE:
             {
-                canvas.drawCircle(x, y, NODE_RADIUS * mZoomLevel, mGuidePaint);
+                canvas.drawCircle(x, y, NODE_RADIUS * mCurrentZoomLevel, mGuidePaint);
                 break;
             }
             case WALL_NODE:
             {
-                canvas.drawCircle(x, y, NODE_RADIUS * mZoomLevel, mWallPaint);
+                canvas.drawCircle(x, y, NODE_RADIUS * mCurrentZoomLevel, mWallPaint);
                 break;
             }
         }
@@ -190,6 +205,16 @@ public class MapRenderer
     }
 
     /**
+     * Gets displaying floor
+     *
+     * @return Displaying floor, or null if no floor is displaying
+     */
+    private Floor getDisplayingFloor()
+    {
+        return NavigateManager.getFloor(mCurrentDisplayingFloorIndex);
+    }
+
+    /**
      * Convert x axis from floor coordinate to view coordinate
      *
      * @param x X axis in floor coordinate
@@ -197,7 +222,7 @@ public class MapRenderer
      */
     private float getRelativeX(int x)
     {
-        return (x - mLookAt.x) * mZoomLevel + mHalfWidth;
+        return (x - mLookAt.x) * mCurrentZoomLevel + mHalfWidth;
     }
 
     /**
@@ -208,7 +233,7 @@ public class MapRenderer
      */
     private float getRelativeY(int y)
     {
-        return (y - mLookAt.y) * mZoomLevel + mHalfHeight;
+        return (y - mLookAt.y) * mCurrentZoomLevel + mHalfHeight;
     }
 
     /**
@@ -251,40 +276,70 @@ public class MapRenderer
     }
 
     /**
-     * Clip the offsets and move "eyes" to specified location
-     *
-     * @param xOffset X-axis offset
-     * @param yOffset Y-axis offset
-     */
-    private void moveEye(float xOffset, float yOffset)
-    {
-        Floor floor;
-        if ((floor = NavigateManager.getCurrentFloor()) == null) return;
-
-        int newX = mLookAt.x += xOffset / mZoomLevel;
-        int newY = mLookAt.y += yOffset / mZoomLevel;
-
-        if (newX < 0) newX = 0;
-        if (newX > floor.getWidth() * mZoomLevel) newX = (int) (floor.getWidth() * mZoomLevel);
-        if (newY < 0) newY = 0;
-        if (newY > floor.getHeight() * mZoomLevel) newY = (int) (floor.getHeight() * mZoomLevel);
-
-        lookAt(newX, newY);
-    }
-
-    /**
      * Zoom the floor view
      *
      * @param offset Zoom offset
      */
     private void zoom(float offset)
     {
-        mZoomLevel += offset / ZOOM_SPEED;
+        mCurrentZoomLevel += offset / ZOOM_SPEED;
 
-        if (mZoomLevel < ZOOM_LEVEL_MIN) mZoomLevel = ZOOM_LEVEL_MIN;
-        if (mZoomLevel > ZOOM_LEVEL_MAX) mZoomLevel = ZOOM_LEVEL_MAX;
+        if (mCurrentZoomLevel < ZOOM_LEVEL_MIN) mCurrentZoomLevel = ZOOM_LEVEL_MIN;
+        if (mCurrentZoomLevel > ZOOM_LEVEL_MAX) mCurrentZoomLevel = ZOOM_LEVEL_MAX;
 
         invalidate();
+    }
+
+    /**
+     * Try display downstairs
+     *
+     * @return True if didn't reach the ground floor, otherwise false
+     */
+    public boolean displayDownstairs()
+    {
+        if (NavigateManager.getCurrentMap() == null) return false;
+        if (mCurrentDisplayingFloorIndex <= 0) return false;
+        mCurrentDisplayingFloorIndex--;
+
+        invalidate();
+        return true;
+    }
+
+    /**
+     * Try display upstairs
+     *
+     * @return True if didn't reach the top floor, otherwise false
+     */
+    public boolean displayUpstairs()
+    {
+        if (NavigateManager.getCurrentMap() == null) return false;
+        if (mCurrentDisplayingFloorIndex >= NavigateManager.getCurrentMap().getFloors().size() - 1) return false;
+        mCurrentDisplayingFloorIndex++;
+
+        invalidate();
+        return true;
+    }
+
+    /**
+     * Clip the offsets and move "eyes" to specified location
+     *
+     * @param xOffset X-axis offset
+     * @param yOffset Y-axis offset
+     */
+    public void moveEye(float xOffset, float yOffset)
+    {
+        Floor floor;
+        if ((floor = getDisplayingFloor()) == null) return;
+
+        int newX = mLookAt.x += xOffset / mCurrentZoomLevel;
+        int newY = mLookAt.y += yOffset / mCurrentZoomLevel;
+
+        if (newX < 0) newX = 0;
+        if (newX > floor.getWidth() * mCurrentZoomLevel) newX = (int) (floor.getWidth() * mCurrentZoomLevel);
+        if (newY < 0) newY = 0;
+        if (newY > floor.getHeight() * mCurrentZoomLevel) newY = (int) (floor.getHeight() * mCurrentZoomLevel);
+
+        lookAt(newX, newY);
     }
 
     //endregion
@@ -375,7 +430,7 @@ public class MapRenderer
     {
         try
         {
-            Floor floor = NavigateManager.getCurrentFloor();
+            Floor floor = getDisplayingFloor();
             if (floor == null) return;
 
             drawNodes(canvas, floor);
