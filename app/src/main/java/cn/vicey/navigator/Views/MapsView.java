@@ -41,16 +41,23 @@ public class MapsView
         @Override
         public void onChooseFile(File chosenFile)
         {
-            if (MapManager.saveMapFile(chosenFile, true))
+            try
             {
-                mParent.alert(R.string.load_succeed);
-                flush();
+                if (MapManager.saveMapFile(chosenFile, true))
+                {
+                    mParent.alert(R.string.load_succeed);
+                    flush();
+                }
+                else mParent.alert(R.string.load_failed);
+                if (mFileChooserDialog != null)
+                {
+                    mFileChooserDialog.dismiss();
+                    mFileChooserDialog = null;
+                }
             }
-            else mParent.alert(R.string.load_failed);
-            if (mFileChooserDialog != null)
+            catch (Throwable t)
             {
-                mFileChooserDialog.dismiss();
-                mFileChooserDialog = null;
+                Logger.error(LOGGER_TAG, "Failed to choose file.", t);
             }
         }
 
@@ -65,97 +72,104 @@ public class MapsView
         @Override
         public void onChooseFile(final File chosenFile)
         {
-            new AlertDialog.Builder(mParent).setTitle(R.string.manage).setItems(new String[]{
-                    mParent.getString(R.string.load),
-                    mParent.getString(R.string.rename),
-                    mParent.getString(R.string.delete)
-            }, new DialogInterface.OnClickListener()
+            try
             {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i)
+                new AlertDialog.Builder(mParent).setTitle(R.string.manage).setItems(new String[]{
+                        mParent.getString(R.string.load),
+                        mParent.getString(R.string.rename),
+                        mParent.getString(R.string.delete)
+                }, new DialogInterface.OnClickListener()
                 {
-                    dialogInterface.dismiss();
-                    switch (i)
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
                     {
-                        //region Load
-                        case 0:
+                        dialogInterface.dismiss();
+                        switch (i)
                         {
-                            Map map;
-                            if ((map = MapManager.loadMap(chosenFile.getName())) != null)
+                            //region Load
+                            case 0:
                             {
-                                NavigateManager.setCurrentMap(map);
-                                mParent.alert(R.string.load_succeed);
-                                mParent.switchView(MainActivity.VIEW_NAVIGATE);
+                                Map map;
+                                if ((map = MapManager.loadMap(chosenFile.getName())) != null)
+                                {
+                                    NavigateManager.setCurrentMap(map);
+                                    mParent.alert(R.string.load_succeed);
+                                    mParent.switchView(MainActivity.VIEW_NAVIGATE);
+                                }
+                                else mParent.alert(R.string.load_failed);
+                                break;
                             }
-                            else mParent.alert(R.string.load_failed);
-                            break;
-                        }
-                        //endregion
-                        //region Rename
-                        case 1:
-                        {
-                            final EditText editor = new EditText(mParent);
-                            editor.setText(chosenFile.getName());
-                            editor.selectAll();
-                            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+                            //endregion
+                            //region Rename
+                            case 1:
                             {
-                                @Override
-                                public void onClick(DialogInterface childDialogInterface, int i)
+                                final EditText editor = new EditText(mParent);
+                                editor.setText(chosenFile.getName());
+                                editor.selectAll();
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
                                 {
-                                    childDialogInterface.dismiss();
-                                    switch (i)
+                                    @Override
+                                    public void onClick(DialogInterface childDialogInterface, int i)
                                     {
-                                        case AlertDialog.BUTTON_POSITIVE:
+                                        childDialogInterface.dismiss();
+                                        switch (i)
                                         {
-                                            String newMapName = editor.getText().toString();
-                                            if (MapManager.renameMapFile(chosenFile.getName(), newMapName))
-                                                mParent.alert(R.string.rename_succeed);
-                                            else mParent.alert(R.string.rename_failed);
-                                            flush();
+                                            case AlertDialog.BUTTON_POSITIVE:
+                                            {
+                                                String newMapName = editor.getText().toString();
+                                                if (MapManager.renameMapFile(chosenFile.getName(), newMapName))
+                                                    mParent.alert(R.string.rename_succeed);
+                                                else mParent.alert(R.string.rename_failed);
+                                                flush();
+                                            }
                                         }
                                     }
-                                }
-                            };
-                            new AlertDialog.Builder(mParent).setTitle(R.string.rename)
-                                                            .setView(editor)
-                                                            .setPositiveButton(R.string.confirm, listener)
-                                                            .setNegativeButton(R.string.cancel, listener)
-                                                            .show();
-                            break;
-                        }
-                        //endregion
-                        //region Delete
-                        case 2:
-                        {
-                            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+                                };
+                                new AlertDialog.Builder(mParent).setTitle(R.string.rename)
+                                                                .setView(editor)
+                                                                .setPositiveButton(R.string.confirm, listener)
+                                                                .setNegativeButton(R.string.cancel, listener)
+                                                                .show();
+                                break;
+                            }
+                            //endregion
+                            //region Delete
+                            case 2:
                             {
-                                @Override
-                                public void onClick(DialogInterface childDialogInterface, int i)
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
                                 {
-                                    childDialogInterface.dismiss();
-                                    switch (i)
+                                    @Override
+                                    public void onClick(DialogInterface childDialogInterface, int i)
                                     {
-                                        case AlertDialog.BUTTON_POSITIVE:
+                                        childDialogInterface.dismiss();
+                                        switch (i)
                                         {
-                                            if (MapManager.deleteMapFile(chosenFile.getName()))
-                                                mParent.alert(R.string.delete_succeed);
-                                            else mParent.alert(R.string.delete_failed);
-                                            flush();
+                                            case AlertDialog.BUTTON_POSITIVE:
+                                            {
+                                                if (MapManager.deleteMapFile(chosenFile.getName()))
+                                                    mParent.alert(R.string.delete_succeed);
+                                                else mParent.alert(R.string.delete_failed);
+                                                flush();
+                                            }
                                         }
                                     }
-                                }
-                            };
-                            new AlertDialog.Builder(mParent).setTitle(R.string.alert)
-                                                            .setMessage(R.string.confirm_to_delete)
-                                                            .setPositiveButton(R.string.confirm, listener)
-                                                            .setNegativeButton(R.string.cancel, listener)
-                                                            .show();
-                            break;
+                                };
+                                new AlertDialog.Builder(mParent).setTitle(R.string.alert)
+                                                                .setMessage(R.string.confirm_to_delete)
+                                                                .setPositiveButton(R.string.confirm, listener)
+                                                                .setNegativeButton(R.string.cancel, listener)
+                                                                .show();
+                                break;
+                            }
+                            //endregion
                         }
-                        //endregion
                     }
-                }
-            }).show();
+                }).show();
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to choose map.", t);
+            }
         }
 
         @Override
@@ -169,56 +183,63 @@ public class MapsView
         @Override
         public void onClick(View view)
         {
-            if (view.getId() != R.id.mv_load_from_net) return;
-            //region Load from net
-            final EditText editor = new EditText(mParent);
-            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+            try
             {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i)
+                if (view.getId() != R.id.mv_load_from_net) return;
+                //region Load from net
+                final EditText editor = new EditText(mParent);
+                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
                 {
-                    dialogInterface.dismiss();
-                    switch (i)
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
                     {
-                        case AlertDialog.BUTTON_POSITIVE:
+                        dialogInterface.dismiss();
+                        switch (i)
                         {
-                            String url = editor.getText().toString();
-                            mParent.alert(R.string.downloading);
-                            Tools.downloadFile(url, new Tools.OnDownloadListener()
+                            case AlertDialog.BUTTON_POSITIVE:
                             {
-                                @Override
-                                public void onDownloadSucceed(@NonNull File file)
+                                String url = editor.getText().toString();
+                                mParent.alert(R.string.downloading);
+                                Tools.downloadFile(url, new Tools.OnDownloadListener()
                                 {
-                                    if (MapManager.saveMapFile(file, true))
+                                    @Override
+                                    public void onDownloadSucceed(@NonNull File file)
                                     {
-                                        mParent.alert(R.string.download_succeed);
-                                        mParent.invoke(new Runnable()
+                                        if (MapManager.saveMapFile(file, true))
                                         {
-                                            @Override
-                                            public void run()
+                                            mParent.alert(R.string.download_succeed);
+                                            mParent.invoke(new Runnable()
                                             {
-                                                flush();
-                                            }
-                                        });
+                                                @Override
+                                                public void run()
+                                                {
+                                                    flush();
+                                                }
+                                            });
+                                        }
                                     }
-                                }
 
-                                @Override
-                                public void onDownloadFailed()
-                                {
-                                    mParent.alert(R.string.download_failed);
-                                }
-                            });
+                                    @Override
+                                    public void onDownloadFailed()
+                                    {
+                                        mParent.alert(R.string.download_failed);
+                                    }
+                                });
+                            }
                         }
                     }
-                }
-            };
-            new AlertDialog.Builder(mParent).setTitle(R.string.load_from_net)
-                                            .setView(editor)
-                                            .setPositiveButton(R.string.confirm, listener)
-                                            .setNegativeButton(R.string.cancel, listener)
-                                            .show();
-            //endregion
+                };
+                new AlertDialog.Builder(mParent).setTitle(R.string.load_from_net)
+                                                .setView(editor)
+                                                .setPositiveButton(R.string.confirm, listener)
+                                                .setNegativeButton(R.string.cancel, listener)
+                                                .show();
+                //endregion
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to load from net.", t);
+            }
         }
     };
     private final OnClickListener               mOnLoadFromSdcardButtonClickListener = new OnClickListener()               // Load from sdcard button click listener
@@ -226,28 +247,35 @@ public class MapsView
         @Override
         public void onClick(View view)
         {
-            if (view.getId() != R.id.mv_load_from_sdcard) return;
-            //region Load from sdcard
-            if (!mParent.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
+            try
             {
-                mParent.alert(R.string.no_permission);
-                mParent.requestPermission(MainActivity.REQ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
-                return;
+                if (view.getId() != R.id.mv_load_from_sdcard) return;
+                //region Load from sdcard
+                if (!mParent.hasPermission(Manifest.permission.READ_EXTERNAL_STORAGE))
+                {
+                    mParent.alert(R.string.no_permission);
+                    mParent.requestPermission(MainActivity.REQ_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE);
+                    return;
+                }
+                if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+                {
+                    mParent.alert(R.string.sdcard_not_found);
+                    return;
+                }
+
+                FileList fileList = new FileList(getContext());
+                fileList.setDirectory(Environment.getExternalStorageDirectory());
+                fileList.setOnItemChooseListener(mOnFileListItemChooseListener);
+
+                mFileChooserDialog = new AlertDialog.Builder(mParent).setTitle(R.string.load_from_sdcard)
+                                                                     .setView(fileList)
+                                                                     .show();
+                //endregion
             }
-            if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+            catch (Throwable t)
             {
-                mParent.alert(R.string.sdcard_not_found);
-                return;
+                Logger.error(LOGGER_TAG, "Failed to load from sdcard.", t);
             }
-
-            FileList fileList = new FileList(getContext());
-            fileList.setDirectory(Environment.getExternalStorageDirectory());
-            fileList.setOnItemChooseListener(mOnFileListItemChooseListener);
-
-            mFileChooserDialog = new AlertDialog.Builder(mParent).setTitle(R.string.load_from_sdcard)
-                                                                 .setView(fileList)
-                                                                 .show();
-            //endregion
         }
     };
 
@@ -286,18 +314,22 @@ public class MapsView
     {
         try
         {
+            // Inflate layout
             LayoutInflater.from(mParent).inflate(R.layout.view_maps, this, true);
 
+            // mMapList
             mMapList = (FileList) findViewById(R.id.mv_file_list);
             mMapList.setOnItemChooseListener(mOnMapListItemChooseListener);
             mMapList.setDirectory(MapManager.getMapDir());
             mMapList.hideParent();
 
-            Button loadFromNet = (Button) findViewById(R.id.mv_load_from_net);
-            loadFromNet.setOnClickListener(mOnLoadFromNetButtonClickListener);
+            // loadFromNetButton
+            Button loadFromNetButton = (Button) findViewById(R.id.mv_load_from_net);
+            loadFromNetButton.setOnClickListener(mOnLoadFromNetButtonClickListener);
 
-            Button loadFromSdcard = (Button) findViewById(R.id.mv_load_from_sdcard);
-            loadFromSdcard.setOnClickListener(mOnLoadFromSdcardButtonClickListener);
+            // loadFromSdcardButton
+            Button loadFromSdcardButton = (Button) findViewById(R.id.mv_load_from_sdcard);
+            loadFromSdcardButton.setOnClickListener(mOnLoadFromSdcardButtonClickListener);
         }
         catch (Throwable t)
         {

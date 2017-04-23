@@ -211,7 +211,9 @@ public class MapRenderer
      */
     private Floor getDisplayingFloor()
     {
-        return NavigateManager.getFloor(mCurrentDisplayingFloorIndex);
+        Floor floor = NavigateManager.getFloor(mCurrentDisplayingFloorIndex);
+        if (floor == null) mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR;
+        return floor;
     }
 
     /**

@@ -2,6 +2,7 @@ package cn.vicey.navigator.Views;
 
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import cn.vicey.navigator.Activities.MainActivity;
@@ -52,6 +53,7 @@ public class LogView
     {
         try
         {
+            // Inflate layout
             LayoutInflater.from(mParent).inflate(R.layout.view_log, this, true);
         }
         catch (Throwable t)
@@ -69,6 +71,7 @@ public class LogView
         mParent.setTitleText(R.string.log);
         TextView textView = (TextView) findViewById(R.id.lv_text_view);
         textView.setText(Logger.getLogContent());
+        fullScroll(View.FOCUS_DOWN);
     }
 
     //endregion

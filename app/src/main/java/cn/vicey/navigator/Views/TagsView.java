@@ -106,22 +106,29 @@ public class TagsView
         @Override
         public void onClick(View view)
         {
-            if (view.getId() != R.id.tv_load_tags) return;
-            //region Load tags
-            if (NavigateManager.getCurrentMap() == null)
+            try
             {
-                mParent.alert(R.string.no_loaded_map);
-                return;
+                if (view.getId() != R.id.tv_load_tags) return;
+                //region Load tags
+                if (NavigateManager.getCurrentMap() == null)
+                {
+                    mParent.alert(R.string.no_loaded_map);
+                    return;
+                }
+                String mapName = NavigateManager.getCurrentMap().getName();
+                List<Tag> tags = TagManager.loadTags(mapName);
+                if (tags == null) mParent.alert(R.string.no_tag);
+                else
+                {
+                    if (NavigateManager.getCurrentMap().setTags(tags)) mParent.alert(R.string.load_succeed);
+                    else mParent.alert(R.string.load_failed);
+                }
+                //endregion
             }
-            String mapName = NavigateManager.getCurrentMap().getName();
-            List<Tag> tags = TagManager.loadTags(mapName);
-            if (tags == null) mParent.alert(R.string.no_tag);
-            else
+            catch (Throwable t)
             {
-                if (NavigateManager.getCurrentMap().setTags(tags)) mParent.alert(R.string.load_succeed);
-                else mParent.alert(R.string.load_failed);
+                Logger.error(LOGGER_TAG, "Failed to load tags.", t);
             }
-            //endregion
         }
     };
     private OnClickListener              mOnSaveTagButtonClick       = new OnClickListener()              // Save tag button click listener
@@ -129,22 +136,29 @@ public class TagsView
         @Override
         public void onClick(View view)
         {
-            //region Save tags
-            if (NavigateManager.getCurrentMap() == null)
+            try
             {
-                mParent.alert(R.string.no_loaded_map);
-                return;
+                //region Save tags
+                if (NavigateManager.getCurrentMap() == null)
+                {
+                    mParent.alert(R.string.no_loaded_map);
+                    return;
+                }
+                List<Tag> tags = mTagListAdapter.getAll();
+                if (tags.size() == 0)
+                {
+                    mParent.alert(R.string.no_tag);
+                    return;
+                }
+                if (TagManager.saveTags(NavigateManager.getCurrentMap().getName(), tags))
+                    mParent.alert(R.string.save_succeed);
+                else mParent.alert(R.string.save_failed);
+                //endregion
             }
-            List<Tag> tags = mTagListAdapter.getAll();
-            if (tags.size() == 0)
+            catch (Throwable t)
             {
-                mParent.alert(R.string.no_tag);
-                return;
+                Logger.error(LOGGER_TAG, "Failed to save tags.", t);
             }
-            if (TagManager.saveTags(NavigateManager.getCurrentMap().getName(), tags))
-                mParent.alert(R.string.save_succeed);
-            else mParent.alert(R.string.save_failed);
-            //endregion
         }
     };
     private ListView.OnItemClickListener mOnTagListItemClickListener = new ListView.OnItemClickListener() // Tag list item click listener
@@ -152,87 +166,95 @@ public class TagsView
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
         {
-            final TextView textView = (TextView) view.findViewById(R.id.fli_text);
-            new AlertDialog.Builder(mParent).setTitle(R.string.manage).setItems(new String[]{
-                    mParent.getString(R.string.modify),
-                    mParent.getString(R.string.delete)
-            }, new DialogInterface.OnClickListener()
+            try
             {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i)
+                final TextView textView = (TextView) view.findViewById(R.id.fli_text);
+                new AlertDialog.Builder(mParent).setTitle(R.string.manage).setItems(new String[]{
+                        mParent.getString(R.string.modify),
+                        mParent.getString(R.string.delete)
+                }, new DialogInterface.OnClickListener()
                 {
-                    dialogInterface.dismiss();
-                    switch (i)
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i)
                     {
-                        //region Modify
-                        case 0:
+                        dialogInterface.dismiss();
+                        switch (i)
                         {
-                            final String tagValue = textView.getText().toString();
-                            final EditText editor = new EditText(mParent);
-                            editor.setText(tagValue);
-                            editor.selectAll();
-                            DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
+                            //region Modify
+                            case 0:
                             {
-                                @Override
-                                public void onClick(DialogInterface childDialogInterface, int i)
+                                final String tagValue = textView.getText().toString();
+                                final EditText editor = new EditText(mParent);
+                                editor.setText(tagValue);
+                                editor.selectAll();
+                                DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener()
                                 {
-                                    childDialogInterface.dismiss();
-                                    switch (i)
+                                    @Override
+                                    public void onClick(DialogInterface childDialogInterface, int i)
                                     {
-                                        case AlertDialog.BUTTON_POSITIVE:
+                                        childDialogInterface.dismiss();
+                                        switch (i)
                                         {
-                                            String newTagValue = editor.getText().toString();
+                                            case AlertDialog.BUTTON_POSITIVE:
+                                            {
+                                                String newTagValue = editor.getText().toString();
 
-                                            if (MapManager.renameMapFile(tagValue, newTagValue))
-                                                mParent.alert(R.string.rename_succeed);
-                                            else mParent.alert(R.string.rename_failed);
-                                            flush();
+                                                if (MapManager.renameMapFile(tagValue, newTagValue))
+                                                    mParent.alert(R.string.rename_succeed);
+                                                else mParent.alert(R.string.rename_failed);
+                                                flush();
+                                            }
                                         }
                                     }
-                                }
-                            };
-                            new AlertDialog.Builder(mParent).setTitle(R.string.rename)
-                                                            .setView(editor)
-                                                            .setPositiveButton(R.string.confirm, listener)
-                                                            .setNegativeButton(R.string.cancel, listener)
-                                                            .show();
-                            break;
-                        }
-                        //endregion
-                        //region Delete
-                        case 1:
-                        {
-                            new AlertDialog.Builder(mParent).setTitle(R.string.alert)
-                                                            .setMessage(R.string.confirm_to_delete)
-                                                            .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener()
-                                                            {
-                                                                @Override
-                                                                public void onClick(DialogInterface childDialogInterface, int i)
+                                };
+                                new AlertDialog.Builder(mParent).setTitle(R.string.rename)
+                                                                .setView(editor)
+                                                                .setPositiveButton(R.string.confirm, listener)
+                                                                .setNegativeButton(R.string.cancel, listener)
+                                                                .show();
+                                break;
+                            }
+                            //endregion
+                            //region Delete
+                            case 1:
+                            {
+                                new AlertDialog.Builder(mParent).setTitle(R.string.alert)
+                                                                .setMessage(R.string.confirm_to_delete)
+                                                                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener()
                                                                 {
-                                                                    childDialogInterface.dismiss();
-                                                                    switch (i)
+                                                                    @Override
+                                                                    public void onClick(DialogInterface childDialogInterface, int i)
                                                                     {
-                                                                        case AlertDialog.BUTTON_POSITIVE:
+                                                                        childDialogInterface.dismiss();
+                                                                        switch (i)
                                                                         {
-                                                                            if (textView == null) return;
-                                                                            String tagFileName = textView.getText()
-                                                                                                         .toString();
-                                                                            if (TagManager.deleteTagFile(tagFileName))
-                                                                                mParent.alert(R.string.delete_succeed);
-                                                                            else mParent.alert(R.string.delete_failed);
-                                                                            flush();
+                                                                            case AlertDialog.BUTTON_POSITIVE:
+                                                                            {
+                                                                                if (textView == null) return;
+                                                                                String tagFileName = textView.getText()
+                                                                                                             .toString();
+                                                                                if (TagManager.deleteTagFile(tagFileName))
+                                                                                    mParent.alert(R.string.delete_succeed);
+                                                                                else
+                                                                                    mParent.alert(R.string.delete_failed);
+                                                                                flush();
+                                                                            }
                                                                         }
                                                                     }
-                                                                }
-                                                            })
-                                                            .setNegativeButton(R.string.cancel, null)
-                                                            .show();
-                            break;
+                                                                })
+                                                                .setNegativeButton(R.string.cancel, null)
+                                                                .show();
+                                break;
+                            }
+                            //endregion
                         }
-                        //endregion
                     }
-                }
-            }).show();
+                }).show();
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to choose tag.", t);
+            }
         }
     };
 
@@ -263,17 +285,22 @@ public class TagsView
     {
         try
         {
+            // Inflate layout
             LayoutInflater.from(mParent).inflate(R.layout.view_tags, this, true);
 
+            // mTagListAdapter
             mTagListAdapter = new TagListAdapter(mParent);
 
+            // tagList
             ListView tagList = (ListView) findViewById(R.id.tv_list_view);
             tagList.setOnItemClickListener(mOnTagListItemClickListener);
             tagList.setAdapter(mTagListAdapter);
 
+            // loadTagButton
             Button loadTagButton = (Button) findViewById(R.id.tv_load_tags);
             loadTagButton.setOnClickListener(mOnLoadTagButtonClick);
 
+            // saveTagButton
             Button saveTagButton = (Button) findViewById(R.id.tv_save_tags);
             saveTagButton.setOnClickListener(mOnSaveTagButtonClick);
         }

@@ -35,9 +35,16 @@ public class SettingsView
         @Override
         public void onClick(View view)
         {
-            SettingsManager.setDebugModeEnabled(false);
-            mParent.alert(R.string.debug_mode_disabled);
-            flush();
+            try
+            {
+                SettingsManager.setDebugModeEnabled(false);
+                mParent.alert(R.string.debug_mode_disabled);
+                flush();
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to disable debug mode.", t);
+            }
         }
     };
     private OnClickListener mOnShowLogTextViewClick          = new OnClickListener() // Show log text view click listener
@@ -45,8 +52,15 @@ public class SettingsView
         @Override
         public void onClick(View view)
         {
-            if (view.getId() != R.id.sv_debug_show_log) return;
-            mParent.switchView(MainActivity.VIEW_LOG);
+            try
+            {
+                if (view.getId() != R.id.sv_debug_show_log) return;
+                mParent.switchView(MainActivity.VIEW_LOG);
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to show log.", t);
+            }
         }
     };
 
@@ -77,11 +91,14 @@ public class SettingsView
     {
         try
         {
+            // Inflate layout
             LayoutInflater.from(mParent).inflate(R.layout.view_settings, this, true);
 
+            // disableDebugModeTextView
             View disableDebugModeTextView = findViewById(R.id.sv_debug_disable_debug_mode);
             disableDebugModeTextView.setOnClickListener(mOnDisableDebugModeTextViewClick);
 
+            // showLogTextView
             View showLogTextView = findViewById(R.id.sv_debug_show_log);
             showLogTextView.setOnClickListener(mOnShowLogTextViewClick);
         }

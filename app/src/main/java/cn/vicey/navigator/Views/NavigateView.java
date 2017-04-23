@@ -9,7 +9,6 @@ import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
 import cn.vicey.navigator.Managers.NavigateManager;
-import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
@@ -24,8 +23,8 @@ public class NavigateView
 
     private static final String LOGGER_TAG = "NavigateView";
 
-    private static final int VIEW_MAP_RENDERER = 0; // Map renderer view's index
-    private static final int VIEW_PLACEHOLDER  = 1; // Placeholder view's index
+    private static final int VIEW_MAP_RENDERER = 1; // Map renderer view's index
+    private static final int VIEW_PLACEHOLDER  = 0; // Placeholder view's index
 
     //endregion
 
@@ -34,6 +33,8 @@ public class NavigateView
     private MapRenderer  mMapRenderer; // Map renderer
     private MainActivity mParent;      // Parent activity
     private ViewFlipper  mViewFlipper; // View flipper
+
+    private int mCurrentView = VIEW_PLACEHOLDER; // Current view
 
     //endregion
 
@@ -85,21 +86,27 @@ public class NavigateView
     {
         try
         {
+            // Inflate layout
             LayoutInflater.from(mParent).inflate(R.layout.view_navigate, this, true);
 
+            // mMapRenderer
             mMapRenderer = new MapRenderer(mParent);
 
+            // upstairsButton
             FloatingActionButton upstairsButton = (FloatingActionButton) findViewById(R.id.nv_upstairs_button);
             upstairsButton.setOnClickListener(mUpstairsButtonOnClickListener);
 
+            // downstairsButton
             FloatingActionButton downStairsButton = (FloatingActionButton) findViewById(R.id.nv_downstairs_button);
             downStairsButton.setOnClickListener(mDownstairsButtonOnClickListener);
 
+            // placeholder
             View placeholder = mParent.getLayoutInflater().inflate(R.layout.cmpt_placeholder, null);
 
+            // mViewFlipper
             mViewFlipper = (ViewFlipper) findViewById(R.id.nv_view_flipper);
-            mViewFlipper.addView(mMapRenderer);
             mViewFlipper.addView(placeholder);
+            mViewFlipper.addView(mMapRenderer);
         }
         catch (Throwable t)
         {
@@ -113,7 +120,7 @@ public class NavigateView
      */
     private void showPlaceholder()
     {
-        mViewFlipper.setDisplayedChild(VIEW_PLACEHOLDER);
+        if (mViewFlipper.getDisplayedChild() != VIEW_PLACEHOLDER) mViewFlipper.setDisplayedChild(VIEW_PLACEHOLDER);
     }
 
     /**
@@ -121,7 +128,7 @@ public class NavigateView
      */
     private void showRenderer()
     {
-        mViewFlipper.setDisplayedChild(VIEW_MAP_RENDERER);
+        if (mViewFlipper.getDisplayedChild() != VIEW_PLACEHOLDER) mViewFlipper.setDisplayedChild(VIEW_MAP_RENDERER);
     }
 
     /**
@@ -129,19 +136,21 @@ public class NavigateView
      */
     public void flush()
     {
-        if (UserNode.getInstance().getCurrentFloorIndex() == NavigateManager.NO_SELECTED_FLOOR)
+        if (NavigateManager.getCurrentMap() == null)
         {
             mParent.setTitleText(R.string.navigate);
-            if (mViewFlipper.getDisplayedChild() != VIEW_PLACEHOLDER) showPlaceholder();
+            showPlaceholder();
+            return;
         }
-        else
+        mParent.setTitleText(NavigateManager.getCurrentMap().getName());
+        if (mMapRenderer.getCurrentDisplayingFloorIndex() == NavigateManager.NO_SELECTED_FLOOR && !mMapRenderer.displayUpstairs())
         {
-            String titleText = NavigateManager.getCurrentMap().getName();
-            int floorIndex = mMapRenderer.getCurrentDisplayingFloorIndex();
-            if (floorIndex != NavigateManager.NO_SELECTED_FLOOR) titleText = titleText + " - " + (floorIndex + 1) + "F";
-            mParent.setTitleText(titleText);
-            if (mViewFlipper.getDisplayedChild() != VIEW_MAP_RENDERER) showRenderer();
+            showPlaceholder();
+            return;
         }
+        int floorIndex = mMapRenderer.getCurrentDisplayingFloorIndex();
+        mParent.setTitleText(NavigateManager.getCurrentMap().getName() + " - " + (floorIndex + 1) + "F");
+        showRenderer();
         mMapRenderer.invalidate();
     }
 
