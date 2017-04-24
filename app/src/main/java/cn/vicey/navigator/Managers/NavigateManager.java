@@ -11,20 +11,45 @@ import cn.vicey.navigator.Navigate.NavigateTask;
 import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.Utils.Logger;
 
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
-
 /**
  * Navigate manager, provides a set of methods to help navigate
  */
 public final class NavigateManager
 {
+    //region Inner classes
+
+    /**
+     * Navigation indicator class, provides the ability to cancel navigation task in other thread
+     */
+    private static class NavigationIndicator
+    {
+        //region Field
+
+        private boolean mIsRunning = true; // Whether the navigation is running
+
+        //endregion
+
+        //region Methods
+
+        /**
+         * Cancel the navigation
+         */
+        private void cancel()
+        {
+            mIsRunning = false;
+        }
+
+        //endregion
+    }
+
+    //endregion
+
     //region Constants
 
     private static final String LOGGER_TAG = "NavigateManager";
 
-    private static final long UPDATE_INTERNAL = 1000; // Update internal in milliseconds
+    private static final Object SYNC_LOCK       = new Object(); // Sync lock
+    private static final long   UPDATE_INTERNAL = 1000;         // Update internal in milliseconds
 
     /**
      * Indicates no floor is selected
@@ -35,10 +60,12 @@ public final class NavigateManager
 
     //region Static fields
 
-    private static Path      mCurrentGuidePath; // Current guide path
-    private static Map       mCurrentMap;       // Current map object
-    private static boolean   mIsNavigating;     // Whether the manager is navigation
-    private static GuideNode mNearestNode;      // Nearest node to user node
+    private static Path                mCurrentGuidePath; // Current guide path
+    private static Map                 mCurrentMap;       // Current map object
+    private static NavigateTask        mCurrentTask;      // Current navigate task
+    private static NavigationIndicator mIndicator;        // Indicates whether the manager is navigation
+    private static int                 mLastFloorIndex;   // Last floor index used for notifying floor changed event
+    private static GuideNode           mNearestNode;      // Nearest node to user node
 
     private static SparseArray<FloorNavigator> mFloorNavigators    = new SparseArray<>();           // Floor navigators
     private static Runnable                    mNavigateHelperTask = new Runnable()                 // Navigate task
@@ -48,93 +75,57 @@ public final class NavigateManager
         {
             try
             {
-                while (mIsNavigating)
+                NavigationIndicator indicator = mIndicator;
+                if (indicator == null) return;
+                while (indicator.mIsRunning)
                 {
                     // Ensure internal between two updates to avoid high cpu usage
                     Thread.sleep(UPDATE_INTERNAL);
 
-                    // Calculate nearest node
+                    // Check current task
+                    NavigateTask task;
+                    synchronized (SYNC_LOCK)
+                    {
+                        if (mCurrentTask == null) break;
+                        task = mCurrentTask;
+                    }
+
+                    // Update the nearest node
                     updateNearestNode();
 
-                    if (mNavigateTaskQueue.isEmpty()) continue;
-
-                    // Gets the first navigate task and check it
-                    NavigateTask task = mNavigateTaskQueue.peek();
-                    if (task.getFloorIndex() != UserNode.getInstance().getCurrentFloorIndex()) continue;
+                    // Check floor index
+                    int floorIndex = UserNode.getInstance().getCurrentFloorIndex();
+                    if (mLastFloorIndex != floorIndex)
+                    {
+                        task.onFloorChanged(floorIndex);
+                        mLastFloorIndex = floorIndex;
+                    }
 
                     if (task.update())
                     {
                         // Current task finished
-                        mNavigateTaskQueue.remove();
-                        continue;
+                        synchronized (SYNC_LOCK)
+                        {
+                            mCurrentTask = null;
+                        }
+                        break;
                     }
 
                     // Get guide path and append user node to it
-                    mCurrentGuidePath = task.getPath().appendHead(UserNode.getInstance());
+                    mCurrentGuidePath = mCurrentTask.getPath().appendHead(UserNode.getInstance());
                 }
+                cancelNavigate();
             }
             catch (Throwable t)
             {
                 Logger.error(LOGGER_TAG, "Failed to finish navigation.", t);
             }
-            finally
-            {
-                mIsNavigating = false;
-            }
         }
     };
-    private static Queue<NavigateTask>         mNavigateTaskQueue  = new ConcurrentLinkedQueue<>(); // Navigation task queue
 
     //endregion
 
     //region Static methods
-
-    /**
-     * Find the nearest downstairs entry node to user node
-     *
-     * @return The nearest downstairs entry node to user node
-     */
-    private static GuideNode findNearestDownstairsEntryNode()
-    {
-        Floor floor = getCurrentFloor();
-        if (floor == null) return null;
-        return findNearestNode(UserNode.getInstance().getX(), UserNode.getInstance().getY(), floor.getPrevEntryNodes());
-    }
-
-    /**
-     * Find the nearest node to specified location
-     *
-     * @param x     X axis
-     * @param y     Y axis
-     * @param nodes Nodes to find
-     * @return The nearest node to specified location
-     */
-    private static GuideNode findNearestNode(int x, int y, List<GuideNode> nodes)
-    {
-        if (getCurrentFloor() == null) return null;
-        double distance = Double.MAX_VALUE;
-        GuideNode result = null;
-        for (GuideNode node : nodes)
-        {
-            double newDistance = node.calcDistance(x, y);
-            if (newDistance > distance) continue;
-            distance = newDistance;
-            result = node;
-        }
-        return result;
-    }
-
-    /**
-     * Find the nearest upstairs entry node to user node
-     *
-     * @return The nearest upstairs entry node to user node
-     */
-    private static GuideNode findNearestUpstairsEntry()
-    {
-        Floor floor = getCurrentFloor();
-        if (floor == null) return null;
-        return findNearestNode(UserNode.getInstance().getX(), UserNode.getInstance().getY(), floor.getNextEntryNodes());
-    }
 
     /**
      * Update nearest node
@@ -147,8 +138,22 @@ public final class NavigateManager
             mNearestNode = null;
             return;
         }
-        mNearestNode = findNearestNode(UserNode.getInstance().getX(), UserNode.getInstance()
-                                                                              .getY(), floor.getGuideNodes());
+        int x = UserNode.getInstance().getX();
+        int y = UserNode.getInstance().getY();
+        mNearestNode = floor.findNearestGuideNode(x, y);
+    }
+
+    /**
+     * Cancel all navigate task
+     */
+    public static void cancelNavigate()
+    {
+        if (!isNavigating()) return;
+        mIndicator.cancel();
+        synchronized (SYNC_LOCK)
+        {
+            mCurrentTask = null;
+        }
     }
 
     /**
@@ -222,6 +227,16 @@ public final class NavigateManager
     }
 
     /**
+     * Gets whether the NavigateManager is navigating
+     *
+     * @return Whether the NavigateManager is navigating
+     */
+    public static boolean isNavigating()
+    {
+        return mIndicator != null && mIndicator.mIsRunning;
+    }
+
+    /**
      * Set current map
      *
      * @param map Map to set
@@ -234,21 +249,18 @@ public final class NavigateManager
     /**
      * Create navigate task for specified start node and end node
      *
-     * @param startFloor Start floor
-     * @param startNode  Start node
-     * @param endFloor   End floor
-     * @param endNode    End node
+     * @param endFloor End floor
+     * @param endNode  End node
      */
-    public static void startNavigate(int startFloor, final @NonNull GuideNode startNode, int endFloor, final @NonNull GuideNode endNode)
+    public static void startNavigate(int endFloor, final @NonNull GuideNode endNode)
     {
-        if (startFloor == endFloor)
+        if (mIndicator != null) mIndicator.cancel();
+        mIndicator = new NavigationIndicator();
+        synchronized (SYNC_LOCK)
         {
-            mNavigateTaskQueue.add(new NavigateTask(startFloor, startNode, endNode));
+            mCurrentTask = new NavigateTask(endFloor, endNode);
         }
-        else
-        {
-            // TODO: Finish different-floor navigation logic here
-        }
+        new Thread(mNavigateHelperTask).start();
     }
 
     //endregion

@@ -33,7 +33,7 @@ public class FloorNavigator
     /**
      * Navigate table builder
      */
-    private class Builder
+    private class TableBuilder
             implements Runnable
     {
         //region Constants
@@ -53,11 +53,11 @@ public class FloorNavigator
         //region Constructors
 
         /**
-         * Initialize new instance of class {@link Builder}
+         * Initialize new instance of class {@link TableBuilder}
          *
          * @param startNode Start node
          */
-        public Builder(final @NonNull NodeBase startNode)
+        public TableBuilder(final @NonNull NodeBase startNode)
         {
             mStartNode = startNode;
         }
@@ -104,13 +104,59 @@ public class FloorNavigator
         //endregion
     }
 
+    /**
+     * Path builder
+     */
+    public class PathBuilder
+    {
+        //region Fields
+
+        GuideNode    mEndNode;      // Related end node
+        TableBuilder mTableBuilder; // Related start node's table builder
+
+        //endregion
+
+        //region Constructors
+
+        /**
+         * Initialize new instance of class {@link PathBuilder}
+         *
+         * @param endNode      Related end node
+         * @param tableBuilder Related start node's table builder
+         */
+        public PathBuilder(final @NonNull GuideNode endNode, final @NonNull TableBuilder tableBuilder)
+        {
+            mEndNode = endNode;
+            mTableBuilder = tableBuilder;
+        }
+
+        //endregion
+
+        //region Methods
+
+        /**
+         * Gets the shortest path from start node to end node in related floor
+         *
+         * @return The shortest path, or null if the navigate table isn't built yet
+         */
+        public Path build()
+        {
+            if (mTableBuilder.mTable == null) return null;
+            Path path = mTableBuilder.mTable.get(mEndNode);
+            if (path == null) throw new IllegalArgumentException("End node doesn't belong to this navigator.");
+            return path.fork();
+        }
+
+        //endregion
+    }
+
     //endregion
 
     //region Fields
 
     private OnNavigationFinishedListener mOnNavigationFinishedListener; // Listener for navigation finished event
 
-    private HashMap<NodeBase, Builder> mBuilderTable = new HashMap<>(); // Builder table to get built table or start building table
+    private HashMap<NodeBase, TableBuilder> mBuilderTable = new HashMap<>(); // TableBuilder table to get built table or start building table
 
     //endregion
 
@@ -123,7 +169,7 @@ public class FloorNavigator
      */
     public FloorNavigator(final @NonNull Floor floor)
     {
-        for (GuideNode guideNode : floor.getGuideNodes()) mBuilderTable.put(guideNode, new Builder(guideNode));
+        for (GuideNode guideNode : floor.getGuideNodes()) mBuilderTable.put(guideNode, new TableBuilder(guideNode));
     }
 
     //endregion
@@ -145,21 +191,17 @@ public class FloorNavigator
     //region Methods
 
     /**
-     * Gets the shortest path from start node to end node in related floor
+     * Gets path builder for building the shortest path from start node to end node in related floor
      *
      * @param start Start node
      * @param end   End node
-     * @return The shortest path, or null if the navigate table isn't built yet
+     * @return Path builder
      */
-    public Path navigate(final @NonNull NodeBase start, final @NonNull NodeBase end)
+    public PathBuilder navigate(final @NonNull GuideNode start, final @NonNull GuideNode end)
     {
-        Builder builder = mBuilderTable.get(start);
-        if (builder == null) throw new IllegalArgumentException("Start node doesn't belong to this navigator.");
-        HashMap<NodeBase, Path> table = builder.build();
-        if (table == null) return null;
-        Path path = table.get(end);
-        if (path == null) throw new IllegalArgumentException("End node doesn't belong to this navigator.");
-        return path;
+        TableBuilder tableBuilder = mBuilderTable.get(start);
+        if (tableBuilder == null) throw new IllegalArgumentException("Start node doesn't belong to this navigator.");
+        return new PathBuilder(end, tableBuilder);
     }
 
     //endregion

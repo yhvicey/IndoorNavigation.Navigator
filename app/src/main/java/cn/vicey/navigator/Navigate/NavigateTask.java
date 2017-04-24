@@ -2,6 +2,8 @@ package cn.vicey.navigator.Navigate;
 
 import android.support.annotation.NonNull;
 import cn.vicey.navigator.Managers.NavigateManager;
+import cn.vicey.navigator.Models.Floor;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Utils.Logger;
@@ -21,13 +23,11 @@ public class NavigateTask
 
     //region Fields
 
-    private NodeBase       mEnd;        // Task's end node
-    private int            mErrorCount; // Task's error count
-    private boolean        mFinished;   // Whether the task has been finished yet
-    private int            mFloorIndex; // Task's related floor index
-    private FloorNavigator mNavigator;  // Task's related navigator
-    private Path           mPath;       // Task's guide path
-    private NodeBase       mStart;      // Task's start node
+    private int                        mErrorCount;       // Task's error count
+    private boolean                    mFinished;         // Whether the task has been finished yet
+    private FloorNavigator.PathBuilder mPathBuilder;             // Task's guide path
+    private GuideNode                  mTarget;           // Task's target node
+    private int                        mTargetFloorIndex; // Task's target floor index
 
     //endregion
 
@@ -36,30 +36,13 @@ public class NavigateTask
     /**
      * Initialize new instance of class {@link NavigateTask}
      *
-     * @param floorIndex Related floor index
-     * @param start      Start node
-     * @param end        End node
+     * @param endFloorIndex End floor index
+     * @param end           End node
      */
-    public NavigateTask(int floorIndex, final @NonNull NodeBase start, final @NonNull NodeBase end)
+    public NavigateTask(int endFloorIndex, final @NonNull GuideNode end)
     {
-        mFloorIndex = floorIndex;
-        mNavigator = NavigateManager.getNavigator(mFloorIndex);
-        mStart = start;
-        mEnd = end;
-    }
-
-    //endregion
-
-    //region Accessors
-
-    /**
-     * Gets task's related floor index
-     *
-     * @return Task's related floor index
-     */
-    public int getFloorIndex()
-    {
-        return mFloorIndex;
+        mTargetFloorIndex = endFloorIndex;
+        mTarget = end;
     }
 
     //endregion
@@ -73,13 +56,77 @@ public class NavigateTask
      */
     public Path getPath()
     {
-        if (mPath == null) return null;
-        return mPath.fork();
+        if (mPathBuilder == null) return null;
+        return mPathBuilder.build();
+    }
+
+    /**
+     * Gets task's target floor index
+     *
+     * @return Task's target floor index
+     */
+    public int getTargetFloorIndex()
+    {
+        return mTargetFloorIndex;
     }
 
     //endregion
 
     //region Methods
+
+    public void onFloorChanged(int newFloorIndex)
+    {
+        Floor floor = NavigateManager.getFloor(newFloorIndex);
+        FloorNavigator navigator = NavigateManager.getNavigator(newFloorIndex);
+        if (floor == null || navigator == null)
+        {
+            // Index out of range, finished task
+            Logger.error(LOGGER_TAG, "Floor index out of range.");
+            mFinished = true;
+            return;
+        }
+        GuideNode nearestNode = NavigateManager.getNearestNode();
+        if (nearestNode == null)
+        {
+            Logger.error(LOGGER_TAG, "No nearest node.");
+            mFinished = true;
+            return;
+        }
+        int x = UserNode.getInstance().getX();
+        int y = UserNode.getInstance().getY();
+        int diff = newFloorIndex - mTargetFloorIndex;
+        if (diff < 0)
+        {
+            // Target is higher
+            GuideNode nearestEntryNode = floor.findNearestNextEntryNode(x, y);
+            if (nearestEntryNode == null)
+            {
+                // Target is unreachable
+                Logger.error(LOGGER_TAG, "Target is unreachable.");
+                mFinished = true;
+                return;
+            }
+            mPathBuilder = navigator.navigate(nearestNode, nearestEntryNode);
+        }
+        else if (diff > 0)
+        {
+            // Target is lower
+            GuideNode nearestEntryNode = floor.findNearestPrevEntryNode(x, y);
+            if (nearestEntryNode == null)
+            {
+                // Target is unreachable
+                Logger.error(LOGGER_TAG, "Target is unreachable.");
+                mFinished = true;
+                return;
+            }
+            mPathBuilder = navigator.navigate(nearestNode, nearestEntryNode);
+        }
+        else
+        {
+            // Same floor
+            mPathBuilder = navigator.navigate(nearestNode, mTarget);
+        }
+    }
 
     /**
      * Update the task
@@ -92,25 +139,34 @@ public class NavigateTask
         {
             if (mFinished) return true;
 
-            // No navigator, finished the task
-            if (mNavigator == null) return true;
+            int floorIndex = UserNode.getInstance().getCurrentFloorIndex();
+            FloorNavigator navigator = NavigateManager.getNavigator(floorIndex);
+            if (navigator == null)
+            {
+                // Floor index out of range, finished task
+                Logger.error(LOGGER_TAG, "Floor index out of range.");
+                mFinished = true;
+                return true;
+            }
+            if (mPathBuilder == null)
+            {
+                // No related path builder, finished task
+                Logger.error(LOGGER_TAG, "No related path builder. Call onFloorChanged(int) first.");
+                mFinished = true;
+                return true;
+            }
 
-            // Not current floor, skip
-            if (mFloorIndex != UserNode.getInstance().getCurrentFloorIndex()) return false;
-
-            // If the path hasn't been built yet then built it
-            if (mPath == null) mPath = mNavigator.navigate(mStart, mEnd);
-            if (mPath == null) return false;
-
+            if (floorIndex != mTargetFloorIndex) return false;
+            // Already target floor, check if the nearest node is the target node
             NodeBase nearestNode = NavigateManager.getNearestNode();
-            if (nearestNode == null) throw new IllegalStateException("Can't find nearest node.");
-            mStart = nearestNode;
-
-            // If new node is in path, check whether the task is finished
-            // Otherwise rebuild path
-            if (mPath.contains(nearestNode)) mFinished = mPath.isEnd(nearestNode);
-            else mPath = mNavigator.navigate(mStart, mEnd);
-
+            if (nearestNode == null)
+            {
+                Logger.error(LOGGER_TAG, "No nearest node.");
+                mFinished = true;
+                return true;
+            }
+            Path path = getPath();
+            mFinished = path.contains(nearestNode) && path.isEnd(nearestNode);
             return mFinished;
         }
         catch (Throwable t)
