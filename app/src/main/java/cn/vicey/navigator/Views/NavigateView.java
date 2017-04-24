@@ -128,7 +128,7 @@ public class NavigateView
      */
     private void showRenderer()
     {
-        if (mViewFlipper.getDisplayedChild() != VIEW_PLACEHOLDER) mViewFlipper.setDisplayedChild(VIEW_MAP_RENDERER);
+        if (mViewFlipper.getDisplayedChild() != VIEW_MAP_RENDERER) mViewFlipper.setDisplayedChild(VIEW_MAP_RENDERER);
     }
 
     /**
