@@ -21,4 +21,5 @@
             android:layout_gravity="center"
             android:textColor="@color/text"
             android:textSize="@dimen/large_font_size"/>
+
 </android.support.v7.widget.Toolbar>

@@ -16,6 +16,7 @@
             app:fabSize="mini"
             app:srcCompat="@drawable/ic_location"
             app:backgroundTint="@android:color/white"/>
+
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/nv_upstairs_button"
             android:layout_width="wrap_content"
@@ -27,6 +28,7 @@
             app:fabSize="mini"
             app:srcCompat="@drawable/ic_upstairs"
             app:backgroundTint="@android:color/white"/>
+
     <android.support.design.widget.FloatingActionButton
             android:id="@+id/nv_downstairs_button"
             android:layout_width="wrap_content"
@@ -39,7 +41,9 @@
             app:fabSize="mini"
             app:srcCompat="@drawable/ic_downstairs"
             app:backgroundTint="@android:color/white"/>
+
     <ViewFlipper
             style="@style/Navigator.Component"
             android:id="@+id/nv_view_flipper"/>
+
 </RelativeLayout>

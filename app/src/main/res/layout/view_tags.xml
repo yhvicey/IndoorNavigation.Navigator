@@ -4,17 +4,21 @@
         android:id="@+id/tags_view"
         android:orientation="vertical"
         android:gravity="top">
+
     <ListView
             style="@style/Navigator.Component"
             android:id="@+id/tv_list_view"
             android:orientation="vertical">
+
     </ListView>
+
     <LinearLayout
             android:id="@+id/tv_list_bottom"
             android:layout_width="match_parent"
             android:layout_height="@dimen/middle_item_height"
             android:layout_alignParentBottom="true"
             android:orientation="horizontal">
+
         <Button
                 android:id="@+id/tv_load_tags"
                 android:layout_width="0dp"
@@ -23,6 +27,7 @@
                 style="?borderlessButtonStyle"
                 android:text="@string/load_tags"
                 android:textSize="@dimen/small_font_size"/>
+
         <Button
                 android:id="@+id/tv_save_tags"
                 android:layout_width="0dp"
@@ -31,6 +36,7 @@
                 style="?borderlessButtonStyle"
                 android:text="@string/save_tags"
                 android:textSize="@dimen/small_font_size"/>
+
     </LinearLayout>
 
 </RelativeLayout>
