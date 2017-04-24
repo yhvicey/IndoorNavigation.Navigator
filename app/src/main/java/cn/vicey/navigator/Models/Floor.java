@@ -102,6 +102,29 @@ public class Floor
 
     // region Methods
 
+
+    /**
+     * Find the nearest node to specified location
+     *
+     * @param x     X axis
+     * @param y     Y axis
+     * @param nodes Nodes to find
+     * @return The nearest node to specified location, or null if there is no node in nodes
+     */
+    private GuideNode findNearestGuideNode(int x, int y, List<GuideNode> nodes)
+    {
+        double distance = Double.MAX_VALUE;
+        GuideNode result = null;
+        for (GuideNode node : nodes)
+        {
+            double newDistance = node.calcDistance(x, y);
+            if (newDistance > distance) continue;
+            distance = newDistance;
+            result = node;
+        }
+        return result;
+    }
+
     /**
      * Add and convert link to {@link NodeBase.Link}
      *
@@ -190,6 +213,42 @@ public class Floor
             if (pattern.matches(node.getName())) result.add(node);
         }
         return result;
+    }
+
+    /**
+     * Find the nearest guide node to specified location
+     *
+     * @param x X axis
+     * @param y Y axis
+     * @return The nearest guide node
+     */
+    public GuideNode findNearestGuideNode(int x, int y)
+    {
+        return findNearestGuideNode(x, y, mGuideNodes);
+    }
+
+    /**
+     * Find the nearest entry node to next floor to specified location
+     *
+     * @param x X axis
+     * @param y Y axis
+     * @return The nearest entry node to next floor
+     */
+    public GuideNode findNearestNextEntryNode(int x, int y)
+    {
+        return findNearestGuideNode(x, y, mNextEntryNodes);
+    }
+
+    /**
+     * Find the nearest entry node to previous floor to specified location
+     *
+     * @param x X axis
+     * @param y Y axis
+     * @return The nearest entry node to previous floor
+     */
+    public GuideNode findNearestPrevEntryNode(int x, int y)
+    {
+        return findNearestGuideNode(x, y, mPrevEntryNodes);
     }
 
     /**
