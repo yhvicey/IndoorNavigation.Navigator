@@ -97,9 +97,7 @@ public class MapRenderer
     private Point                      mLookAt;               // The center point of the view window in map
     private float                      mPrevTouchX;           // Previous touch point x axis
     private float                      mPrevTouchY;           // Previous touch point y axis
-    private RelativeLayout             mSearchBox;            // Search box
     private ListViewAdapter<GuideNode> mSearchResultsAdapter; // Search result list adapter
-    private SearchView                 mSearchView;           // Search view
     private float                      mTouchPointDistance;   // Distance between two touch points
     private int                        mTouchedPointCount;    // Current touch point count
     private Paint                      mWallPaint;            // Paint for wall nodes and lines
@@ -304,11 +302,11 @@ public class MapRenderer
             LayoutInflater.from(getContext()).inflate(R.layout.cmpt_map_renderer, this, true);
 
             // mSearchBox
-            mSearchBox = (RelativeLayout) findViewById(R.id.mr_search_box);
+            RelativeLayout mSearchBox = (RelativeLayout) findViewById(R.id.mr_search_box);
             mSearchBox.setOnClickListener(mOnSearchBoxClickListener);
 
             // mSearchView
-            mSearchView = (SearchView) findViewById(R.id.mr_search_view);
+            SearchView mSearchView = (SearchView) findViewById(R.id.mr_search_view);
             mSearchView.setOnQueryTextListener(mOnQueryTextListener);
 
             // mSearchResultsListAdapter
