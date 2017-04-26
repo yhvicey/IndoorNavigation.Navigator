@@ -210,7 +210,7 @@ public class Floor
         for (GuideNode node : mGuideNodes)
         {
             if (node.getName() == null) continue;
-            if (pattern.matches(node.getName())) result.add(node);
+            if (node.getName().toLowerCase().contains(pattern.toLowerCase())) result.add(node);
         }
         return result;
     }
