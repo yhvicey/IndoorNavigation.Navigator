@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
@@ -55,7 +56,7 @@ public class MapRenderer
         @Override
         public boolean onQueryTextSubmit(String s)
         {
-            return false;
+            return true;
         }
 
         @Override
@@ -74,6 +75,19 @@ public class MapRenderer
                 mSearchResultsAdapter.replace(targets);
             }
             return true;
+        }
+    };
+    private ListView.OnItemClickListener   mOnResultClickListener    = new AdapterView.OnItemClickListener()
+    {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
+        {
+            GuideNode target = mSearchResultsAdapter.getItem(i);
+            if (target == null) return;
+            mSearchView.setQuery("", false);
+            mSearchView.setIconified(true);
+            mSearchResultsAdapter.clear();
+            NavigateManager.startNavigate(mCurrentDisplayingFloorIndex, target);
         }
     };
     private View.OnClickListener           mOnSearchBoxClickListener = new View.OnClickListener()           // Search box click event listener
@@ -98,6 +112,7 @@ public class MapRenderer
     private float                      mPrevTouchX;           // Previous touch point x axis
     private float                      mPrevTouchY;           // Previous touch point y axis
     private ListViewAdapter<GuideNode> mSearchResultsAdapter; // Search result list adapter
+    private SearchView                 mSearchView;           // Search view
     private float                      mTouchPointDistance;   // Distance between two touch points
     private int                        mTouchedPointCount;    // Current touch point count
     private Paint                      mWallPaint;            // Paint for wall nodes and lines
@@ -301,12 +316,12 @@ public class MapRenderer
             // Inflate layout
             LayoutInflater.from(getContext()).inflate(R.layout.cmpt_map_renderer, this, true);
 
-            // mSearchBox
-            RelativeLayout mSearchBox = (RelativeLayout) findViewById(R.id.mr_search_box);
-            mSearchBox.setOnClickListener(mOnSearchBoxClickListener);
+            // searchBox
+            RelativeLayout searchBox = (RelativeLayout) findViewById(R.id.mr_search_box);
+            searchBox.setOnClickListener(mOnSearchBoxClickListener);
 
             // mSearchView
-            SearchView mSearchView = (SearchView) findViewById(R.id.mr_search_view);
+            mSearchView = (SearchView) findViewById(R.id.mr_search_view);
             mSearchView.setOnQueryTextListener(mOnQueryTextListener);
 
             // mSearchResultsListAdapter
@@ -315,6 +330,7 @@ public class MapRenderer
             // searchResults
             ListView searchResults = (ListView) findViewById(R.id.mr_search_results);
             searchResults.setAdapter(mSearchResultsAdapter);
+            searchResults.setOnItemClickListener(mOnResultClickListener);
 
             // mBackgroundPaint
             mBackgroundPaint = new Paint();
