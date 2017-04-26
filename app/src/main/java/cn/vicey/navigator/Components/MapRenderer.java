@@ -7,8 +7,12 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Models.Floor;
@@ -17,43 +21,92 @@ import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Navigator;
+import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.ListViewAdapter;
 import cn.vicey.navigator.Utils.Logger;
+
+import java.util.List;
 
 /**
  * Map renderer component, provides support for drawing, scrolling and zooming map
  */
 public class MapRenderer
-        extends View
+        extends RelativeLayout
 {
     //region Constants
 
     private static final String LOGGER_TAG = "MapRenderer";
 
-    private static final int GUIDE_COLOR    = Color.GREEN;  // Guide color
-    private static final int LINE_WIDTH     = 8;            // Line width
-    private static final int NODE_RADIUS    = 4;            // Node radius
-    private static final int WALL_COLOR     = Color.DKGRAY; // Wall color
-    private static final int ZOOM_LEVEL_MAX = 5;            // Max zoom level
-    private static final int ZOOM_LEVEL_MIN = 1;            // Min zoom level
-    private static final int ZOOM_SPEED     = 200;          // Zoom speed
+    private static final int BACKGROUND_COLOR = Color.LTGRAY; // Background color
+    private static final int GUIDE_COLOR      = Color.GREEN;  // Guide color
+    private static final int LINE_WIDTH       = 8;            // Line width
+    private static final int NODE_RADIUS      = 4;            // Node radius
+    private static final int WALL_COLOR       = Color.DKGRAY; // Wall color
+    private static final int ZOOM_LEVEL_MAX   = 5;            // Max zoom level
+    private static final int ZOOM_LEVEL_MIN   = 1;            // Min zoom level
+    private static final int ZOOM_SPEED       = 200;          // Zoom speed
+
+    //endregion
+
+    //region Listeners
+
+    private SearchView.OnQueryTextListener mOnQueryTextListener      = new SearchView.OnQueryTextListener() // Search view query text listener
+    {
+        @Override
+        public boolean onQueryTextSubmit(String s)
+        {
+            return false;
+        }
+
+        @Override
+        public boolean onQueryTextChange(String s)
+        {
+            if (s.isEmpty())
+            {
+                // No query string, hide list panel
+                mSearchResultsAdapter.clear();
+            }
+            else
+            {
+                Floor floor = NavigateManager.getFloor(mCurrentDisplayingFloorIndex);
+                if (floor == null) return false;
+                List<GuideNode> targets = floor.findGuideNodes(s);
+                mSearchResultsAdapter.replace(targets);
+            }
+            return true;
+        }
+    };
+    private View.OnClickListener           mOnSearchBoxClickListener = new View.OnClickListener()           // Search box click event listener
+    {
+        @Override
+        public void onClick(View view)
+        {
+            ((SearchView) findViewById(R.id.mr_search_view)).setIconified(false);
+        }
+    };
 
     //endregion
 
     //region Fields
 
-    private Paint   mGuidePaint;         // Paint for guide nodes and lines
-    private int     mHalfHeight;         // Half of the component height
-    private int     mHalfWidth;          // Half of the component width
-    private boolean mIsZooming;          // Whether the component is zooming
-    private Point   mLookAt;             // The center point of the view window in map
-    private float   mPrevTouchX;         // Previous touch point x axis
-    private float   mPrevTouchY;         // Previous touch point y axis
-    private float   mTouchPointDistance; // Distance between two touch points
-    private int     mTouchedPointCount;  // Current touch point count
-    private Paint   mWallPaint;          // Paint for wall nodes and lines
+    private Paint                      mBackgroundPaint;      // Paint for background
+    private Paint                      mGuidePaint;           // Paint for guide nodes and lines
+    private int                        mHalfHeight;           // Half of the component height
+    private int                        mHalfWidth;            // Half of the component width
+    private boolean                    mIsZooming;            // Whether the component is zooming
+    private Point                      mLookAt;               // The center point of the view window in map
+    private float                      mPrevTouchX;           // Previous touch point x axis
+    private float                      mPrevTouchY;           // Previous touch point y axis
+    private RelativeLayout             mSearchBox;            // Search box
+    private ListViewAdapter<GuideNode> mSearchResultsAdapter; // Search result list adapter
+    private SearchView                 mSearchView;           // Search view
+    private float                      mTouchPointDistance;   // Distance between two touch points
+    private int                        mTouchedPointCount;    // Current touch point count
+    private Paint                      mWallPaint;            // Paint for wall nodes and lines
 
-    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR; // Current displaying floor's index
-    private float mCurrentZoomLevel            = 3;                                 // Current zoom level
+    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR;                       // Current displaying floor's index
+    private float mCurrentZoomLevel            = 3;                                                       // Current zoom level
+
 
     //endregion
 
@@ -247,6 +300,29 @@ public class MapRenderer
     {
         try
         {
+            // Inflate layout
+            LayoutInflater.from(getContext()).inflate(R.layout.cmpt_map_renderer, this, true);
+
+            // mSearchBox
+            mSearchBox = (RelativeLayout) findViewById(R.id.mr_search_box);
+            mSearchBox.setOnClickListener(mOnSearchBoxClickListener);
+
+            // mSearchView
+            mSearchView = (SearchView) findViewById(R.id.mr_search_view);
+            mSearchView.setOnQueryTextListener(mOnQueryTextListener);
+
+            // mSearchResultsListAdapter
+            mSearchResultsAdapter = new ListViewAdapter<>(getContext());
+
+            // searchResults
+            ListView searchResults = (ListView) findViewById(R.id.mr_search_results);
+            searchResults.setAdapter(mSearchResultsAdapter);
+
+            // mBackgroundPaint
+            mBackgroundPaint = new Paint();
+            mBackgroundPaint.setColor(BACKGROUND_COLOR);
+            mBackgroundPaint.setStyle(Paint.Style.FILL);
+
             // mGuidePaint
             mGuidePaint = new Paint();
             mGuidePaint.setColor(GUIDE_COLOR);
@@ -257,6 +333,8 @@ public class MapRenderer
 
             // mLookAt
             mLookAt = new Point();
+
+            setWillNotDraw(false);
         }
         catch (Throwable t)
         {
@@ -274,7 +352,7 @@ public class MapRenderer
     private void lookAt(int x, int y)
     {
         mLookAt.set(x, y);
-        invalidate();
+        flush();
     }
 
     /**
@@ -289,7 +367,7 @@ public class MapRenderer
         if (mCurrentZoomLevel < ZOOM_LEVEL_MIN) mCurrentZoomLevel = ZOOM_LEVEL_MIN;
         if (mCurrentZoomLevel > ZOOM_LEVEL_MAX) mCurrentZoomLevel = ZOOM_LEVEL_MAX;
 
-        invalidate();
+        flush();
     }
 
     /**
@@ -303,7 +381,7 @@ public class MapRenderer
         if (mCurrentDisplayingFloorIndex <= 0) return false;
         mCurrentDisplayingFloorIndex--;
 
-        invalidate();
+        flush();
         return true;
     }
 
@@ -318,8 +396,16 @@ public class MapRenderer
         if (mCurrentDisplayingFloorIndex >= NavigateManager.getCurrentMap().getFloors().size() - 1) return false;
         mCurrentDisplayingFloorIndex++;
 
-        invalidate();
+        flush();
         return true;
+    }
+
+    /**
+     * Flush view
+     */
+    public void flush()
+    {
+        invalidate();
     }
 
     /**
@@ -347,6 +433,41 @@ public class MapRenderer
     //endregion
 
     //region Override methods
+
+    @Override
+    protected void onDraw(Canvas canvas)
+    {
+        try
+        {
+            canvas.drawPaint(mBackgroundPaint);
+            Floor floor = getDisplayingFloor();
+            if (floor == null) return;
+
+            drawNodes(canvas, floor);
+            drawLinks(canvas, floor);
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to handle draw event.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+        }
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldW, int oldH)
+    {
+        try
+        {
+            mHalfWidth = w / 2;
+            mHalfHeight = h / 2;
+            mLookAt.set(mHalfWidth, mHalfHeight);
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to handle size change event.", t);
+            Navigator.exitWithError(Navigator.ERR_INIT);
+        }
+    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event)
@@ -408,40 +529,6 @@ public class MapRenderer
             Logger.error(LOGGER_TAG, "Failed to handle touch event.", t);
             Navigator.exitWithError(Navigator.ERR_INIT);
             return false;
-        }
-    }
-
-    @Override
-    protected void onSizeChanged(int w, int h, int oldW, int oldH)
-    {
-        try
-        {
-            mHalfWidth = w / 2;
-            mHalfHeight = h / 2;
-            mLookAt.set(mHalfWidth, mHalfHeight);
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to handle size change event.", t);
-            Navigator.exitWithError(Navigator.ERR_INIT);
-        }
-    }
-
-    @Override
-    protected void onDraw(Canvas canvas)
-    {
-        try
-        {
-            Floor floor = getDisplayingFloor();
-            if (floor == null) return;
-
-            drawNodes(canvas, floor);
-            drawLinks(canvas, floor);
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to handle draw event.", t);
-            Navigator.exitWithError(Navigator.ERR_INIT);
         }
     }
 

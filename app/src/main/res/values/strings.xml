@@ -23,6 +23,7 @@
     <string name="save_tags">保存标签</string>
     <string name="show_log">显示日志</string>
     <string name="disable_debug_mode">关闭开发者模式</string>
+    <string name="input_target_name">输入目标名</string>
 
     <!--   Notification texts   -->
     <string name="load_succeed">加载成功</string>
