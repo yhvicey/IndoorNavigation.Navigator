@@ -86,8 +86,7 @@ public class GuideNode
     @Override
     public String toString()
     {
-        return super.toString() + (getName() == null ? "" : (" Name: " + getName())) + (mNext == null ? "" : (" Next: " + mNext)) + (mPrev == null ? "" : (" Prev: " + mPrev));
-
+        return getName() == null ? "" : getName();
     }
 
     //endregion
