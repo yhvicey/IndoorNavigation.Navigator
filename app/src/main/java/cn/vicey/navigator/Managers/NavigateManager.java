@@ -9,6 +9,7 @@ import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Navigate.FloorNavigator;
 import cn.vicey.navigator.Navigate.NavigateTask;
 import cn.vicey.navigator.Navigate.Path;
+import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
 
 /**
@@ -108,6 +109,7 @@ public final class NavigateManager
                         {
                             mCurrentTask = null;
                         }
+                        AlertManager.alert(R.string.navigation_finished);
                         break;
                     }
 
@@ -261,6 +263,7 @@ public final class NavigateManager
             mCurrentTask = new NavigateTask(endFloor, endNode);
         }
         new Thread(mNavigateHelperTask).start();
+        AlertManager.alert(R.string.starting_navigation);
     }
 
     //endregion

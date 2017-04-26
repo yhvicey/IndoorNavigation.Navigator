@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ScrollView;
 import cn.vicey.navigator.Activities.MainActivity;
+import cn.vicey.navigator.Managers.AlertManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -38,7 +39,7 @@ public class SettingsView
             try
             {
                 SettingsManager.setDebugModeEnabled(false);
-                mParent.alert(R.string.debug_mode_disabled);
+                AlertManager.alert(R.string.debug_mode_disabled);
                 flush();
             }
             catch (Throwable t)

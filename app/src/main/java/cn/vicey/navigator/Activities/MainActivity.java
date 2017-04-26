@@ -3,7 +3,6 @@ package cn.vicey.navigator.Activities;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -13,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Components.MenuItem;
+import cn.vicey.navigator.Managers.AlertManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -37,41 +37,29 @@ public class MainActivity
     private static final Object SYNC_LOCK       = new Object();  // Sync lock
 
     /**
-     * Long toast duration (3500 ms) constant
-     */
-    public static final long LONG_TOAST_DURATION   = 3500;
-    /**
-     * Middle toast duration (2000 ms) constant
-     */
-    public static final long MIDDLE_TOAST_DURATION = 2000;
-    /**
      * Request code for storage
      */
-    public static final int  REQ_STORAGE           = 1;
-    /**
-     * Short toast duration (1000 ms) constant
-     */
-    public static final long SHORT_TOAST_DURATION  = 1000;
+    public static final int REQ_STORAGE   = 1;
     /**
      * Log view index
      */
-    public static final int  VIEW_LOG              = 4;
+    public static final int VIEW_LOG      = 4;
     /**
      * Maps view index
      */
-    public static final int  VIEW_MAPS             = 1;
+    public static final int VIEW_MAPS     = 1;
     /**
      * Navigate view index
      */
-    public static final int  VIEW_NAVIGATE         = 0;
+    public static final int VIEW_NAVIGATE = 0;
     /**
      * Settings view index
      */
-    public static final int  VIEW_SETTINGS         = 3;
+    public static final int VIEW_SETTINGS = 3;
     /**
      * Tags view index
      */
-    public static final int  VIEW_TAGS             = 2;
+    public static final int VIEW_TAGS     = 2;
 
     //endregion
 
@@ -157,12 +145,12 @@ public class MainActivity
                 if (mClickCount > 5)
                 {
                     SettingsManager.setDebugModeEnabled(true);
-                    alert(R.string.debug_mode_enabled);
+                    AlertManager.alert(R.string.debug_mode_enabled);
                     flush();
                 }
                 else if (mClickCount > 3)
                 {
-                    alert(getString(R.string.debug_mode_notification, 5 - mClickCount + 1));
+                    AlertManager.alert(getString(R.string.debug_mode_notification, 5 - mClickCount + 1));
                 }
             }
             catch (Throwable t)
@@ -281,6 +269,13 @@ public class MainActivity
     {
         try
         {
+            // Alert manager
+            if (!AlertManager.init(this))
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init alert manager.");
+                Navigator.exitWithError(Navigator.ERR_INIT);
+            }
+
             // Inflate layout
             setContentView(R.layout.activity_main);
 
@@ -358,76 +353,6 @@ public class MainActivity
         {
             Logger.error(LOGGER_TAG, "Failed to init views.", t);
             Navigator.exitWithError(Navigator.ERR_INIT);
-        }
-    }
-
-    /**
-     * Alert a message
-     *
-     * @param redId Message string resource id
-     */
-    public void alert(int redId)
-    {
-        alert(getString(redId), MIDDLE_TOAST_DURATION);
-    }
-
-    /**
-     * Alert a message with specified duration
-     *
-     * @param redId    Message string resource id
-     * @param duration Duration
-     */
-    public void alert(int redId, final long duration)
-    {
-        getString(redId, duration);
-    }
-
-    /**
-     * Alert a message
-     *
-     * @param message Message string
-     */
-    public void alert(final @NonNull String message)
-    {
-        alert(message, MIDDLE_TOAST_DURATION);
-    }
-
-    /**
-     * Alert a message with specified duration
-     *
-     * @param message  Message string
-     * @param duration Duration
-     */
-    public void alert(final @NonNull String message, final long duration)
-    {
-        try
-        {
-            synchronized (SYNC_LOCK)
-            {
-                invoke(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (mCurrentToast != null) mCurrentToast.cancel();
-                        mCurrentToast = Toast.makeText(MainActivity.this, message, Toast.LENGTH_LONG);
-                        mCurrentToast.show();
-                        final Toast toastToCancel = mCurrentToast;
-                        new Handler().postDelayed(new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                toastToCancel.cancel();
-                            }
-                        }, duration);
-                    }
-                });
-            }
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to alert message.", t);
         }
     }
 
@@ -522,9 +447,9 @@ public class MainActivity
             else
             {
                 long current = new Date().getTime();
-                if (current - mLastBackPressedTime > SHORT_TOAST_DURATION)
+                if (current - mLastBackPressedTime > AlertManager.SHORT_TOAST_DURATION)
                 {
-                    alert(getString(R.string.exit_notification), SHORT_TOAST_DURATION);
+                    AlertManager.alert(getString(R.string.exit_notification), AlertManager.SHORT_TOAST_DURATION);
                     mLastBackPressedTime = current;
                 }
                 else

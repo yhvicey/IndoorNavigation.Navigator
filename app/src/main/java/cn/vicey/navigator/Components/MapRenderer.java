@@ -51,7 +51,7 @@ public class MapRenderer
 
     //region Listeners
 
-    private SearchView.OnQueryTextListener mOnQueryTextListener      = new SearchView.OnQueryTextListener() // Search view query text listener
+    private SearchView.OnQueryTextListener mOnQueryTextListener      = new SearchView.OnQueryTextListener()  // Search view query text listener
     {
         @Override
         public boolean onQueryTextSubmit(String s)
@@ -77,7 +77,7 @@ public class MapRenderer
             return true;
         }
     };
-    private ListView.OnItemClickListener   mOnResultClickListener    = new AdapterView.OnItemClickListener()
+    private ListView.OnItemClickListener   mOnResultClickListener    = new AdapterView.OnItemClickListener() // Search result item click listener
     {
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l)
@@ -90,7 +90,7 @@ public class MapRenderer
             NavigateManager.startNavigate(mCurrentDisplayingFloorIndex, target);
         }
     };
-    private View.OnClickListener           mOnSearchBoxClickListener = new View.OnClickListener()           // Search box click event listener
+    private View.OnClickListener           mOnSearchBoxClickListener = new View.OnClickListener()            // Search box click event listener
     {
         @Override
         public void onClick(View view)
@@ -117,8 +117,8 @@ public class MapRenderer
     private int                        mTouchedPointCount;    // Current touch point count
     private Paint                      mWallPaint;            // Paint for wall nodes and lines
 
-    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR;                       // Current displaying floor's index
-    private float mCurrentZoomLevel            = 3;                                                       // Current zoom level
+    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR; // Current displaying floor's index
+    private float mCurrentZoomLevel            = 3;                                 // Current zoom level
 
 
     //endregion

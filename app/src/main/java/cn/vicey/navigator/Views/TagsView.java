@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import cn.vicey.navigator.Activities.MainActivity;
+import cn.vicey.navigator.Managers.AlertManager;
 import cn.vicey.navigator.Managers.MapManager;
 import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Managers.TagManager;
@@ -112,16 +113,16 @@ public class TagsView
                 //region Load tags
                 if (NavigateManager.getCurrentMap() == null)
                 {
-                    mParent.alert(R.string.no_loaded_map);
+                    AlertManager.alert(R.string.no_loaded_map);
                     return;
                 }
                 String mapName = NavigateManager.getCurrentMap().getName();
                 List<Tag> tags = TagManager.loadTags(mapName);
-                if (tags == null) mParent.alert(R.string.no_tag);
+                if (tags == null) AlertManager.alert(R.string.no_tag);
                 else
                 {
-                    if (NavigateManager.getCurrentMap().setTags(tags)) mParent.alert(R.string.load_succeed);
-                    else mParent.alert(R.string.load_failed);
+                    if (NavigateManager.getCurrentMap().setTags(tags)) AlertManager.alert(R.string.load_succeed);
+                    else AlertManager.alert(R.string.load_failed);
                 }
                 //endregion
             }
@@ -141,18 +142,18 @@ public class TagsView
                 //region Save tags
                 if (NavigateManager.getCurrentMap() == null)
                 {
-                    mParent.alert(R.string.no_loaded_map);
+                    AlertManager.alert(R.string.no_loaded_map);
                     return;
                 }
                 List<Tag> tags = mTagListAdapter.getAll();
                 if (tags.size() == 0)
                 {
-                    mParent.alert(R.string.no_tag);
+                    AlertManager.alert(R.string.no_tag);
                     return;
                 }
                 if (TagManager.saveTags(NavigateManager.getCurrentMap().getName(), tags))
-                    mParent.alert(R.string.save_succeed);
-                else mParent.alert(R.string.save_failed);
+                    AlertManager.alert(R.string.save_succeed);
+                else AlertManager.alert(R.string.save_failed);
                 //endregion
             }
             catch (Throwable t)
@@ -200,8 +201,8 @@ public class TagsView
                                                 String newTagValue = editor.getText().toString();
 
                                                 if (MapManager.renameMapFile(tagValue, newTagValue))
-                                                    mParent.alert(R.string.rename_succeed);
-                                                else mParent.alert(R.string.rename_failed);
+                                                    AlertManager.alert(R.string.rename_succeed);
+                                                else AlertManager.alert(R.string.rename_failed);
                                                 flush();
                                             }
                                         }
@@ -234,9 +235,9 @@ public class TagsView
                                                                                 String tagFileName = textView.getText()
                                                                                                              .toString();
                                                                                 if (TagManager.deleteTagFile(tagFileName))
-                                                                                    mParent.alert(R.string.delete_succeed);
+                                                                                    AlertManager.alert(R.string.delete_succeed);
                                                                                 else
-                                                                                    mParent.alert(R.string.delete_failed);
+                                                                                    AlertManager.alert(R.string.delete_failed);
                                                                                 flush();
                                                                             }
                                                                         }
@@ -325,7 +326,7 @@ public class TagsView
         }
         else
         {
-            mParent.alert(R.string.no_loaded_map);
+            AlertManager.alert(R.string.no_loaded_map);
         }
     }
 

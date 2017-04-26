@@ -51,6 +51,8 @@
     <string name="no_current_floor">No current floor</string>
     <string name="confirm_to_delete">Are you sure about deleting this file?</string>
     <string name="click_to_switch_floor">Click direction button to switch floor</string>
+    <string name="starting_navigation">Starting navigation…</string>
+    <string name="navigation_finished">Navigation finished</string>
 
     <!--   Unformatted texts   -->
     <string name="debug_mode_notification" formatted="false">%d more clicks to enable debug mode</string>

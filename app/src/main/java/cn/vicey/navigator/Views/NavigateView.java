@@ -8,6 +8,7 @@ import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
+import cn.vicey.navigator.Managers.AlertManager;
 import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -44,8 +45,8 @@ public class NavigateView
         public void onClick(View view)
         {
             if (view.getId() != R.id.nv_downstairs_button) return;
-            if (NavigateManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!mMapRenderer.displayDownstairs()) mParent.alert(R.string.already_ground_floor);
+            if (NavigateManager.getCurrentMap() == null) AlertManager.alert(R.string.no_loaded_map);
+            else if (!mMapRenderer.displayDownstairs()) AlertManager.alert(R.string.already_ground_floor);
             flush();
         }
     };
@@ -55,8 +56,8 @@ public class NavigateView
         public void onClick(View view)
         {
             if (view.getId() != R.id.nv_upstairs_button) return;
-            if (NavigateManager.getCurrentMap() == null) mParent.alert(R.string.no_loaded_map);
-            else if (!mMapRenderer.displayUpstairs()) mParent.alert(R.string.already_top_floor);
+            if (NavigateManager.getCurrentMap() == null) AlertManager.alert(R.string.no_loaded_map);
+            else if (!mMapRenderer.displayUpstairs()) AlertManager.alert(R.string.already_top_floor);
             flush();
         }
     };

@@ -51,6 +51,8 @@
     <string name="no_current_floor">没有当前楼层</string>
     <string name="confirm_to_delete">是否要删除该文件？</string>
     <string name="click_to_switch_floor">点击方向键以切换楼层</string>
+    <string name="starting_navigation">开始导航…</string>
+    <string name="navigation_finished">导航结束</string>
 
     <!--   Unformatted texts   -->
     <string name="debug_mode_notification" formatted="false">再点击 %d 次以开启开发者模式</string>
