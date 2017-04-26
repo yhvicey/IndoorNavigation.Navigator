@@ -34,8 +34,6 @@ public class NavigateView
     private MainActivity mParent;      // Parent activity
     private ViewFlipper  mViewFlipper; // View flipper
 
-    private int mCurrentView = VIEW_PLACEHOLDER; // Current view
-
     //endregion
 
     //region Listeners
