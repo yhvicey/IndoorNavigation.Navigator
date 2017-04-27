@@ -42,7 +42,9 @@ public class MapRenderer
     private static final int BACKGROUND_COLOR = Color.LTGRAY; // Background color
     private static final int GUIDE_COLOR      = Color.GREEN;  // Guide color
     private static final int LINE_WIDTH       = 8;            // Line width
+    private static final int MAX_ERROR_COUNT  = 3;            // Max error count
     private static final int NODE_RADIUS      = 4;            // Node radius
+    private static final int UPDATE_INTERNAL  = 1000;         // Update internal in milliseconds
     private static final int WALL_COLOR       = Color.DKGRAY; // Wall color
     private static final int ZOOM_LEVEL_MAX   = 5;            // Max zoom level
     private static final int ZOOM_LEVEL_MIN   = 1;            // Min zoom level
@@ -105,6 +107,7 @@ public class MapRenderer
     //region Fields
 
     private Paint                      mBackgroundPaint;      // Paint for background
+    private int                        mErrorCount;           // Error count
     private Paint                      mGuidePaint;           // Paint for guide nodes and lines
     private int                        mHalfHeight;           // Half of the component height
     private int                        mHalfWidth;            // Half of the component width
@@ -118,8 +121,35 @@ public class MapRenderer
     private int                        mTouchedPointCount;    // Current touch point count
     private Paint                      mWallPaint;            // Paint for wall nodes and lines
 
-    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR; // Current displaying floor's index
-    private float mCurrentZoomLevel            = 3;                                 // Current zoom level
+    private int      mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR;     // Current displaying floor's index
+    private float    mCurrentZoomLevel            = (ZOOM_LEVEL_MAX + ZOOM_LEVEL_MIN) / 2; // Current zoom level
+    private Runnable mUpdateTask                  = new Runnable()                         // Update task for updating renderer
+    {
+        @Override
+        public void run()
+        {
+            try
+            {
+                while (true)
+                {
+                    Thread.sleep(UPDATE_INTERNAL);
+                    if (!NavigateManager.isNavigating()) continue;
+                    flush();
+                }
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Error occurred when updating renderer. Error count: " + mErrorCount++ + ".", t);
+                if (mErrorCount < MAX_ERROR_COUNT)
+                {
+                    Logger.info(LOGGER_TAG, "Trying to restart update task.");
+                    new Thread(this).start();
+                }
+                else
+                    Logger.error(LOGGER_TAG, "Map renderer update task's crash count reaches its limit. Update function will be disabled.");
+            }
+        }
+    };
 
 
     //endregion
@@ -380,6 +410,9 @@ public class MapRenderer
 
             // mLookAt
             mLookAt = new Point();
+
+            // mUpdateTask
+            new Thread(mUpdateTask).start();
 
             setWillNotDraw(false);
         }
