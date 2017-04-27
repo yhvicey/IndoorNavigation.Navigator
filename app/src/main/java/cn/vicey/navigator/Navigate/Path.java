@@ -64,6 +64,26 @@ public class Path
         return mLength;
     }
 
+    /**
+     * Gets path's nodes
+     *
+     * @return Path's nodes
+     */
+    public List<PathNode> getNodes()
+    {
+        return mNodes;
+    }
+
+    /**
+     * Gets path's node size
+     *
+     * @return Path's node size
+     */
+    public int getSize()
+    {
+        return mNodes.size();
+    }
+
     //endregion
 
     //region Methods
