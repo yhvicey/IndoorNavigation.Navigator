@@ -111,6 +111,8 @@ public class Path
                 break;
             }
         }
+        mNodes.add(0, new PathNode(node));
+        mLength += head.calcDistance(node);
         return this;
     }
 
@@ -149,6 +151,8 @@ public class Path
                 break;
             }
         }
+        mNodes.add(new PathNode(node));
+        mLength += tail.calcDistance(node);
         return this;
     }
 
