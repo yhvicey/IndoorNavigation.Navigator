@@ -92,7 +92,7 @@ public final class MapManager
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init map manager.", t);
+            Logger.error(LOGGER_TAG, "Failed to init map manager.", t);
             return false;
         }
     }
