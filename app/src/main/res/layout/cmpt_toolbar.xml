@@ -4,7 +4,7 @@
         style="@style/Navigator.Component"
         android:minHeight="?attr/actionBarSize"
         android:windowNoTitle="true"
-        android:background="@color/backgroundDark"
+        android:background="@color/background_dark"
         app:contentInsetStart="0dp">
 
     <ImageView
