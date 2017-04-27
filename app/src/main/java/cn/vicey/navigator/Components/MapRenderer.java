@@ -19,7 +19,6 @@ import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.NodeBase;
-import cn.vicey.navigator.Models.Nodes.NodeType;
 import cn.vicey.navigator.Models.Nodes.PathNode;
 import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Navigate.Path;
@@ -187,10 +186,11 @@ public class MapRenderer
      * Draw a link between two nodes
      *
      * @param canvas Canvas to draw
+     * @param paint  Paint to use
      * @param start  Start node
      * @param end    End node
      */
-    private void drawLink(final @NonNull Canvas canvas, final @NonNull NodeBase start, final @NonNull NodeBase end)
+    private void drawLink(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
         mGuidePaint.setStrokeWidth(LINE_WIDTH * mCurrentZoomLevel);
         mWallPaint.setStrokeWidth(LINE_WIDTH * mCurrentZoomLevel);
@@ -198,9 +198,7 @@ public class MapRenderer
         float startY = getRelativeY(start.getY());
         float endX = getRelativeX(end.getX());
         float endY = getRelativeY(end.getY());
-        if (start.getType() == NodeType.WALL_NODE && end.getType() == NodeType.WALL_NODE)
-            canvas.drawLine(startX, startY, endX, endY, mWallPaint);
-        else canvas.drawLine(startX, startY, endX, endY, mGuidePaint);
+        canvas.drawLine(startX, startY, endX, endY, paint);
     }
 
     /**
@@ -215,7 +213,7 @@ public class MapRenderer
         {
             for (NodeBase.Link link : wallNode.getLinks())
             {
-                drawLink(canvas, wallNode, link.getTarget());
+                drawLink(canvas, mWallPaint, wallNode, link.getTarget());
             }
         }
         if (!SettingsManager.isDebugModeEnabled()) return;
@@ -223,7 +221,7 @@ public class MapRenderer
         {
             for (NodeBase.Link link : guideNode.getLinks())
             {
-                drawLink(canvas, guideNode, link.getTarget());
+                drawLink(canvas, mGuidePaint, guideNode, link.getTarget());
             }
         }
     }
@@ -232,25 +230,14 @@ public class MapRenderer
      * Draw a node
      *
      * @param canvas Canvas to draw
+     * @param paint  Paint to use
      * @param node   Target node
      */
-    private void drawNode(final @NonNull Canvas canvas, final @NonNull NodeBase node)
+    private void drawNode(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull NodeBase node)
     {
         float x = getRelativeX(node.getX());
         float y = getRelativeY(node.getY());
-        switch (node.getType())
-        {
-            case GUIDE_NODE:
-            {
-                canvas.drawCircle(x, y, NODE_RADIUS * mCurrentZoomLevel, mGuidePaint);
-                break;
-            }
-            case WALL_NODE:
-            {
-                canvas.drawCircle(x, y, NODE_RADIUS * mCurrentZoomLevel, mWallPaint);
-                break;
-            }
-        }
+        canvas.drawCircle(x, y, NODE_RADIUS * mCurrentZoomLevel, paint);
     }
 
     /**
@@ -263,12 +250,15 @@ public class MapRenderer
     {
         for (WallNode wallNode : floor.getWallNodes())
         {
-            drawNode(canvas, wallNode);
+            drawNode(canvas, mWallPaint, wallNode);
         }
         if (!SettingsManager.isDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
         {
-            drawNode(canvas, guideNode);
+            drawNode(canvas, mGuidePaint, guideNode);
+        }
+    }
+
     /**
      * Draw a path
      *
