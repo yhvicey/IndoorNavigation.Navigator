@@ -2,7 +2,7 @@
 
     <style name="Navigator" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="colorPrimary">@color/background</item>
-        <item name="colorPrimaryDark">@color/backgroundDark</item>
+        <item name="colorPrimaryDark">@color/background_dark</item>
         <item name="colorAccent">@color/highlighted</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

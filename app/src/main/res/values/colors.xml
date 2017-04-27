@@ -2,6 +2,11 @@
 <resources>
     <color name="text">#DCDCDC</color>
     <color name="background">#444153</color>
-    <color name="backgroundDark">#383547</color>
+    <color name="background_dark">#383547</color>
     <color name="highlighted">#30d1d5</color>
+    <color name="renderer_background">#DCDCDC</color>
+    <color name="renderer_guide_color">#659EC7</color>
+    <color name="renderer_wall_color">#808080</color>
+    <color name="renderer_user_color">#1569C7</color>
+    <color name="renderer_user_path_color">#667C26</color>
 </resources>
