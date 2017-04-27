@@ -114,7 +114,8 @@ public final class NavigateManager
                     }
 
                     // Get guide path and append user node to it
-                    mCurrentGuidePath = mCurrentTask.getPath().appendHead(UserNode.getInstance());
+                    mCurrentGuidePath = mCurrentTask.getPath();
+                    if (mCurrentGuidePath != null) mCurrentGuidePath.appendHead(UserNode.getInstance());
                 }
                 cancelNavigate();
             }
@@ -127,36 +128,7 @@ public final class NavigateManager
 
     //endregion
 
-    //region Static methods
-
-    /**
-     * Update nearest node
-     */
-    private static void updateNearestNode()
-    {
-        Floor floor = getCurrentFloor();
-        if (floor == null)
-        {
-            mNearestNode = null;
-            return;
-        }
-        int x = UserNode.getInstance().getX();
-        int y = UserNode.getInstance().getY();
-        mNearestNode = floor.findNearestGuideNode(x, y);
-    }
-
-    /**
-     * Cancel all navigate task
-     */
-    public static void cancelNavigate()
-    {
-        if (!isNavigating()) return;
-        mIndicator.cancel();
-        synchronized (SYNC_LOCK)
-        {
-            mCurrentTask = null;
-        }
-    }
+    //region Static accessors
 
     /**
      * Gets current floor
@@ -166,6 +138,16 @@ public final class NavigateManager
     public static Floor getCurrentFloor()
     {
         return getFloor(UserNode.getInstance().getCurrentFloorIndex());
+    }
+
+    /**
+     * Gets current guide path's fork
+     *
+     * @return Current guide path's fork, or null if no navigation now
+     */
+    public static Path getCurrentGuidePath()
+    {
+        return mCurrentGuidePath;
     }
 
     /**
@@ -246,6 +228,39 @@ public final class NavigateManager
     public static void setCurrentMap(final @NonNull Map map)
     {
         mCurrentMap = map;
+    }
+
+    //endregion
+
+    //region Static methods
+
+    /**
+     * Update nearest node
+     */
+    private static void updateNearestNode()
+    {
+        Floor floor = getCurrentFloor();
+        if (floor == null)
+        {
+            mNearestNode = null;
+            return;
+        }
+        int x = UserNode.getInstance().getX();
+        int y = UserNode.getInstance().getY();
+        mNearestNode = floor.findNearestGuideNode(x, y);
+    }
+
+    /**
+     * Cancel all navigate task
+     */
+    public static void cancelNavigate()
+    {
+        if (!isNavigating()) return;
+        mIndicator.cancel();
+        synchronized (SYNC_LOCK)
+        {
+            mCurrentTask = null;
+        }
     }
 
     /**
