@@ -171,7 +171,7 @@ public class NavigateTask
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to update task. Error count: " + mErrorCount, t);
+            Logger.error(LOGGER_TAG, "Failed to update task. Error count: " + mErrorCount + ".", t);
             return ++mErrorCount >= MAX_ERROR_COUNT;
         }
     }
