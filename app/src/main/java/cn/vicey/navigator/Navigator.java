@@ -1,10 +1,7 @@
 package cn.vicey.navigator;
 
 import android.app.Application;
-import cn.vicey.navigator.Managers.MapManager;
-import cn.vicey.navigator.Managers.SettingsManager;
-import cn.vicey.navigator.Managers.TagManager;
-import cn.vicey.navigator.Managers.TypefaceManager;
+import cn.vicey.navigator.Managers.*;
 import cn.vicey.navigator.Utils.Logger;
 
 import java.util.Date;
@@ -155,6 +152,11 @@ public class Navigator
             if (!TagManager.init())
             {
                 Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init TagManager.");
+                exitWithError(ERR_INIT);
+            }
+            if (!NavigateManager.init())
+            {
+                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init NavigateManager.");
                 exitWithError(ERR_INIT);
             }
             if (!TypefaceManager.init(getAssets()))
