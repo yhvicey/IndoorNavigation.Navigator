@@ -8,6 +8,7 @@ import android.widget.ScrollView;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.SettingsCheckBox;
 import cn.vicey.navigator.Managers.AlertManager;
+import cn.vicey.navigator.Managers.DebugManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -27,7 +28,7 @@ public class SettingsView
 
     //region Fields
 
-    private MainActivity mParent; // Parent activity
+    private MainActivity     mParent;                  // Parent activity
     private SettingsCheckBox mTrackPathCheckBox;       // Track path check box
     private SettingsCheckBox mUseFakeLocationCheckBox; // Use fake location check box
 
@@ -35,7 +36,7 @@ public class SettingsView
 
     //region Listeners
 
-    private OnClickListener mOnDisableDebugModeTextViewClick = new OnClickListener() // Disable debug mode text view click listener
+    private OnClickListener                        mOnDisableDebugModeTextViewClick        = new OnClickListener()                        // Listener for disable debug mode text view click event
     {
         @Override
         public void onClick(View view)
@@ -52,7 +53,7 @@ public class SettingsView
             }
         }
     };
-    private OnClickListener mOnShowLogTextViewClick          = new OnClickListener() // Show log text view click listener
+    private OnClickListener                        mOnShowLogTextViewClick                 = new OnClickListener()                        // Listener for show log text view click event
     {
         @Override
         public void onClick(View view)
@@ -68,7 +69,7 @@ public class SettingsView
             }
         }
     };
-    private CheckBox.OnCheckedChangeListener mOnTrackPathCheckedChangeListener       = new CheckBox.OnCheckedChangeListener() // Listener for check box checked change event
+    private CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener       = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -76,7 +77,7 @@ public class SettingsView
             DebugManager.setTrackPathEnabled(b);
         }
     };
-    private CheckBox.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener = new CheckBox.OnCheckedChangeListener() // Listener for check box checked change event
+    private CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -145,8 +146,11 @@ public class SettingsView
     public void flush()
     {
         mParent.setTitleText(R.string.settings);
+
+        // debugView
         View debugView = findViewById(R.id.sv_debug_view);
-        debugView.setVisibility(SettingsManager.isDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
+        debugView.setVisibility(SettingsManager.isDebugModeEnabled() ? View.VISIBLE : View.GONE);
+
         // mTrackPathCheckBox
         mTrackPathCheckBox.setChecked(DebugManager.isTrackPathEnabled());
 
