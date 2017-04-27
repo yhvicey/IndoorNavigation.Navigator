@@ -21,19 +21,13 @@
                     style="@style/Navigator.SettingsView.Header"
                     android:text="@string/general"/>
 
-            <cn.vicey.navigator.Components.SettingsItem
-                    android:layout_width="match_parent"
-                    android:layout_height="@dimen/middle_item_height"
-                    app:text="Settings 1"/>
-
         </LinearLayout>
 
         <LinearLayout
                 android:id="@+id/sv_debug_view"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="invisible">
+                android:orientation="vertical">
 
             <TextView
                     android:id="@+id/sv_debug_header"
@@ -44,6 +38,18 @@
                     android:id="@+id/sv_debug_show_log"
                     style="@style/Navigator.SettingsView.Item"
                     android:text="@string/show_log"/>
+
+            <cn.vicey.navigator.Components.SettingsCheckBox
+                    android:id="@+id/sv_debug_use_fake_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/middle_item_height"
+                    app:text="@string/use_fake_location"/>
+
+            <cn.vicey.navigator.Components.SettingsCheckBox
+                    android:id="@+id/sv_debug_track_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/middle_item_height"
+                    app:text="@string/track_path"/>
 
             <TextView
                     android:id="@+id/sv_debug_disable_debug_mode"

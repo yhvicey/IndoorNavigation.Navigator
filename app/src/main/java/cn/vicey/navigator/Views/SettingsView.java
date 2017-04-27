@@ -3,8 +3,10 @@ package cn.vicey.navigator.Views;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.ScrollView;
 import cn.vicey.navigator.Activities.MainActivity;
+import cn.vicey.navigator.Components.SettingsCheckBox;
 import cn.vicey.navigator.Managers.AlertManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
@@ -26,6 +28,8 @@ public class SettingsView
     //region Fields
 
     private MainActivity mParent; // Parent activity
+    private SettingsCheckBox mTrackPathCheckBox;       // Track path check box
+    private SettingsCheckBox mUseFakeLocationCheckBox; // Use fake location check box
 
     //endregion
 
@@ -62,6 +66,22 @@ public class SettingsView
             {
                 Logger.error(LOGGER_TAG, "Failed to show log.", t);
             }
+        }
+    };
+    private CheckBox.OnCheckedChangeListener mOnTrackPathCheckedChangeListener       = new CheckBox.OnCheckedChangeListener() // Listener for check box checked change event
+    {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+        {
+            DebugManager.setTrackPathEnabled(b);
+        }
+    };
+    private CheckBox.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener = new CheckBox.OnCheckedChangeListener() // Listener for check box checked change event
+    {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+        {
+            DebugManager.setUseFakeLocation(b);
         }
     };
 
@@ -102,6 +122,14 @@ public class SettingsView
             // showLogTextView
             View showLogTextView = findViewById(R.id.sv_debug_show_log);
             showLogTextView.setOnClickListener(mOnShowLogTextViewClick);
+
+            // mTrackPathCheckBox
+            mTrackPathCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_track_path);
+            mTrackPathCheckBox.setOnCheckedChangeListener(mOnTrackPathCheckedChangeListener);
+
+            // mUseFakeLocationCheckBox
+            mUseFakeLocationCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_use_fake_location);
+            mUseFakeLocationCheckBox.setOnCheckedChangeListener(mOnUseFakeLocationCheckedChangeListener);
         }
         catch (Throwable t)
         {
@@ -119,6 +147,11 @@ public class SettingsView
         mParent.setTitleText(R.string.settings);
         View debugView = findViewById(R.id.sv_debug_view);
         debugView.setVisibility(SettingsManager.isDebugModeEnabled() ? View.VISIBLE : View.INVISIBLE);
+        // mTrackPathCheckBox
+        mTrackPathCheckBox.setChecked(DebugManager.isTrackPathEnabled());
+
+        // mUseFakeLocationCheckBox
+        mUseFakeLocationCheckBox.setChecked(DebugManager.isUseFakeLocation());
     }
 
     //endregion
