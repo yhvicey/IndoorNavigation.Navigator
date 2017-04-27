@@ -29,6 +29,11 @@ public final class SettingsManager
 
     //region Static accessors
 
+    /**
+     * Gets whether the debug mode is enabled
+     *
+     * @return Whether the debug mode is enabled
+     */
     public static boolean isDebugModeEnabled()
     {
         return mDebugModeEnabled;
