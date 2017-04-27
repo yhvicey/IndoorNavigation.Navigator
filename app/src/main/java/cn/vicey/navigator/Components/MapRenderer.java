@@ -2,10 +2,10 @@ package cn.vicey.navigator.Components;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -14,13 +14,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
+import cn.vicey.navigator.Managers.DebugManager;
 import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Models.Floor;
-import cn.vicey.navigator.Models.Nodes.GuideNode;
-import cn.vicey.navigator.Models.Nodes.NodeBase;
-import cn.vicey.navigator.Models.Nodes.PathNode;
-import cn.vicey.navigator.Models.Nodes.WallNode;
+import cn.vicey.navigator.Models.Map;
+import cn.vicey.navigator.Models.Nodes.*;
 import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -39,16 +38,13 @@ public class MapRenderer
 
     private static final String LOGGER_TAG = "MapRenderer";
 
-    private static final int BACKGROUND_COLOR = Color.LTGRAY; // Background color
-    private static final int GUIDE_COLOR      = Color.GREEN;  // Guide color
-    private static final int LINE_WIDTH       = 8;            // Line width
-    private static final int MAX_ERROR_COUNT  = 3;            // Max error count
-    private static final int NODE_RADIUS      = 4;            // Node radius
-    private static final int UPDATE_INTERNAL  = 1000;         // Update internal in milliseconds
-    private static final int WALL_COLOR       = Color.DKGRAY; // Wall color
-    private static final int ZOOM_LEVEL_MAX   = 5;            // Max zoom level
-    private static final int ZOOM_LEVEL_MIN   = 1;            // Min zoom level
-    private static final int ZOOM_SPEED       = 200;          // Zoom speed
+    private static final int LINE_WIDTH      = 8;    // Line width
+    private static final int MAX_ERROR_COUNT = 3;    // Max error count
+    private static final int NODE_RADIUS     = 4;    // Node radius
+    private static final int UPDATE_INTERNAL = 1000; // Update internal in milliseconds
+    private static final int ZOOM_LEVEL_MAX  = 10;   // Max zoom level
+    private static final int ZOOM_LEVEL_MIN  = 1;    // Min zoom level
+    private static final int ZOOM_SPEED      = 200;  // Zoom speed
 
     //endregion
 
@@ -119,38 +115,12 @@ public class MapRenderer
     private SearchView                 mSearchView;           // Search view
     private float                      mTouchPointDistance;   // Distance between two touch points
     private int                        mTouchedPointCount;    // Current touch point count
+    private Paint                      mUserPaint;            // Paint for user node and lines
+    private Paint                      mUserPathPaint;        // Paint for user path
     private Paint                      mWallPaint;            // Paint for wall nodes and lines
 
-    private int      mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR;     // Current displaying floor's index
-    private float    mCurrentZoomLevel            = (ZOOM_LEVEL_MAX + ZOOM_LEVEL_MIN) / 2; // Current zoom level
-    private Runnable mUpdateTask                  = new Runnable()                         // Update task for updating renderer
-    {
-        @Override
-        public void run()
-        {
-            try
-            {
-                while (true)
-                {
-                    Thread.sleep(UPDATE_INTERNAL);
-                    if (!NavigateManager.isNavigating()) continue;
-                    flush();
-                }
-            }
-            catch (Throwable t)
-            {
-                Logger.error(LOGGER_TAG, "Error occurred when updating renderer. Error count: " + mErrorCount++ + ".", t);
-                if (mErrorCount < MAX_ERROR_COUNT)
-                {
-                    Logger.info(LOGGER_TAG, "Trying to restart update task.");
-                    new Thread(this).start();
-                }
-                else
-                    Logger.error(LOGGER_TAG, "Map renderer update task's crash count reaches its limit. Update function will be disabled.");
-            }
-        }
-    };
-
+    private int   mCurrentDisplayingFloorIndex = NavigateManager.NO_SELECTED_FLOOR;     // Current displaying floor's index
+    private float mCurrentZoomLevel            = (ZOOM_LEVEL_MAX + ZOOM_LEVEL_MIN) / 2; // Current zoom level
 
     //endregion
 
@@ -192,6 +162,15 @@ public class MapRenderer
         return mCurrentDisplayingFloorIndex;
     }
 
+    public void setCurrentDisplayingFloorIndex(int value)
+    {
+        Map currentMap = NavigateManager.getCurrentMap();
+        if (currentMap == null) return;
+        if (value < 0) return;
+        if (value > currentMap.getFloors().size() - 1) return;
+        mCurrentDisplayingFloorIndex = value;
+    }
+
     //endregion
 
     //region Methods
@@ -213,17 +192,16 @@ public class MapRenderer
     }
 
     /**
-     * Draw a link between two nodes
+     * Draw a line between two nodes
      *
      * @param canvas Canvas to draw
      * @param paint  Paint to use
      * @param start  Start node
      * @param end    End node
      */
-    private void drawLink(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull NodeBase start, final @NonNull NodeBase end)
+    private void drawLine(final @NonNull Canvas canvas, final @NonNull Paint paint, int width, final @NonNull NodeBase start, final @NonNull NodeBase end)
     {
-        mGuidePaint.setStrokeWidth(LINE_WIDTH * mCurrentZoomLevel);
-        mWallPaint.setStrokeWidth(LINE_WIDTH * mCurrentZoomLevel);
+        paint.setStrokeWidth(width * mCurrentZoomLevel);
         float startX = getRelativeX(start.getX());
         float startY = getRelativeY(start.getY());
         float endX = getRelativeX(end.getX());
@@ -240,20 +218,12 @@ public class MapRenderer
     private void drawLinks(final @NonNull Canvas canvas, final @NonNull Floor floor)
     {
         for (WallNode wallNode : floor.getWallNodes())
-        {
             for (NodeBase.Link link : wallNode.getLinks())
-            {
-                drawLink(canvas, mWallPaint, wallNode, link.getTarget());
-            }
-        }
+                drawLine(canvas, mWallPaint, LINE_WIDTH, wallNode, link.getTarget());
         if (!SettingsManager.isDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
-        {
             for (NodeBase.Link link : guideNode.getLinks())
-            {
-                drawLink(canvas, mGuidePaint, guideNode, link.getTarget());
-            }
-        }
+                drawLine(canvas, mGuidePaint, LINE_WIDTH, guideNode, link.getTarget());
     }
 
     /**
@@ -263,11 +233,11 @@ public class MapRenderer
      * @param paint  Paint to use
      * @param node   Target node
      */
-    private void drawNode(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull NodeBase node)
+    private void drawNode(final @NonNull Canvas canvas, final @NonNull Paint paint, int radius, final @NonNull NodeBase node)
     {
         float x = getRelativeX(node.getX());
         float y = getRelativeY(node.getY());
-        canvas.drawCircle(x, y, NODE_RADIUS * mCurrentZoomLevel, paint);
+        canvas.drawCircle(x, y, radius * mCurrentZoomLevel, paint);
     }
 
     /**
@@ -279,14 +249,12 @@ public class MapRenderer
     private void drawNodes(final @NonNull Canvas canvas, final @NonNull Floor floor)
     {
         for (WallNode wallNode : floor.getWallNodes())
-        {
-            drawNode(canvas, mWallPaint, wallNode);
-        }
+            drawNode(canvas, mWallPaint, NODE_RADIUS, wallNode);
+        if (UserNode.getInstance().getCurrentFloorIndex() == mCurrentDisplayingFloorIndex)
+            drawNode(canvas, mUserPaint, NODE_RADIUS * 2, UserNode.getInstance());
         if (!SettingsManager.isDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
-        {
-            drawNode(canvas, mGuidePaint, guideNode);
-        }
+            drawNode(canvas, mGuidePaint, NODE_RADIUS, guideNode);
     }
 
     /**
@@ -312,12 +280,13 @@ public class MapRenderer
      */
     private void drawPath(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull Path path, int startIndex, int endIndex)
     {
-        if (startIndex < 0 || endIndex >= path.getSize() - 1 || startIndex > endIndex) return;
+        if (startIndex < 0 || endIndex >= path.getSize() || startIndex > endIndex) return;
         PathNode prevNode = null;
         for (; startIndex < endIndex; startIndex++)
         {
             PathNode curNode = path.getNodes().get(startIndex);
-            if (prevNode != null) drawLink(canvas, paint, prevNode, curNode);
+            if (prevNode != null) drawLine(canvas, paint, LINE_WIDTH, prevNode, curNode);
+            drawNode(canvas, paint, NODE_RADIUS, curNode);
             prevNode = curNode;
         }
     }
@@ -331,6 +300,11 @@ public class MapRenderer
     {
         Path navigatePath = NavigateManager.getCurrentGuidePath();
         if (navigatePath != null) drawPath(canvas, mGuidePaint, navigatePath);
+        if (DebugManager.isTrackPathEnabled())
+        {
+            List<Path> userPaths = NavigateManager.getUserPaths(mCurrentDisplayingFloorIndex);
+            if (userPaths != null) for (Path path : userPaths) drawPath(canvas, mUserPathPaint, path);
+        }
     }
 
     /**
@@ -397,22 +371,43 @@ public class MapRenderer
 
             // mBackgroundPaint
             mBackgroundPaint = new Paint();
-            mBackgroundPaint.setColor(BACKGROUND_COLOR);
+            mBackgroundPaint.setColor(ContextCompat.getColor(getContext(), R.color.renderer_background));
             mBackgroundPaint.setStyle(Paint.Style.FILL);
 
             // mGuidePaint
             mGuidePaint = new Paint();
-            mGuidePaint.setColor(GUIDE_COLOR);
+            mGuidePaint.setColor(ContextCompat.getColor(getContext(), R.color.renderer_guide_color));
 
             // mWallPaint
             mWallPaint = new Paint();
-            mWallPaint.setColor(WALL_COLOR);
+            mWallPaint.setColor(ContextCompat.getColor(getContext(), R.color.renderer_wall_color));
+
+            // mUserPaint
+            mUserPaint = new Paint();
+            mUserPaint.setColor(ContextCompat.getColor(getContext(), R.color.renderer_user_color));
+
+            // mUserPathPaint
+            mUserPathPaint = new Paint();
+            mUserPathPaint.setColor(ContextCompat.getColor(getContext(), R.color.renderer_user_path_color));
 
             // mLookAt
             mLookAt = new Point();
 
-            // mUpdateTask
-            new Thread(mUpdateTask).start();
+            NavigateManager.addOnUpdateListener(new NavigateManager.OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    invoke(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            flush();
+                        }
+                    });
+                }
+            });
 
             setWillNotDraw(false);
         }
@@ -424,14 +419,25 @@ public class MapRenderer
     }
 
     /**
-     * Move "eyes" to specified location
+     * Clip the offsets and move "eyes" to specified location
      *
-     * @param x X axis
-     * @param y Y axis
+     * @param xOffset X-axis offset
+     * @param yOffset Y-axis offset
      */
-    private void lookAt(int x, int y)
+    private void moveEye(float xOffset, float yOffset)
     {
-        mLookAt.set(x, y);
+        Floor floor;
+        if ((floor = getDisplayingFloor()) == null) return;
+
+        int newX = mLookAt.x += xOffset / mCurrentZoomLevel;
+        int newY = mLookAt.y += yOffset / mCurrentZoomLevel;
+
+        if (newX < 0) newX = 0;
+        if (newX > floor.getWidth() * mCurrentZoomLevel) newX = (int) (floor.getWidth() * mCurrentZoomLevel);
+        if (newY < 0) newY = 0;
+        if (newY > floor.getHeight() * mCurrentZoomLevel) newY = (int) (floor.getHeight() * mCurrentZoomLevel);
+
+        mLookAt.set(newX, newY);
         flush();
     }
 
@@ -489,25 +495,19 @@ public class MapRenderer
     }
 
     /**
-     * Clip the offsets and move "eyes" to specified location
+     * Invoke a method on UI thread
      *
-     * @param xOffset X-axis offset
-     * @param yOffset Y-axis offset
+     * @param runnable Method to run on UI thread
      */
-    public void moveEye(float xOffset, float yOffset)
+    public void invoke(final Runnable runnable)
     {
-        Floor floor;
-        if ((floor = getDisplayingFloor()) == null) return;
+        post(runnable);
+    }
 
-        int newX = mLookAt.x += xOffset / mCurrentZoomLevel;
-        int newY = mLookAt.y += yOffset / mCurrentZoomLevel;
-
-        if (newX < 0) newX = 0;
-        if (newX > floor.getWidth() * mCurrentZoomLevel) newX = (int) (floor.getWidth() * mCurrentZoomLevel);
-        if (newY < 0) newY = 0;
-        if (newY > floor.getHeight() * mCurrentZoomLevel) newY = (int) (floor.getHeight() * mCurrentZoomLevel);
-
-        lookAt(newX, newY);
+    public void lookAt(int x, int y)
+    {
+        mLookAt.x = x;
+        mLookAt.y = y;
     }
 
     //endregion

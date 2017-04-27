@@ -10,6 +10,7 @@ import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
 import cn.vicey.navigator.Managers.AlertManager;
 import cn.vicey.navigator.Managers.NavigateManager;
+import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
@@ -29,17 +30,9 @@ public class NavigateView
 
     //endregion
 
-    //region Fields
-
-    private MapRenderer  mMapRenderer; // Map renderer
-    private MainActivity mParent;      // Parent activity
-    private ViewFlipper  mViewFlipper; // View flipper
-
-    //endregion
-
     //region Listeners
 
-    private OnClickListener mDownstairsButtonOnClickListener = new OnClickListener() // Downstairs button click listener
+    private final OnClickListener mOnDownstairsButtonClickListener = new OnClickListener() // Downstairs button click listener
     {
         @Override
         public void onClick(View view)
@@ -50,7 +43,24 @@ public class NavigateView
             flush();
         }
     };
-    private OnClickListener mUpstairsButtonOnClickListener   = new OnClickListener() // Upstairs button click listener
+    private final OnClickListener mOnLocationButtonClickListener   = new OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            if (NavigateManager.getCurrentMap() == null)
+            {
+                AlertManager.alert(R.string.no_loaded_map);
+                return;
+            }
+            int floorIndex = UserNode.getInstance().getCurrentFloorIndex();
+            if (mMapRenderer.getCurrentDisplayingFloorIndex() != floorIndex)
+                mMapRenderer.setCurrentDisplayingFloorIndex(floorIndex);
+            mMapRenderer.lookAt(UserNode.getInstance().getX(), UserNode.getInstance().getY());
+            mMapRenderer.flush();
+        }
+    };
+    private final OnClickListener mOnUpstairsButtonClickListener   = new OnClickListener() // Upstairs button click listener
     {
         @Override
         public void onClick(View view)
@@ -61,6 +71,14 @@ public class NavigateView
             flush();
         }
     };
+
+    //endregion
+
+    //region Fields
+
+    private MapRenderer  mMapRenderer; // Map renderer
+    private MainActivity mParent;      // Parent activity
+    private ViewFlipper  mViewFlipper; // View flipper
 
     //endregion
 
@@ -78,6 +96,10 @@ public class NavigateView
         init();
     }
 
+    //endregion
+
+    //region Methods
+
     /**
      * Initialize view
      */
@@ -93,11 +115,15 @@ public class NavigateView
 
             // upstairsButton
             FloatingActionButton upstairsButton = (FloatingActionButton) findViewById(R.id.nv_upstairs_button);
-            upstairsButton.setOnClickListener(mUpstairsButtonOnClickListener);
+            upstairsButton.setOnClickListener(mOnUpstairsButtonClickListener);
 
             // downstairsButton
             FloatingActionButton downStairsButton = (FloatingActionButton) findViewById(R.id.nv_downstairs_button);
-            downStairsButton.setOnClickListener(mDownstairsButtonOnClickListener);
+            downStairsButton.setOnClickListener(mOnDownstairsButtonClickListener);
+
+            // locationButton
+            FloatingActionButton locationButton = (FloatingActionButton) findViewById(R.id.nv_location_button);
+            locationButton.setOnClickListener(mOnLocationButtonClickListener);
 
             // placeholder
             View placeholder = mParent.getLayoutInflater().inflate(R.layout.cmpt_placeholder, null);
