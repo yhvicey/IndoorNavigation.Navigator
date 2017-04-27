@@ -2,8 +2,10 @@ package cn.vicey.navigator.Components;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -11,14 +13,27 @@ import cn.vicey.navigator.R;
 import cn.vicey.navigator.Utils.Logger;
 
 /**
- * Settings item class, provides a checkable item for settings view
+ * Settings check box class, provides a checkable item for settings view
  */
-public class SettingsItem
+public class SettingsCheckBox
         extends LinearLayout
 {
     //region Constants
 
     private static final String LOGGER_TAG = "SettingsItem";
+
+    //endregion
+
+    //region Listeners
+
+    private final OnClickListener mOnTextClickListener = new OnClickListener()
+    {
+        @Override
+        public void onClick(View view)
+        {
+            mCheckBox.setChecked(!mCheckBox.isChecked());
+        }
+    };
 
     //endregion
 
@@ -32,22 +47,22 @@ public class SettingsItem
     //region Constructors
 
     /**
-     * Initialize new instance of class {@link SettingsItem}
+     * Initialize new instance of class {@link SettingsCheckBox}
      *
      * @param context Related context
      */
-    public SettingsItem(Context context)
+    public SettingsCheckBox(Context context)
     {
         this(context, null);
     }
 
     /**
-     * Initialize new instance of class {@link SettingsItem}
+     * Initialize new instance of class {@link SettingsCheckBox}
      *
      * @param context Related context
      * @param attrs   Xml file attributes
      */
-    public SettingsItem(Context context, AttributeSet attrs)
+    public SettingsCheckBox(Context context, AttributeSet attrs)
     {
         super(context, attrs, 0);
         init(attrs);
@@ -88,6 +103,16 @@ public class SettingsItem
     }
 
     /**
+     * Sets {@link CheckBox.OnCheckedChangeListener} for this settings check box
+     *
+     * @param value Listener to set
+     */
+    public void setOnCheckedChangeListener(final @NonNull CheckBox.OnCheckedChangeListener value)
+    {
+        mCheckBox.setOnCheckedChangeListener(value);
+    }
+
+    /**
      * Sets the item text
      *
      * @param resId Item text string resource id
@@ -121,13 +146,14 @@ public class SettingsItem
         try
         {
             // Inflate layout
-            LayoutInflater.from(getContext()).inflate(R.layout.cmpt_settings_item, this, true);
+            LayoutInflater.from(getContext()).inflate(R.layout.cmpt_settings_check_box, this, true);
 
             // mCheckBox
-            mCheckBox = (CheckBox) findViewById(R.id.si_checkBox);
+            mCheckBox = (CheckBox) findViewById(R.id.scb_checkBox);
 
             // mTextView
-            mTextView = (TextView) findViewById(R.id.si_textView);
+            mTextView = (TextView) findViewById(R.id.scb_textView);
+            mTextView.setOnClickListener(mOnTextClickListener);
 
             if (attrs == null) return;
 

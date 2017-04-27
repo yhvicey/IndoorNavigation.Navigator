@@ -1,22 +1,21 @@
-<LinearLayout
+<RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         style="@style/Navigator.Component"
         android:orientation="horizontal"
         android:gravity="start">
 
     <TextView
-            android:id="@+id/si_textView"
-            android:layout_width="0dp"
+            style="@style/Navigator.SettingsView.Item"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:paddingStart="@dimen/middle_spacing"
-            android:paddingEnd="@dimen/middle_spacing"
+            android:id="@+id/scb_textView"
+            android:layout_toStartOf="@+id/scb_checkBox"
             android:gravity="start|center"
             android:text=""/>
 
     <CheckBox
-            android:id="@+id/si_checkBox"
+            android:id="@+id/scb_checkBox"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"/>
 
-</LinearLayout>
+</RelativeLayout>
