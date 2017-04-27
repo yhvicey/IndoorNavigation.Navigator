@@ -20,7 +20,9 @@ import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.NodeType;
+import cn.vicey.navigator.Models.Nodes.PathNode;
 import cn.vicey.navigator.Models.Nodes.WallNode;
+import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.ListViewAdapter;
@@ -267,7 +269,48 @@ public class MapRenderer
         for (GuideNode guideNode : floor.getGuideNodes())
         {
             drawNode(canvas, guideNode);
+    /**
+     * Draw a path
+     *
+     * @param canvas Canvas to draw
+     * @param paint  Paint to use
+     * @param path   Path to draw
+     */
+    private void drawPath(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull Path path)
+    {
+        drawPath(canvas, paint, path, 0, path.getSize() - 1);
+    }
+
+    /**
+     * Draw a path
+     *
+     * @param canvas     Canvas to draw
+     * @param paint      Paint to use
+     * @param path       Path to draw
+     * @param startIndex Path's start index for drawing
+     * @param endIndex   Path's end index for drawing
+     */
+    private void drawPath(final @NonNull Canvas canvas, final @NonNull Paint paint, final @NonNull Path path, int startIndex, int endIndex)
+    {
+        if (startIndex < 0 || endIndex >= path.getSize() - 1 || startIndex > endIndex) return;
+        PathNode prevNode = null;
+        for (; startIndex < endIndex; startIndex++)
+        {
+            PathNode curNode = path.getNodes().get(startIndex);
+            if (prevNode != null) drawLink(canvas, paint, prevNode, curNode);
+            prevNode = curNode;
         }
+    }
+
+    /**
+     * Draw current paths
+     *
+     * @param canvas Canvas to draw
+     */
+    private void drawPaths(final @NonNull Canvas canvas)
+    {
+        Path navigatePath = NavigateManager.getCurrentGuidePath();
+        if (navigatePath != null) drawPath(canvas, mGuidePaint, navigatePath);
     }
 
     /**
@@ -459,6 +502,7 @@ public class MapRenderer
 
             drawNodes(canvas, floor);
             drawLinks(canvas, floor);
+            drawPaths(canvas);
         }
         catch (Throwable t)
         {
