@@ -55,6 +55,17 @@ public class Path
     //region Accessors
 
     /**
+     * Gets path's end node
+     *
+     * @return End node, or null if the path is empty
+     */
+    public PathNode getEnd()
+    {
+        if (mNodes.isEmpty()) return null;
+        return mNodes.get(mNodes.size() - 1);
+    }
+
+    /**
      * Gets path length
      *
      * @return Path length
@@ -82,6 +93,17 @@ public class Path
     public int getSize()
     {
         return mNodes.size();
+    }
+
+    /**
+     * Gets path's start node
+     *
+     * @return Start node, or null if the path is empty
+     */
+    public PathNode getStart()
+    {
+        if (mNodes.isEmpty()) return null;
+        return mNodes.get(0);
     }
 
     //endregion
