@@ -93,7 +93,7 @@ public final class NavigateManager
                             // Current task finished
                             cancelNavigate();
                             AlertManager.alert(R.string.navigation_finished);
-                            break;
+                            continue;
                         }
 
                         // Get guide path and append user node to it
