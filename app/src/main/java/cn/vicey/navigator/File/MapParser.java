@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Map;
+package cn.vicey.navigator.File;
 
 import android.support.annotation.NonNull;
 import android.util.Xml;

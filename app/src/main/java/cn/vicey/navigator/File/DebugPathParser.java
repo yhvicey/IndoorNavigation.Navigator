@@ -1,7 +1,8 @@
-package cn.vicey.navigator.Debug;
+package cn.vicey.navigator.File;
 
 import android.support.annotation.NonNull;
 import android.util.Xml;
+import cn.vicey.navigator.Debug.DebugPath;
 import cn.vicey.navigator.Models.Nodes.PathNode;
 import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.Utils.Logger;

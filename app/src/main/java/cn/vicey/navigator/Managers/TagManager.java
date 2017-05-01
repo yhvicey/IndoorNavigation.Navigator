@@ -1,8 +1,8 @@
 package cn.vicey.navigator.Managers;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Map.TagParser;
-import cn.vicey.navigator.Map.TagSaver;
+import cn.vicey.navigator.File.TagParser;
+import cn.vicey.navigator.File.TagSaver;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Utils.Logger;
