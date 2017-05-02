@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import cn.vicey.navigator.Managers.TypefaceManager;
 import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.TypefaceManager;
 import cn.vicey.navigator.Utils.Logger;
 
 /**

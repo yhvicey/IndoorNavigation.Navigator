@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.Share;
 
 import android.content.res.AssetManager;
 import android.graphics.Typeface;

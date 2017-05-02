@@ -1,7 +1,6 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.File;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.File.MapParser;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Utils.Logger;

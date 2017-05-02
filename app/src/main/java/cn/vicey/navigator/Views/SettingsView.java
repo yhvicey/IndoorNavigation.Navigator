@@ -9,11 +9,11 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.SettingsCheckBox;
-import cn.vicey.navigator.Managers.AlertManager;
-import cn.vicey.navigator.Managers.DebugManager;
-import cn.vicey.navigator.Managers.SettingsManager;
+import cn.vicey.navigator.Debug.DebugManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.AlertManager;
+import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Utils.Logger;
 
 /**

@@ -1,11 +1,11 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.Debug;
 
 import android.graphics.Point;
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Debug.DebugPath;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Nodes.DebugPathNode;
+import cn.vicey.navigator.Navigate.NavigateManager;
 
 import java.util.Date;
 import java.util.Random;

@@ -1,5 +1,6 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.Debug;
 
+import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Utils.Logger;
 
 /**
@@ -9,7 +10,7 @@ public final class DebugManager
 {
     //region Constants
 
-    private static final String LOGGER_TAG = "DebugManager";
+    private static final String LOGGER_TAG = "DebugFileManager";
 
     //endregion
 

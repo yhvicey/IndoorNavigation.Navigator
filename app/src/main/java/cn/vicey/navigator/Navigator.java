@@ -1,7 +1,11 @@
 package cn.vicey.navigator;
 
 import android.app.Application;
-import cn.vicey.navigator.Managers.*;
+import cn.vicey.navigator.File.MapManager;
+import cn.vicey.navigator.File.TagManager;
+import cn.vicey.navigator.Navigate.NavigateManager;
+import cn.vicey.navigator.Share.SettingsManager;
+import cn.vicey.navigator.Share.TypefaceManager;
 import cn.vicey.navigator.Utils.Logger;
 
 import java.util.Date;

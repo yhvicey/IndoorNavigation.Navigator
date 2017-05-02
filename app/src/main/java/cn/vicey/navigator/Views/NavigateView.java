@@ -8,11 +8,11 @@ import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
-import cn.vicey.navigator.Managers.AlertManager;
-import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Models.Nodes.UserNode;
+import cn.vicey.navigator.Navigate.NavigateManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.AlertManager;
 import cn.vicey.navigator.Utils.Logger;
 
 /**

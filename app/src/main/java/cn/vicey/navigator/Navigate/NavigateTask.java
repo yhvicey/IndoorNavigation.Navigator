@@ -1,7 +1,6 @@
 package cn.vicey.navigator.Navigate;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Managers.NavigateManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.NodeBase;

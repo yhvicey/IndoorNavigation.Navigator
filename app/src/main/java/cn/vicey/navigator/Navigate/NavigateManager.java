@@ -1,15 +1,15 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.Navigate;
 
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
+import cn.vicey.navigator.Debug.DebugManager;
+import cn.vicey.navigator.Debug.FakeLocateManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.UserNode;
-import cn.vicey.navigator.Navigate.FloorNavigator;
-import cn.vicey.navigator.Navigate.NavigateTask;
-import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.AlertManager;
 import cn.vicey.navigator.Utils.Logger;
 
 import java.util.ArrayList;

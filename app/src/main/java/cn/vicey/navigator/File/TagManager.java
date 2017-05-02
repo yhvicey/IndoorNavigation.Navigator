@@ -1,8 +1,6 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.File;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.File.TagParser;
-import cn.vicey.navigator.File.TagSaver;
 import cn.vicey.navigator.Models.Tag;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.Utils.Logger;
@@ -77,14 +75,14 @@ public class TagManager
             mTagDir = new File(Navigator.getFilesDirPath() + TAG_DIR);
             if (!(mTagDir.exists() || mTagDir.mkdir()))
             {
-                Logger.error(LOGGER_TAG, "Failed to init map manager. Can not init tag directory.");
+                Logger.error(LOGGER_TAG, "Failed to init tag manager. Can not init tag directory.");
                 return false;
             }
             return true;
         }
         catch (Throwable t)
         {
-            Logger.error(LOGGER_TAG, "Failed to init map manager.", t);
+            Logger.error(LOGGER_TAG, "Failed to init tag manager.", t);
             return false;
         }
     }

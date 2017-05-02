@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.Navigate;
 
 import android.graphics.Point;
 

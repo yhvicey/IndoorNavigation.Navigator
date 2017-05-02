@@ -9,13 +9,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import cn.vicey.navigator.Activities.MainActivity;
-import cn.vicey.navigator.Managers.AlertManager;
-import cn.vicey.navigator.Managers.MapManager;
-import cn.vicey.navigator.Managers.NavigateManager;
-import cn.vicey.navigator.Managers.TagManager;
+import cn.vicey.navigator.File.MapManager;
+import cn.vicey.navigator.File.TagManager;
 import cn.vicey.navigator.Models.Tag;
+import cn.vicey.navigator.Navigate.NavigateManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
+import cn.vicey.navigator.Share.AlertManager;
 import cn.vicey.navigator.Share.ListViewAdapter;
 import cn.vicey.navigator.Utils.Logger;
 

@@ -1,8 +1,8 @@
 package cn.vicey.navigator.Models.Nodes;
 
-import cn.vicey.navigator.Managers.DebugManager;
-import cn.vicey.navigator.Managers.FakeLocateManager;
-import cn.vicey.navigator.Managers.LocateManager;
+import cn.vicey.navigator.Debug.DebugManager;
+import cn.vicey.navigator.Debug.FakeLocateManager;
+import cn.vicey.navigator.Navigate.LocateManager;
 
 /**
  * User node

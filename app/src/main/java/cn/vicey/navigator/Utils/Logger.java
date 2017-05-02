@@ -1,8 +1,8 @@
 package cn.vicey.navigator.Utils;
 
 import android.util.Log;
-import cn.vicey.navigator.Managers.SettingsManager;
 import cn.vicey.navigator.Navigator;
+import cn.vicey.navigator.Share.SettingsManager;
 
 import java.io.*;
 import java.util.Locale;

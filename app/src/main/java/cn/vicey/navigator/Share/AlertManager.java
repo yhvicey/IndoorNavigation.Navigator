@@ -1,4 +1,4 @@
-package cn.vicey.navigator.Managers;
+package cn.vicey.navigator.Share;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;
