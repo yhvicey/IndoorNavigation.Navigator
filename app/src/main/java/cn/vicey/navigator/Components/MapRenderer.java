@@ -38,13 +38,11 @@ public class MapRenderer
 
     private static final String LOGGER_TAG = "MapRenderer";
 
-    private static final int LINE_WIDTH      = 8;    // Line width
-    private static final int MAX_ERROR_COUNT = 3;    // Max error count
-    private static final int NODE_RADIUS     = 4;    // Node radius
-    private static final int UPDATE_INTERNAL = 1000; // Update internal in milliseconds
-    private static final int ZOOM_LEVEL_MAX  = 10;   // Max zoom level
-    private static final int ZOOM_LEVEL_MIN  = 1;    // Min zoom level
-    private static final int ZOOM_SPEED      = 200;  // Zoom speed
+    private static final int LINE_WIDTH     = 8;   // Line width
+    private static final int NODE_RADIUS    = 4;   // Node radius
+    private static final int ZOOM_LEVEL_MAX = 10;  // Max zoom level
+    private static final int ZOOM_LEVEL_MIN = 1;   // Min zoom level
+    private static final int ZOOM_SPEED     = 200; // Zoom speed
 
     //endregion
 
@@ -103,7 +101,6 @@ public class MapRenderer
     //region Fields
 
     private Paint                      mBackgroundPaint;      // Paint for background
-    private int                        mErrorCount;           // Error count
     private Paint                      mGuidePaint;           // Paint for guide nodes and lines
     private int                        mHalfHeight;           // Half of the component height
     private int                        mHalfWidth;            // Half of the component width
