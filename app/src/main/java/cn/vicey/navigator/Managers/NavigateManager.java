@@ -74,6 +74,9 @@ public final class NavigateManager
                     // Check floor index
                     if (mLastFloorIndex != floorIndex) onFloorChanged(floorIndex);
 
+                    // If is using fake location then update user node's location
+                    if (DebugManager.isUseFakeLocationEnabled()) FakeLocateManager.update();
+
                     // If is navigating then update the task
                     if (mIsNavigating)
                     {
