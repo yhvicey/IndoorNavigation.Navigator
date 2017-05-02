@@ -67,7 +67,7 @@ public class UserNode
      */
     public int getCurrentFloorIndex()
     {
-        return DebugManager.isUseFakeLocation() ? FakeLocateManager.getCurrentFloorIndex() : LocateManager.getCurrentFloorIndex();
+        return DebugManager.isUseFakeLocationEnabled() ? FakeLocateManager.getCurrentFloorIndex() : LocateManager.getCurrentFloorIndex();
     }
 
     /**
@@ -89,7 +89,7 @@ public class UserNode
     @Override
     public int getX()
     {
-        return DebugManager.isUseFakeLocation() ? FakeLocateManager.getCurrentLocation().x : LocateManager.getCurrentLocation().x;
+        return DebugManager.isUseFakeLocationEnabled() ? FakeLocateManager.getCurrentLocation().x : LocateManager.getCurrentLocation().x;
     }
 
     /**
@@ -100,7 +100,7 @@ public class UserNode
     @Override
     public int getY()
     {
-        return DebugManager.isUseFakeLocation() ? FakeLocateManager.getCurrentLocation().y : LocateManager.getCurrentLocation().y;
+        return DebugManager.isUseFakeLocationEnabled() ? FakeLocateManager.getCurrentLocation().y : LocateManager.getCurrentLocation().y;
     }
 
     //endregion

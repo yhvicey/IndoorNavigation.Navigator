@@ -15,8 +15,8 @@ public final class DebugManager
 
     //region Static fields
 
-    private static boolean mUseFakeLocationEnabled; // Whether the user node should use fake location
-    private static boolean mTrackPathEnabled;       // Whether the application should record user's path
+    private static boolean mTrackPathEnabled;         // Whether the application should record user's path
+    private static boolean mUseFakeLocationEnabled;   // Whether the user node should use fake location
 
     //endregion
 
@@ -37,7 +37,7 @@ public final class DebugManager
      *
      * @return Whether the user node should use fake location
      */
-    public static boolean isUseFakeLocation()
+    public static boolean isUseFakeLocationEnabled()
     {
         return mUseFakeLocationEnabled;
     }
@@ -60,7 +60,7 @@ public final class DebugManager
      *
      * @param value Whether the user node should use fake location
      */
-    public static void setUseFakeLocation(boolean value)
+    public static void setUseFakeLocationEnabled(boolean value)
     {
         if (!SettingsManager.isDebugModeEnabled()) return;
         mUseFakeLocationEnabled = value;
