@@ -17,6 +17,7 @@ public final class DebugManager
 
     private static boolean mTrackPathEnabled;         // Whether the application should record user's path
     private static boolean mUseFakeLocationEnabled;   // Whether the user node should use fake location
+    private static boolean mUseRandomLocationEnabled; // Whether the user node should use random location
 
     //endregion
 
@@ -43,6 +44,16 @@ public final class DebugManager
     }
 
     /**
+     * Gets whether the user node should use random location
+     *
+     * @return Whether the user node should use random location
+     */
+    public static boolean isUseRandomLocationEnabled()
+    {
+        return mUseRandomLocationEnabled;
+    }
+
+    /**
      * Sets whether the application should record user's path
      *
      * @param value Whether the application should record user's path
@@ -66,6 +77,19 @@ public final class DebugManager
         mUseFakeLocationEnabled = value;
         if (value) Logger.debug(LOGGER_TAG, "Use fake location enabled.");
         else Logger.debug(LOGGER_TAG, "Use fake location disabled.");
+    }
+
+    /**
+     * Sets whether the user node should use random location
+     *
+     * @param value Whether the user node should use random location
+     */
+    public static void setUseRandomLocationEnabled(boolean value)
+    {
+        if (!SettingsManager.isDebugModeEnabled()) return;
+        mUseRandomLocationEnabled = value;
+        if (value) Logger.debug(LOGGER_TAG, "Use random location enabled.");
+        else Logger.debug(LOGGER_TAG, "Use random location disabled.");
     }
 
     //endregion
