@@ -21,11 +21,14 @@
     <string name="load_from_net">从网络加载</string>
     <string name="load_tags">载入标签</string>
     <string name="save_tags">保存标签</string>
-    <string name="show_log">显示日志</string>
-    <string name="disable_debug_mode">关闭开发者模式</string>
     <string name="input_target_name">输入目标名</string>
     <string name="use_fake_location">使用虚假位置</string>
+    <string name="use_random_location">使用随机位置</string>
+    <string name="use_debug_path">使用调试路径</string>
+    <string name="edit_debug_path">编辑调试路径</string>
     <string name="track_path">记录路径</string>
+    <string name="show_log">显示日志</string>
+    <string name="disable_debug_mode">关闭开发者模式</string>
 
     <!--   Notification texts   -->
     <string name="load_succeed">加载成功</string>

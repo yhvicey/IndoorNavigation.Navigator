@@ -4,7 +4,9 @@ import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.TextView;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.SettingsCheckBox;
 import cn.vicey.navigator.Managers.AlertManager;
@@ -28,15 +30,27 @@ public class SettingsView
 
     //region Fields
 
-    private MainActivity     mParent;                  // Parent activity
-    private SettingsCheckBox mTrackPathCheckBox;       // Track path check box
-    private SettingsCheckBox mUseFakeLocationCheckBox; // Use fake location check box
+    private TextView         mEditDebugPathTextView;     // Edit debug path text view
+    private LinearLayout     mFakeLocationPanel;         // Fake location panel
+    private MainActivity     mParent;                    // Parent activity
+    private SettingsCheckBox mTrackPathCheckBox;         // Track path check box
+    private SettingsCheckBox mUseDebugPathCheckBox;      // Use debug path check box
+    private SettingsCheckBox mUseFakeLocationCheckBox;   // Use fake location check box
+    private SettingsCheckBox mUseRandomLocationCheckBox; // Use Random location check box
 
     //endregion
 
     //region Listeners
 
-    private OnClickListener                        mOnDisableDebugModeTextViewClick        = new OnClickListener()                        // Listener for disable debug mode text view click event
+    private OnClickListener                        mOnEditDebugPathTextViewClick             = new OnClickListener()                        // Listener for edit debug path text view click event
+    {
+        @Override
+        public void onClick(View view)
+        {
+            // TODO: Edit debug path
+        }
+    };
+    private OnClickListener                        mOnDisableDebugModeTextViewClick          = new OnClickListener()                        // Listener for disable debug mode text view click event
     {
         @Override
         public void onClick(View view)
@@ -53,7 +67,7 @@ public class SettingsView
             }
         }
     };
-    private OnClickListener                        mOnShowLogTextViewClick                 = new OnClickListener()                        // Listener for show log text view click event
+    private OnClickListener                        mOnShowLogTextViewClick                   = new OnClickListener()                        // Listener for show log text view click event
     {
         @Override
         public void onClick(View view)
@@ -69,7 +83,7 @@ public class SettingsView
             }
         }
     };
-    private CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener       = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener         = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -77,12 +91,42 @@ public class SettingsView
             DebugManager.setTrackPathEnabled(b);
         }
     };
-    private CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private CompoundButton.OnCheckedChangeListener mOnUseDebugPathCheckedChangeListener      = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
-            DebugManager.setUseFakeLocation(b);
+            DebugManager.setUseRandomLocationEnabled(!b);
+            if (b)
+            {
+                mEditDebugPathTextView.setVisibility(View.VISIBLE);
+                mUseRandomLocationCheckBox.setChecked(false);
+            }
+            else mEditDebugPathTextView.setVisibility(View.GONE);
+        }
+    };
+    private CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener   = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+        {
+            DebugManager.setUseFakeLocationEnabled(b);
+            if (b) mFakeLocationPanel.setVisibility(View.VISIBLE);
+            else mFakeLocationPanel.setVisibility(View.GONE);
+        }
+    };
+    private CompoundButton.OnCheckedChangeListener mOnUseRandomLocationCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+        {
+            DebugManager.setUseRandomLocationEnabled(b);
+            if (!b) mEditDebugPathTextView.setVisibility(View.VISIBLE);
+            else
+            {
+                mEditDebugPathTextView.setVisibility(View.GONE);
+                mUseDebugPathCheckBox.setChecked(false);
+            }
         }
     };
 
@@ -116,21 +160,36 @@ public class SettingsView
             // Inflate layout
             LayoutInflater.from(mParent).inflate(R.layout.view_settings, this, true);
 
-            // disableDebugModeTextView
-            View disableDebugModeTextView = findViewById(R.id.sv_debug_disable_debug_mode);
-            disableDebugModeTextView.setOnClickListener(mOnDisableDebugModeTextViewClick);
+            // mUseFakeLocationCheckBox
+            mUseFakeLocationCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_use_fake_location);
+            mUseFakeLocationCheckBox.setOnCheckedChangeListener(mOnUseFakeLocationCheckedChangeListener);
 
-            // showLogTextView
-            View showLogTextView = findViewById(R.id.sv_debug_show_log);
-            showLogTextView.setOnClickListener(mOnShowLogTextViewClick);
+            // mFakeLocationPanel
+            mFakeLocationPanel = (LinearLayout) findViewById(R.id.sv_debug_fake_location_panel);
+
+            // mUseRandomLocationCheckBox
+            mUseRandomLocationCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_use_random_location);
+            mUseRandomLocationCheckBox.setOnCheckedChangeListener(mOnUseRandomLocationCheckedChangeListener);
+
+            // mUseDebugPathCheckBox
+            mUseDebugPathCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_use_debug_path);
+            mUseDebugPathCheckBox.setOnCheckedChangeListener(mOnUseDebugPathCheckedChangeListener);
+
+            // mEditDebugPathTextView
+            mEditDebugPathTextView = (TextView) findViewById(R.id.sv_debug_edit_debug_path);
+            mEditDebugPathTextView.setOnClickListener(mOnEditDebugPathTextViewClick);
 
             // mTrackPathCheckBox
             mTrackPathCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_track_path);
             mTrackPathCheckBox.setOnCheckedChangeListener(mOnTrackPathCheckedChangeListener);
 
-            // mUseFakeLocationCheckBox
-            mUseFakeLocationCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_use_fake_location);
-            mUseFakeLocationCheckBox.setOnCheckedChangeListener(mOnUseFakeLocationCheckedChangeListener);
+            // showLogTextView
+            View showLogTextView = findViewById(R.id.sv_debug_show_log);
+            showLogTextView.setOnClickListener(mOnShowLogTextViewClick);
+
+            // disableDebugModeTextView
+            View disableDebugModeTextView = findViewById(R.id.sv_debug_disable_debug_mode);
+            disableDebugModeTextView.setOnClickListener(mOnDisableDebugModeTextViewClick);
         }
         catch (Throwable t)
         {
@@ -155,7 +214,7 @@ public class SettingsView
         mTrackPathCheckBox.setChecked(DebugManager.isTrackPathEnabled());
 
         // mUseFakeLocationCheckBox
-        mUseFakeLocationCheckBox.setChecked(DebugManager.isUseFakeLocation());
+        mUseFakeLocationCheckBox.setChecked(DebugManager.isUseFakeLocationEnabled());
     }
 
     //endregion
