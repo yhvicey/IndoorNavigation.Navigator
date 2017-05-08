@@ -54,7 +54,8 @@
                         android:id="@+id/sv_debug_use_random_location"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/middle_item_height"
-                        app:text="@string/use_random_location"/>
+                        app:text="@string/use_random_location"
+                        app:checked="true"/>
 
                 <cn.vicey.navigator.Components.SettingsCheckBox
                         android:id="@+id/sv_debug_use_debug_path"
@@ -62,11 +63,31 @@
                         android:layout_height="@dimen/middle_item_height"
                         app:text="@string/use_debug_path"/>
 
-                <TextView
-                        style="@style/Navigator.SettingsView.Item"
-                        android:id="@+id/sv_debug_edit_debug_path"
-                        android:text="@string/edit_debug_path"
-                        android:visibility="gone"/>
+                <LinearLayout
+                        android:id="@+id/sv_debug_debug_path_panel"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="@dimen/middle_spacing"
+                        android:paddingEnd="0dp"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                    <TextView
+                            style="@style/Navigator.SettingsView.Item"
+                            android:id="@+id/sv_debug_edit_debug_path"
+                            android:text="@string/edit_debug_path"/>
+
+                    <TextView
+                            style="@style/Navigator.SettingsView.Item"
+                            android:id="@+id/sv_debug_start_emulating"
+                            android:text="@string/start_emulating"/>
+
+                    <TextView
+                            style="@style/Navigator.SettingsView.Item"
+                            android:id="@+id/sv_debug_stop_emulating"
+                            android:text="@string/stop_emulating"/>
+
+                </LinearLayout>
 
             </LinearLayout>
 

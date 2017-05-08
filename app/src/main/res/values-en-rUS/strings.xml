@@ -26,6 +26,8 @@
     <string name="use_random_location">Use random location</string>
     <string name="use_debug_path">Use debug path</string>
     <string name="edit_debug_path">Edit debug path</string>
+    <string name="start_emulating">Start emulating</string>
+    <string name="stop_emulating">Stop emulating</string>
     <string name="track_path">Track path</string>
     <string name="show_log">Show log</string>
     <string name="disable_debug_mode">Disable debug mode</string>
@@ -58,6 +60,7 @@
     <string name="click_to_switch_floor">Click direction button to switch floor</string>
     <string name="starting_navigation">Starting navigation…</string>
     <string name="navigation_finished">Navigation finished</string>
+    <string name="no_debug_path">No debug path</string>
 
     <!--   Unformatted texts   -->
     <string name="debug_mode_notification" formatted="false">%d more clicks to enable debug mode</string>

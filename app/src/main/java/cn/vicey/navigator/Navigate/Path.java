@@ -5,7 +5,6 @@ import cn.vicey.navigator.Models.Nodes.NodeBase;
 import cn.vicey.navigator.Models.Nodes.PathNode;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -210,7 +209,7 @@ public class Path
     {
         Path newPath = new Path(null);
         newPath.mLength = mLength;
-        Collections.copy(newPath.mNodes, mNodes);
+        for (PathNode node : mNodes) newPath.mNodes.add(new PathNode(node));
         return newPath;
     }
 

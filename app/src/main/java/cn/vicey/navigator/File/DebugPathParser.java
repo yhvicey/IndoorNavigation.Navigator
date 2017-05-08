@@ -5,8 +5,6 @@ import cn.vicey.navigator.Debug.DebugPath;
 import cn.vicey.navigator.Models.Nodes.DebugPathNode;
 import cn.vicey.navigator.Utils.Logger;
 
-import java.util.List;
-
 /**
  * Debug path parser, provides a set of methods to parse debug path
  */
@@ -17,11 +15,15 @@ public final class DebugPathParser
 
     private static final String LOGGER_TAG = "DebugPathParser";
 
-    private static final int    SESSION_COUNT       = 3;     // Session count
-    private static final String SESSION_DELIM       = ",";   // Value delimiting character
-    private static final int    SESSION_FLOOR_INDEX = 0;     // Floor index session
-    private static final int    SESSION_X           = 1;     // X session
-    private static final int    SESSION_Y           = 2;     // Y session
+    private static final int SESSION_COUNT       = 3; // Session count
+    private static final int SESSION_FLOOR_INDEX = 0; // Floor index session
+    private static final int SESSION_X           = 1; // X session
+    private static final int SESSION_Y           = 2; // Y session
+
+    /**
+     * Value delimiting character
+     */
+    public static final String SESSION_DELIM = ",";
 
     //endregion
 
@@ -64,15 +66,15 @@ public final class DebugPathParser
      * @param lines Lines to parse
      * @return Debug path object, or null if error occurred
      */
-    public static DebugPath parse(final @NonNull List<String> lines)
+    public static DebugPath parse(final @NonNull String[] lines)
     {
         try
         {
             DebugPath path = new DebugPath();
 
-            for (int i = 0; i < lines.size(); i++)
+            for (int i = 0; i < lines.length; i++)
             {
-                DebugPathNode node = generateDebugPathNode(lines.get(i));
+                DebugPathNode node = generateDebugPathNode(lines[i]);
                 if (node == null)
                 {
                     Logger.error(LOGGER_TAG, "Failed in building path node. Line: " + i + ".");

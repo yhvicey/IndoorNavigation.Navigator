@@ -88,8 +88,6 @@ public final class SettingsManager
         {
             mSharedPreference = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
 
-            // TODO: Add settings item values initialization here
-
             return true;
         }
         catch (Throwable t)

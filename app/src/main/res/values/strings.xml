@@ -26,6 +26,8 @@
     <string name="use_random_location">使用随机位置</string>
     <string name="use_debug_path">使用调试路径</string>
     <string name="edit_debug_path">编辑调试路径</string>
+    <string name="start_emulating">开始模拟</string>
+    <string name="stop_emulating">停止模拟</string>
     <string name="track_path">记录路径</string>
     <string name="show_log">显示日志</string>
     <string name="disable_debug_mode">关闭开发者模式</string>
@@ -58,6 +60,7 @@
     <string name="click_to_switch_floor">点击方向键以切换楼层</string>
     <string name="starting_navigation">开始导航…</string>
     <string name="navigation_finished">导航结束</string>
+    <string name="no_debug_path">无调试路径</string>
 
     <!--   Unformatted texts   -->
     <string name="debug_mode_notification" formatted="false">再点击 %d 次以开启开发者模式</string>

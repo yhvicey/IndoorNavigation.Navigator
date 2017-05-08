@@ -1,20 +1,24 @@
 package cn.vicey.navigator.Views;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.annotation.NonNull;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.CompoundButton;
-import android.widget.LinearLayout;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import android.widget.*;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.SettingsCheckBox;
 import cn.vicey.navigator.Debug.DebugManager;
+import cn.vicey.navigator.Debug.DebugPath;
+import cn.vicey.navigator.Debug.FakeLocateManager;
+import cn.vicey.navigator.File.DebugPathParser;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.AlertManager;
 import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Utils.Logger;
+import cn.vicey.navigator.Utils.Tools;
 
 /**
  * Settings view, provides a view to manage setting items
@@ -28,29 +32,44 @@ public class SettingsView
 
     //endregion
 
-    //region Fields
-
-    private TextView         mEditDebugPathTextView;     // Edit debug path text view
-    private LinearLayout     mFakeLocationPanel;         // Fake location panel
-    private MainActivity     mParent;                    // Parent activity
-    private SettingsCheckBox mTrackPathCheckBox;         // Track path check box
-    private SettingsCheckBox mUseDebugPathCheckBox;      // Use debug path check box
-    private SettingsCheckBox mUseFakeLocationCheckBox;   // Use fake location check box
-    private SettingsCheckBox mUseRandomLocationCheckBox; // Use Random location check box
-
-    //endregion
-
     //region Listeners
 
-    private OnClickListener                        mOnEditDebugPathTextViewClick             = new OnClickListener()                        // Listener for edit debug path text view click event
+    private final OnClickListener                        mOnEditDebugPathTextViewClick             = new OnClickListener()                        // Listener for edit debug path text view click event
     {
         @Override
         public void onClick(View view)
         {
-            // TODO: Edit debug path
+            final EditText editor = new EditText(getContext());
+            editor.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE);
+            editor.setSingleLine(false);
+
+            DebugPath currentDebugPath = FakeLocateManager.getDebugPath();
+            if (currentDebugPath != null) editor.setText(currentDebugPath.toString());
+
+            new AlertDialog.Builder(getContext()).setView(editor)
+                                                 .setTitle(R.string.edit_debug_path)
+                                                 .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener()
+                                                 {
+                                                     @Override
+                                                     public void onClick(DialogInterface dialogInterface, int i)
+                                                     {
+                                                         FakeLocateManager.setDebugPath(DebugPathParser.parse(editor.getText()
+                                                                                                                    .toString()
+                                                                                                                    .split(Tools.NEW_LINE)));
+                                                     }
+                                                 })
+                                                 .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+                                                 {
+                                                     @Override
+                                                     public void onClick(DialogInterface dialogInterface, int i)
+                                                     {
+                                                         dialogInterface.dismiss();
+                                                     }
+                                                 })
+                                                 .show();
         }
     };
-    private OnClickListener                        mOnDisableDebugModeTextViewClick          = new OnClickListener()                        // Listener for disable debug mode text view click event
+    private final OnClickListener                        mOnDisableDebugModeTextViewClick          = new OnClickListener()                        // Listener for disable debug mode text view click event
     {
         @Override
         public void onClick(View view)
@@ -67,7 +86,7 @@ public class SettingsView
             }
         }
     };
-    private OnClickListener                        mOnShowLogTextViewClick                   = new OnClickListener()                        // Listener for show log text view click event
+    private final OnClickListener                        mOnShowLogTextViewClick                   = new OnClickListener()                        // Listener for show log text view click event
     {
         @Override
         public void onClick(View view)
@@ -83,7 +102,57 @@ public class SettingsView
             }
         }
     };
-    private CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener         = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final OnClickListener                        mOnStartEmulatingTextViewClick            = new OnClickListener()                        // Listener for start emulating text view click event
+    {
+        @Override
+        public void onClick(View view)
+        {
+            try
+            {
+                if (view.getId() != R.id.sv_debug_start_emulating) return;
+                if (!DebugManager.isUseFakeLocationEnabled()) return;
+                if (DebugManager.isUseRandomLocationEnabled()) return;
+                DebugPath debugPath = FakeLocateManager.getDebugPath();
+                if (debugPath == null)
+                {
+                    AlertManager.alert(R.string.no_debug_path);
+                    return;
+                }
+                debugPath.start();
+                mParent.switchView(MainActivity.VIEW_NAVIGATE);
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to start emulating.", t);
+            }
+        }
+    };
+    private final OnClickListener                        mOnStopEmulatingTextViewClick             = new OnClickListener()                        // Listener for stop emulating text view click event
+    {
+        @Override
+        public void onClick(View view)
+        {
+            try
+            {
+                if (view.getId() != R.id.sv_debug_stop_emulating) return;
+                if (!DebugManager.isUseFakeLocationEnabled()) return;
+                if (DebugManager.isUseRandomLocationEnabled()) return;
+                DebugPath debugPath = FakeLocateManager.getDebugPath();
+                if (debugPath == null)
+                {
+                    AlertManager.alert(R.string.no_debug_path);
+                    return;
+                }
+                debugPath.stop();
+                mParent.switchView(MainActivity.VIEW_NAVIGATE);
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Failed to stop emulating.", t);
+            }
+        }
+    };
+    private final CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener         = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -91,21 +160,15 @@ public class SettingsView
             DebugManager.setTrackPathEnabled(b);
         }
     };
-    private CompoundButton.OnCheckedChangeListener mOnUseDebugPathCheckedChangeListener      = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnUseDebugPathCheckedChangeListener      = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
-            DebugManager.setUseRandomLocationEnabled(!b);
-            if (b)
-            {
-                mEditDebugPathTextView.setVisibility(View.VISIBLE);
-                mUseRandomLocationCheckBox.setChecked(false);
-            }
-            else mEditDebugPathTextView.setVisibility(View.GONE);
+            mUseRandomLocationCheckBox.setChecked(!b);
         }
     };
-    private CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener   = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener   = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -115,20 +178,29 @@ public class SettingsView
             else mFakeLocationPanel.setVisibility(View.GONE);
         }
     };
-    private CompoundButton.OnCheckedChangeListener mOnUseRandomLocationCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnUseRandomLocationCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
             DebugManager.setUseRandomLocationEnabled(b);
-            if (!b) mEditDebugPathTextView.setVisibility(View.VISIBLE);
-            else
-            {
-                mEditDebugPathTextView.setVisibility(View.GONE);
-                mUseDebugPathCheckBox.setChecked(false);
-            }
+            mUseDebugPathCheckBox.setChecked(!b);
+            if (b) mDebugPathPanel.setVisibility(View.GONE);
+            else mDebugPathPanel.setVisibility(View.VISIBLE);
         }
     };
+
+    //endregion
+
+    //region Fields
+
+    private LinearLayout     mDebugPathPanel;            // Debug path panel
+    private LinearLayout     mFakeLocationPanel;         // Fake location panel
+    private MainActivity     mParent;                    // Parent activity
+    private SettingsCheckBox mTrackPathCheckBox;         // Track path check box
+    private SettingsCheckBox mUseDebugPathCheckBox;      // Use debug path check box
+    private SettingsCheckBox mUseFakeLocationCheckBox;   // Use fake location check box
+    private SettingsCheckBox mUseRandomLocationCheckBox; // Use Random location check box
 
     //endregion
 
@@ -175,9 +247,20 @@ public class SettingsView
             mUseDebugPathCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_use_debug_path);
             mUseDebugPathCheckBox.setOnCheckedChangeListener(mOnUseDebugPathCheckedChangeListener);
 
-            // mEditDebugPathTextView
-            mEditDebugPathTextView = (TextView) findViewById(R.id.sv_debug_edit_debug_path);
-            mEditDebugPathTextView.setOnClickListener(mOnEditDebugPathTextViewClick);
+            // mDebugPathPanel
+            mDebugPathPanel = (LinearLayout) findViewById(R.id.sv_debug_debug_path_panel);
+
+            // editDebugPathTextView
+            TextView editDebugPathTextView = (TextView) findViewById(R.id.sv_debug_edit_debug_path);
+            editDebugPathTextView.setOnClickListener(mOnEditDebugPathTextViewClick);
+
+            // startEmulatingTextView
+            TextView startEmulatingTextView = (TextView) findViewById(R.id.sv_debug_start_emulating);
+            startEmulatingTextView.setOnClickListener(mOnStartEmulatingTextViewClick);
+
+            // stopEmulatingTextView
+            TextView stopEmulatingTextView = (TextView) findViewById(R.id.sv_debug_stop_emulating);
+            stopEmulatingTextView.setOnClickListener(mOnStopEmulatingTextViewClick);
 
             // mTrackPathCheckBox
             mTrackPathCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_track_path);

@@ -1,11 +1,11 @@
 package cn.vicey.navigator.Debug;
 
 import android.graphics.Point;
-import android.support.annotation.NonNull;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Nodes.DebugPathNode;
 import cn.vicey.navigator.Navigate.NavigateManager;
+import cn.vicey.navigator.Utils.Logger;
 
 import java.util.Date;
 import java.util.Random;
@@ -16,6 +16,8 @@ import java.util.Random;
 public final class FakeLocateManager
 {
     //region Constants
+
+    private static final String LOGGER_TAG = "FakeLocateManager";
 
     private static final int X_SPEED = 50; // X speed in pixel per sec
     private static final int Y_SPEED = 50; // Y speed in pixel per sec
@@ -67,7 +69,7 @@ public final class FakeLocateManager
     public static Point getCurrentLocation()
     {
         Floor floor = NavigateManager.getCurrentFloor();
-        if (floor == null) return new Point(-1, -1);
+        if (floor == null) return new Point(0, 0);
 
         if (DebugManager.isUseRandomLocationEnabled())
         {
@@ -92,11 +94,21 @@ public final class FakeLocateManager
     }
 
     /**
+     * Gets related debug path
+     *
+     * @return Related debug path
+     */
+    public static DebugPath getDebugPath()
+    {
+        return mDebugPath;
+    }
+
+    /**
      * Sets related debug path
      *
      * @param debugPath Debug path to set
      */
-    public static void setDebugPath(final @NonNull DebugPath debugPath)
+    public static void setDebugPath(final DebugPath debugPath)
     {
         mDebugPath = debugPath;
     }

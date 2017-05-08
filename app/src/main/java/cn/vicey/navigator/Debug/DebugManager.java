@@ -1,5 +1,6 @@
 package cn.vicey.navigator.Debug;
 
+import cn.vicey.navigator.Navigate.NavigateManager;
 import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Utils.Logger;
 
@@ -64,7 +65,11 @@ public final class DebugManager
         if (!SettingsManager.isDebugModeEnabled()) return;
         mTrackPathEnabled = value;
         if (value) Logger.debug(LOGGER_TAG, "Track path enabled.");
-        else Logger.debug(LOGGER_TAG, "Track path disabled.");
+        else
+        {
+            NavigateManager.clearUserPath();
+            Logger.debug(LOGGER_TAG, "Track path disabled.");
+        }
     }
 
     /**

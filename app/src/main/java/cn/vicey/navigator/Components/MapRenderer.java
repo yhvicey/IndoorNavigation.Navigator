@@ -299,8 +299,8 @@ public class MapRenderer
         if (navigatePath != null) drawPath(canvas, mGuidePaint, navigatePath);
         if (DebugManager.isTrackPathEnabled())
         {
-            List<Path> userPaths = NavigateManager.getUserPaths(mCurrentDisplayingFloorIndex);
-            if (userPaths != null) for (Path path : userPaths) drawPath(canvas, mUserPathPaint, path);
+            Path userPath = NavigateManager.getCurrentUserPath();
+            if (userPath != null) drawPath(canvas, mUserPathPaint, userPath);
         }
     }
 
@@ -390,7 +390,7 @@ public class MapRenderer
             // mLookAt
             mLookAt = new Point();
 
-            NavigateManager.addOnUpdateListener(new NavigateManager.OnUpdateListener()
+            NavigateManager.addOnUpdateListener(NavigateManager.LOWER_PRIORITY, new NavigateManager.OnUpdateListener()
             {
                 @Override
                 public void onUpdate()

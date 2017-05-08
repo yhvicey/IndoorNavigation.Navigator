@@ -3,7 +3,6 @@ package cn.vicey.navigator.Navigate;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import cn.vicey.navigator.Debug.DebugManager;
-import cn.vicey.navigator.Debug.FakeLocateManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
@@ -109,7 +108,6 @@ public final class NavigateManager
             }
         }
     };
-    private static SparseArray<List<Path>>     mUserPaths         = new SparseArray<>(); // User paths
 
     //endregion
 
@@ -156,6 +154,21 @@ public final class NavigateManager
     }
 
     /**
+     * Gets current user path's fork
+     *
+     * @return Current user path's fork, or null if there is no user path
+     */
+    public static Path getCurrentUserPath()
+    {
+        Path path = null;
+        synchronized (SYNC_LOCK_PATH)
+        {
+            if (mCurrentUserPath != null) path = mCurrentUserPath.fork();
+        }
+        return path;
+    }
+
+    /**
      * Gets specified floor
      *
      * @param floorIndex Specified floor index
@@ -196,21 +209,6 @@ public final class NavigateManager
     }
 
     /**
-     * Gets specified floor's user paths
-     *
-     * @param floorIndex Floor index
-     * @return Specified floor's user paths, or null if index is out of range
-     */
-    public static List<Path> getUserPaths(int floorIndex)
-    {
-        if (mCurrentMap == null) return null;
-        if (floorIndex < 0) return null;
-        if (floorIndex > mCurrentMap.getFloors().size() - 1) return null;
-        if (mUserPaths.get(floorIndex) == null) mUserPaths.put(floorIndex, new ArrayList<Path>());
-        return mUserPaths.get(floorIndex);
-    }
-
-    /**
      * Gets whether the NavigateManager is navigating
      *
      * @return Whether the NavigateManager is navigating
@@ -234,17 +232,17 @@ public final class NavigateManager
 
     //region Static methods
 
+    /**
+     * Floor changed event handler
+     *
+     * @param newFloorIndex New floor index
+     */
     private static void onFloorChanged(int newFloorIndex)
     {
-        if (mCurrentUserPath != null)
-        {
-            List<Path> paths = getUserPaths(mLastFloorIndex);
-            if (paths != null) paths.add(mCurrentUserPath);
-            mCurrentUserPath = null;
-        }
+        clearUserPath();
 
         NavigateTask task;
-        synchronized (SYNC_LOCK)
+        synchronized (SYNC_LOCK_TASK)
         {
             task = mCurrentTask;
         }
@@ -333,9 +331,20 @@ public final class NavigateManager
     {
         if (!mIsNavigating) return;
         mIsNavigating = false;
-        synchronized (SYNC_LOCK)
+        synchronized (SYNC_LOCK_TASK)
         {
             mCurrentTask = null;
+        }
+    }
+
+    /**
+     * Clear user paths
+     */
+    public static void clearUserPath()
+    {
+        synchronized (SYNC_LOCK_PATH)
+        {
+            mCurrentUserPath = null;
         }
     }
 
@@ -391,7 +400,7 @@ public final class NavigateManager
     {
         if (mIsNavigating) cancelNavigate();
         mIsNavigating = true;
-        synchronized (SYNC_LOCK)
+        synchronized (SYNC_LOCK_TASK)
         {
             mCurrentTask = new NavigateTask(endFloor, endNode);
         }
