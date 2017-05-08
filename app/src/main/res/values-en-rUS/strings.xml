@@ -29,6 +29,7 @@
     <string name="start_emulating">Start emulating</string>
     <string name="stop_emulating">Stop emulating</string>
     <string name="track_path">Track path</string>
+    <string name="display_all_guide_path">Display all guide path</string>
     <string name="show_log">Show log</string>
     <string name="disable_debug_mode">Disable debug mode</string>
 
@@ -61,6 +62,7 @@
     <string name="starting_navigation">Starting navigation…</string>
     <string name="navigation_finished">Navigation finished</string>
     <string name="no_debug_path">No debug path</string>
+    <string name="failed_to_build_path">Failed to build navigate path. Navigation canceled</string>
 
     <!--   Unformatted texts   -->
     <string name="debug_mode_notification" formatted="false">%d more clicks to enable debug mode</string>

@@ -96,6 +96,12 @@
                     android:layout_height="@dimen/middle_item_height"
                     app:text="@string/track_path"/>
 
+            <cn.vicey.navigator.Components.SettingsCheckBox
+                    android:id="@+id/sv_debug_display_all_path"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/middle_item_height"
+                    app:text="@string/display_all_guide_path"/>
+
             <TextView
                     style="@style/Navigator.SettingsView.Item"
                     android:id="@+id/sv_debug_show_log"

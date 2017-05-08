@@ -26,7 +26,6 @@ import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.ListViewAdapter;
-import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Utils.Logger;
 
 import java.util.List;
@@ -220,7 +219,7 @@ public class MapRenderer
         for (WallNode wallNode : floor.getWallNodes())
             for (NodeBase.Link link : wallNode.getLinks())
                 drawLine(canvas, mWallPaint, LINE_WIDTH, wallNode, link.getTarget());
-        if (!SettingsManager.isDebugModeEnabled()) return;
+        if (!DebugManager.isDisplayAllGuidePaths()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
             for (NodeBase.Link link : guideNode.getLinks())
                 drawLine(canvas, mGuidePaint, LINE_WIDTH, guideNode, link.getTarget());
@@ -253,7 +252,7 @@ public class MapRenderer
         if (NavigateManager.getCurrentFloorIndex() == mCurrentDisplayingFloorIndex)
             drawNode(canvas, mUserPaint, NODE_RADIUS * 2, new PathNode(NavigateManager.getCurrentLocation().x, NavigateManager
                     .getCurrentLocation().y));
-        if (!SettingsManager.isDebugModeEnabled()) return;
+        if (!DebugManager.isDisplayAllGuidePaths()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
             drawNode(canvas, mGuidePaint, NODE_RADIUS, guideNode);
     }

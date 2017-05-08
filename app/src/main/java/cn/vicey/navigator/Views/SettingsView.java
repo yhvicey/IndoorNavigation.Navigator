@@ -34,7 +34,7 @@ public class SettingsView
 
     //region Listeners
 
-    private final OnClickListener                        mOnEditDebugPathTextViewClick             = new OnClickListener()                        // Listener for edit debug path text view click event
+    private final OnClickListener                        mOnEditDebugPathTextViewClick               = new OnClickListener()                        // Listener for edit debug path text view click event
     {
         @Override
         public void onClick(View view)
@@ -69,7 +69,7 @@ public class SettingsView
                                                  .show();
         }
     };
-    private final OnClickListener                        mOnDisableDebugModeTextViewClick          = new OnClickListener()                        // Listener for disable debug mode text view click event
+    private final OnClickListener                        mOnDisableDebugModeTextViewClick            = new OnClickListener()                        // Listener for disable debug mode text view click event
     {
         @Override
         public void onClick(View view)
@@ -86,7 +86,7 @@ public class SettingsView
             }
         }
     };
-    private final OnClickListener                        mOnShowLogTextViewClick                   = new OnClickListener()                        // Listener for show log text view click event
+    private final OnClickListener                        mOnShowLogTextViewClick                     = new OnClickListener()                        // Listener for show log text view click event
     {
         @Override
         public void onClick(View view)
@@ -102,7 +102,7 @@ public class SettingsView
             }
         }
     };
-    private final OnClickListener                        mOnStartEmulatingTextViewClick            = new OnClickListener()                        // Listener for start emulating text view click event
+    private final OnClickListener                        mOnStartEmulatingTextViewClick              = new OnClickListener()                        // Listener for start emulating text view click event
     {
         @Override
         public void onClick(View view)
@@ -127,7 +127,7 @@ public class SettingsView
             }
         }
     };
-    private final OnClickListener                        mOnStopEmulatingTextViewClick             = new OnClickListener()                        // Listener for stop emulating text view click event
+    private final OnClickListener                        mOnStopEmulatingTextViewClick               = new OnClickListener()                        // Listener for stop emulating text view click event
     {
         @Override
         public void onClick(View view)
@@ -152,7 +152,15 @@ public class SettingsView
             }
         }
     };
-    private final CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener         = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnDisplayAllGuidePathCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    {
+        @Override
+        public void onCheckedChanged(CompoundButton compoundButton, boolean b)
+        {
+            DebugManager.setDisplayAllGuidePaths(b);
+        }
+    };
+    private final CompoundButton.OnCheckedChangeListener mOnTrackPathCheckedChangeListener           = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -160,12 +168,12 @@ public class SettingsView
             DebugManager.setTrackPathEnabled(b);
         }
     };
-    private final CompoundButton.OnCheckedChangeListener mOnUseDebugPathCheckedChangeListener      = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnUseDebugPathCheckedChangeListener        = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
-            DebugManager.setUseRandomLocationEnabled(!b);
+            DebugManager.setUseDebugPathEnabled(b);
             if (!b) mDebugPathPanel.setVisibility(View.GONE);
             else
             {
@@ -174,7 +182,7 @@ public class SettingsView
             }
         }
     };
-    private final CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener   = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener     = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -184,7 +192,7 @@ public class SettingsView
             else mFakeLocationPanel.setVisibility(View.GONE);
         }
     };
-    private final CompoundButton.OnCheckedChangeListener mOnUseRandomLocationCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
+    private final CompoundButton.OnCheckedChangeListener mOnUseRandomLocationCheckedChangeListener   = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
     {
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
@@ -203,6 +211,7 @@ public class SettingsView
     private LinearLayout     mDebugPathPanel;            // Debug path panel
     private LinearLayout     mFakeLocationPanel;         // Fake location panel
     private MainActivity     mParent;                    // Parent activity
+    private SettingsCheckBox mDisplayAllGuidePath;       // Display all guide path check box
     private SettingsCheckBox mTrackPathCheckBox;         // Track path check box
     private SettingsCheckBox mUseDebugPathCheckBox;      // Use debug path check box
     private SettingsCheckBox mUseFakeLocationCheckBox;   // Use fake location check box
@@ -268,6 +277,10 @@ public class SettingsView
             TextView stopEmulatingTextView = (TextView) findViewById(R.id.sv_debug_stop_emulating);
             stopEmulatingTextView.setOnClickListener(mOnStopEmulatingTextViewClick);
 
+            // mDisplayAllGuidePath
+            mDisplayAllGuidePath = (SettingsCheckBox) findViewById(R.id.sv_debug_display_all_path);
+            mDisplayAllGuidePath.setOnCheckedChangeListener(mOnDisplayAllGuidePathCheckedChangeListener);
+
             // mTrackPathCheckBox
             mTrackPathCheckBox = (SettingsCheckBox) findViewById(R.id.sv_debug_track_path);
             mTrackPathCheckBox.setOnCheckedChangeListener(mOnTrackPathCheckedChangeListener);
@@ -299,11 +312,20 @@ public class SettingsView
         View debugView = findViewById(R.id.sv_debug_view);
         debugView.setVisibility(SettingsManager.isDebugModeEnabled() ? View.VISIBLE : View.GONE);
 
-        // mTrackPathCheckBox
-        mTrackPathCheckBox.setChecked(DebugManager.isTrackPathEnabled());
-
         // mUseFakeLocationCheckBox
         mUseFakeLocationCheckBox.setChecked(DebugManager.isUseFakeLocationEnabled());
+
+        // mUseRandomLocationCheckBox
+        mUseRandomLocationCheckBox.setChecked(DebugManager.isUseRandomLocationEnabled());
+
+        // mUseDebugPathCheckBox
+        mUseDebugPathCheckBox.setChecked(DebugManager.isUseDebugPathEnabled());
+
+        // mDisplayAllGuidePath
+        mDisplayAllGuidePath.setChecked(DebugManager.isDisplayAllGuidePaths());
+
+        // mTrackPathCheckBox
+        mTrackPathCheckBox.setChecked(DebugManager.isTrackPathEnabled());
     }
 
     //endregion
