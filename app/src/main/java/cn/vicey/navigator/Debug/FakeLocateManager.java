@@ -106,32 +106,32 @@ public final class FakeLocateManager
     //region Static methods
 
     /**
-     * Starts emulating user's walk path
+     * Initialize manager
+     *
+     * @return Whether the initialization is succeed or not
      */
-    public static void startEmulating()
+    public static boolean init()
     {
-        if (DebugManager.isUseRandomLocationEnabled()) return;
-        if (mDebugPath == null) return;
-        mDebugPath.start();
-    }
-
-    /**
-     * Ends emulating user's walk path
-     */
-    public static void stopEmulating()
-    {
-        if (mDebugPath == null) return;
-        mDebugPath.stop();
-    }
-
-    /**
-     * Update fake location
-     */
-    public static void update()
-    {
-        if (!DebugManager.isUseFakeLocationEnabled()) return;
-        if (mDebugPath == null) return;
-        mDebugPath.moveNext();
+        try
+        {
+            NavigateManager.addOnUpdateListener(NavigateManager.HIGHER_PRIORITY, new NavigateManager.OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    if (!DebugManager.isUseFakeLocationEnabled()) return;
+                    if (DebugManager.isUseRandomLocationEnabled()) return;
+                    if (mDebugPath == null) return;
+                    mDebugPath.moveNext();
+                }
+            });
+            return true;
+        }
+        catch (Throwable t)
+        {
+            Logger.error(LOGGER_TAG, "Failed to initialize fake location manager.", t);
+            return false;
+        }
     }
 
     //endregion

@@ -33,9 +33,26 @@ public final class NavigateManager
 
     private static final String LOGGER_TAG = "NavigateManager";
 
-    private static final Object SYNC_LOCK       = new Object(); // Sync lock
-    private static final int    MAX_ERROR_COUNT = 3;            // Max error count
-    private static final long   UPDATE_INTERNAL = 1000;         // Update internal in milliseconds
+    private static final Object SYNC_LOCK_TASK = new Object(); // Sync lock for task
+    private static final Object SYNC_LOCK_PATH = new Object(); // Sync lock for user path
+
+    private static final int  MAX_ERROR_COUNT = 3;            // Max error count
+    private static final long UPDATE_INTERNAL = 1000;         // Update internal in milliseconds
+
+    /**
+     * Higher priority
+     */
+    public static final int HIGHER_PRIORITY = 1;
+
+    /**
+     * Lower priority
+     */
+    public static final int LOWER_PRIORITY = -1;
+
+    /**
+     * Normal priority
+     */
+    public static final int NORMAL_PRIORITY = 0;
 
     /**
      * Indicates no floor is selected
@@ -55,9 +72,9 @@ public final class NavigateManager
     private static int          mLastFloorIndex;   // Last floor index used for notifying floor changed event
     private static GuideNode    mNearestNode;      // Nearest node to user node
 
-    private static SparseArray<FloorNavigator> mFloorNavigators   = new SparseArray<>(); // Floor navigators
-    private static List<OnUpdateListener>      mOnUpdateListeners = new ArrayList<>();   // Listeners for update event
-    private static Runnable                    mUpdateTask        = new Runnable()       // Update task
+    private static SparseArray<FloorNavigator>         mFloorNavigators   = new SparseArray<>(); // Floor navigators
+    private static SparseArray<List<OnUpdateListener>> mOnUpdateListeners = new SparseArray<>(); // Listeners for update event
+    private static Runnable                            mUpdateTask        = new Runnable()       // Update task
     {
         @Override
         public void run()
@@ -69,56 +86,14 @@ public final class NavigateManager
                     // Ensure internal between two updates to avoid high cpu usage
                     Thread.sleep(UPDATE_INTERNAL);
 
+                    // Check whether floor changed
                     int floorIndex = UserNode.getInstance().getCurrentFloorIndex();
-
-                    // Check floor index
                     if (mLastFloorIndex != floorIndex) onFloorChanged(floorIndex);
 
-                    // If is using fake location then update user node's location
-                    if (DebugManager.isUseFakeLocationEnabled()) FakeLocateManager.update();
-
-                    // If is navigating then update the task
-                    if (mIsNavigating)
-                    {
-                        // Check current task
-                        NavigateTask task;
-                        synchronized (SYNC_LOCK)
-                        {
-                            if (mCurrentTask == null) continue;
-                            task = mCurrentTask;
-                        }
-
-                        // Update the nearest node
-                        updateNearestNode();
-
-                        if (task.update())
-                        {
-                            // Current task finished
-                            cancelNavigate();
-                            AlertManager.alert(R.string.navigation_finished);
-                            continue;
-                        }
-
-                        // Get guide path and append user node to it
-                        mCurrentGuidePath = task.getPath();
-                        if (mCurrentGuidePath != null) mCurrentGuidePath.appendHead(UserNode.getInstance());
-                    }
-
-                    // Track user path if it's enabled
-                    if (DebugManager.isTrackPathEnabled())
-                    {
-                        if (mCurrentUserPath == null)
-                        {
-                            mCurrentUserPath = new Path(UserNode.getInstance());
-                            List<Path> paths = getUserPaths(floorIndex);
-                            if (paths != null) paths.add(mCurrentUserPath);
-                        }
-                        else mCurrentUserPath.appendTail(UserNode.getInstance());
-                    }
-                    else if (mCurrentUserPath != null) mCurrentUserPath = null;
-
-                    // Notified all listeners
-                    for (OnUpdateListener listener : mOnUpdateListeners) listener.onUpdate();
+                    // Notify all listeners
+                    for (OnUpdateListener listener : mOnUpdateListeners.get(HIGHER_PRIORITY)) listener.onUpdate();
+                    for (OnUpdateListener listener : mOnUpdateListeners.get(NORMAL_PRIORITY)) listener.onUpdate();
+                    for (OnUpdateListener listener : mOnUpdateListeners.get(LOWER_PRIORITY)) listener.onUpdate();
                 }
             }
             catch (Throwable t)
@@ -278,6 +253,36 @@ public final class NavigateManager
         mLastFloorIndex = newFloorIndex;
     }
 
+    private static void updateNavigation()
+    {
+        // If is navigating then update the task
+        if (mIsNavigating)
+        {
+            // Check current task
+            NavigateTask task;
+            synchronized (SYNC_LOCK_TASK)
+            {
+                if (mCurrentTask == null) return;
+                task = mCurrentTask;
+            }
+
+            // Update the nearest node
+            updateNearestNode();
+
+            if (task.update())
+            {
+                // Current task finished
+                cancelNavigate();
+                AlertManager.alert(R.string.navigation_finished);
+                return;
+            }
+
+            // Get guide path and append user node to it
+            mCurrentGuidePath = task.getPath();
+            if (mCurrentGuidePath != null) mCurrentGuidePath.appendHead(UserNode.getInstance());
+        }
+    }
+
     /**
      * Update nearest node
      */
@@ -294,14 +299,31 @@ public final class NavigateManager
         mNearestNode = floor.findNearestGuideNode(x, y);
     }
 
+    private static void updateUserPath()
+    {
+        // Track user path if it's enabled
+        if (DebugManager.isTrackPathEnabled())
+        {
+            synchronized (SYNC_LOCK_PATH)
+            {
+                // If no current user path then create one
+                if (mCurrentUserPath == null) mCurrentUserPath = new Path(null);
+                mCurrentUserPath.appendTail(UserNode.getInstance());
+            }
+        }
+    }
+
     /**
      * Add {@link OnUpdateListener} to navigate manager
      *
+     * @param priority Task priority
      * @param listener Listener to add
      */
-    public static void addOnUpdateListener(final @NonNull OnUpdateListener listener)
+    public static void addOnUpdateListener(int priority, final @NonNull OnUpdateListener listener)
     {
-        mOnUpdateListeners.add(listener);
+        if (priority > 0) mOnUpdateListeners.get(HIGHER_PRIORITY).add(listener);
+        else if (priority < 0) mOnUpdateListeners.get(LOWER_PRIORITY).add(listener);
+        else mOnUpdateListeners.get(NORMAL_PRIORITY).add(listener);
     }
 
     /**
@@ -327,6 +349,29 @@ public final class NavigateManager
         try
         {
             new Thread(mUpdateTask).start();
+
+            mOnUpdateListeners.put(HIGHER_PRIORITY, new ArrayList<OnUpdateListener>());
+            mOnUpdateListeners.put(NORMAL_PRIORITY, new ArrayList<OnUpdateListener>());
+            mOnUpdateListeners.put(LOWER_PRIORITY, new ArrayList<OnUpdateListener>());
+
+            addOnUpdateListener(NORMAL_PRIORITY, new OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    updateUserPath();
+                }
+            });
+
+            addOnUpdateListener(NORMAL_PRIORITY, new OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    updateNavigation();
+                }
+            });
+
             return true;
         }
         catch (Throwable t)
@@ -334,16 +379,6 @@ public final class NavigateManager
             Logger.error(LOGGER_TAG, "Failed to init navigate manager.", t);
             return false;
         }
-    }
-
-    /**
-     * Remove {@link OnUpdateListener} from navigate manager
-     *
-     * @param listener Listener to remove
-     */
-    public static void removeOnUpdateListener(final @NonNull OnUpdateListener listener)
-    {
-        mOnUpdateListeners.remove(listener);
     }
 
     /**
