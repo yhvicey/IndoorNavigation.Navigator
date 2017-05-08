@@ -257,5 +257,31 @@ public class Path
         return !mNodes.isEmpty() && mNodes.get(mNodes.size() - 1) == target;
     }
 
+    /**
+     * Remove path's tail
+     *
+     * @return This path
+     */
+    public Path removeTail()
+    {
+        if (mNodes.isEmpty()) return this;
+        PathNode oldTail = mNodes.get(mNodes.size() - 1);
+        if (mNodes.size() > 1)
+        {
+            PathNode newTail = mNodes.get(mNodes.size() - 2);
+            mLength -= newTail.calcDistance(oldTail);
+        }
+        mNodes.remove(oldTail);
+        return this;
+    }
+
+    public Path reverse()
+    {
+        Path newPath = new Path(null);
+        newPath.mLength = mLength;
+        for (int i = mNodes.size() - 1; i >= 0; i--) newPath.mNodes.add(mNodes.get(i));
+        return newPath;
+    }
+
     //endregion
 }

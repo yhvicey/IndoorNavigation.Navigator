@@ -73,19 +73,20 @@ public final class NavigateManager
 
     //region Static fields
 
-    private static int          mCurrentFloorIndex; // Current floor index
-    private static Path         mCurrentGuidePath;  // Current guide path
-    private static Point        mCurrentLocation;   // Current location
-    private static Map          mCurrentMap;        // Current map object
-    private static NavigateTask mCurrentTask;       // Current navigate task
-    private static Path         mCurrentUserPath;   // Current user path
-    private static int          mErrorCount;        // Error count
-    private static boolean      mIsNavigating;      // Indicates whether the manager is navigating
-    private static int          mLastFloorIndex;    // Last floor index used for notifying floor changed event
-    private static GuideNode    mNearestNode;       // Nearest node to user node
+    private static int          mCurrentFloorIndex;  // Current floor index
+    private static Point        mCurrentLocation;    // Current location
+    private static Map          mCurrentMap;         // Current map object
+    private static NavigateTask mCurrentTask;        // Current navigate task
+    private static Path         mCurrentUserPath;    // Current user path
+    private static int          mErrorCount;         // Error count
+    private static Path         mCurrentGuidePath;          // Current guide path
+    private static boolean      mIsNavigating;       // Indicates whether the manager is navigating
+    private static int          mLastFloorIndex;     // Last floor index used for notifying floor changed event
+    private static GuideNode    mLastNearestNode;    // Last nearest node
+    private static GuideNode    mCurrentNearestNode; // Nearest node to user node
 
-    private static SparseArray<FloorNavigator>            mFloorNavigators         = new SparseArray<>();                         // Floor navigators
-    private static FloorNavigator.OnBuildFinishedListener mOnBuildFinishedListener = new FloorNavigator.OnBuildFinishedListener() // Listener for build finished event
+    private static SparseArray<FloorNavigator>          mFloorNavigators       = new SparseArray<>();                         // Floor navigators
+    private static FloorNavigator.OnBuildFailedListener mOnBuildFailedListener = new FloorNavigator.OnBuildFailedListener() // Listener for build finished event
     {
         @Override
         public void onFailed()
@@ -93,15 +94,9 @@ public final class NavigateManager
             AlertManager.alert(R.string.failed_to_build_path);
             cancelNavigate();
         }
-
-        @Override
-        public void onSucceed()
-        {
-
-        }
     };
-    private static SparseArray<List<OnUpdateListener>>    mOnUpdateListeners       = new SparseArray<>();                         // Listeners for update event
-    private static Runnable                               mUpdateTask              = new Runnable()                               // Update task
+    private static SparseArray<List<OnUpdateListener>>  mOnUpdateListeners     = new SparseArray<>();                         // Listeners for update event
+    private static Runnable                             mUpdateTask            = new Runnable()                               // Update task
     {
         @Override
         public void run()
@@ -112,9 +107,6 @@ public final class NavigateManager
                 {
                     // Ensure internal between two updates to avoid high cpu usage
                     Thread.sleep(UPDATE_INTERNAL);
-
-                    // Check whether floor changed
-                    if (mLastFloorIndex != mCurrentFloorIndex) onFloorChanged(mCurrentFloorIndex);
 
                     // Notify all listeners
                     for (OnUpdateListener listener : mOnUpdateListeners.get(HIGHEST_PRIORITY)) listener.onUpdate();
@@ -165,11 +157,12 @@ public final class NavigateManager
     /**
      * Gets current guide path's fork
      *
-     * @return Current guide path's fork, or null if no navigation now
+     * @return Current guide path's fork, or null if guide path is not ready
      */
     public static Path getCurrentGuidePath()
     {
-        return mCurrentGuidePath;
+        if (mCurrentGuidePath == null) return null;
+        return mCurrentGuidePath.fork();
     }
 
     /**
@@ -245,7 +238,7 @@ public final class NavigateManager
         if (mFloorNavigators.get(floorIndex) == null)
         {
             FloorNavigator navigator = new FloorNavigator(floor);
-            navigator.setOnBuildFinishedListener(mOnBuildFinishedListener);
+            navigator.setOnBuildFailedListener(mOnBuildFailedListener);
             mFloorNavigators.put(floorIndex, navigator);
         }
         return mFloorNavigators.get(floorIndex);
@@ -258,7 +251,7 @@ public final class NavigateManager
      */
     public static GuideNode getNearestNode()
     {
-        return mNearestNode;
+        return mCurrentNearestNode;
     }
 
     /**
@@ -286,28 +279,32 @@ public final class NavigateManager
     //region Static methods
 
     /**
-     * Floor changed event handler
-     *
-     * @param newFloorIndex New floor index
+     * Update floor index
      */
-    private static void onFloorChanged(int newFloorIndex)
+    private static void updateFloorIndex()
     {
-        clearUserPath();
-
-        NavigateTask task;
-        synchronized (SYNC_LOCK_TASK)
+        if (mCurrentFloorIndex != mLastFloorIndex)
         {
-            task = mCurrentTask;
-        }
-        if (task != null) task.onFloorChanged(newFloorIndex);
+            clearUserPath();
 
-        mLastFloorIndex = newFloorIndex;
+            NavigateTask task;
+            synchronized (SYNC_LOCK_TASK)
+            {
+                task = mCurrentTask;
+            }
+            if (task != null) task.onFloorChanged();
+
+            mLastFloorIndex = mCurrentFloorIndex;
+        }
     }
 
     private static void updateLocation()
     {
         mCurrentFloorIndex = UserNode.getInstance().getCurrentFloorIndex();
         mCurrentLocation = new Point(UserNode.getInstance().getX(), UserNode.getInstance().getY());
+        mCurrentNearestNode = null;
+        Floor floor = getCurrentFloor();
+        if (floor != null) mCurrentNearestNode = floor.findNearestGuideNode(mCurrentLocation.x, mCurrentLocation.y);
     }
 
     /**
@@ -316,31 +313,28 @@ public final class NavigateManager
     private static void updateNavigation()
     {
         // If is navigating then update the task
-        if (mIsNavigating)
+        if (!mIsNavigating) return;
+
+        // Check current task
+        NavigateTask task;
+        synchronized (SYNC_LOCK_TASK)
         {
-            // Check current task
-            NavigateTask task;
-            synchronized (SYNC_LOCK_TASK)
-            {
-                if (mCurrentTask == null) return;
-                task = mCurrentTask;
-            }
-
-            // Update the nearest node
-            updateNearestNode();
-
-            if (task.update())
-            {
-                // Current task finished
-                cancelNavigate();
-                AlertManager.alert(R.string.navigation_finished);
-                return;
-            }
-
-            // Get guide path and append user node to it
-            mCurrentGuidePath = task.getPath();
-            if (mCurrentGuidePath != null) mCurrentGuidePath.appendHead(UserNode.getInstance());
+            if (mCurrentTask == null) return;
+            task = mCurrentTask;
         }
+
+        if (task.isFinished())
+        {
+            // Current task finished
+            cancelNavigate();
+            AlertManager.alert(R.string.navigation_finished);
+            return;
+        }
+
+        // Get guide path and append user node to it
+        mCurrentGuidePath = task.getPath();
+        if (mCurrentGuidePath != null) mCurrentGuidePath.appendHead(UserNode.getInstance());
+
     }
 
     /**
@@ -348,15 +342,17 @@ public final class NavigateManager
      */
     private static void updateNearestNode()
     {
-        Floor floor = getCurrentFloor();
-        if (floor == null)
+        if (mLastNearestNode != mCurrentNearestNode)
         {
-            mNearestNode = null;
-            return;
+            NavigateTask task;
+            synchronized (SYNC_LOCK_TASK)
+            {
+                task = mCurrentTask;
+            }
+            if (task != null) task.onNearestNodeChanged();
+
+            mLastNearestNode = mCurrentNearestNode;
         }
-        int x = UserNode.getInstance().getX();
-        int y = UserNode.getInstance().getY();
-        mNearestNode = floor.findNearestGuideNode(x, y);
     }
 
     /**
@@ -444,11 +440,29 @@ public final class NavigateManager
                 @Override
                 public void onUpdate()
                 {
-                    updateUserPath();
+                    updateFloorIndex();
                 }
             });
 
             addOnUpdateListener(NORMAL_PRIORITY, new OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    updateNearestNode();
+                }
+            });
+
+            addOnUpdateListener(NORMAL_PRIORITY, new OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    updateUserPath();
+                }
+            });
+
+            addOnUpdateListener(LOWER_PRIORITY, new OnUpdateListener()
             {
                 @Override
                 public void onUpdate()
@@ -479,7 +493,8 @@ public final class NavigateManager
         synchronized (SYNC_LOCK_TASK)
         {
             mCurrentTask = new NavigateTask(endFloor, endNode);
-            onFloorChanged(NavigateManager.getCurrentFloorIndex());
+            mCurrentTask.onFloorChanged();
+            mCurrentTask.onNearestNodeChanged();
         }
         AlertManager.alert(R.string.starting_navigation);
     }

@@ -4,9 +4,11 @@ import android.support.annotation.NonNull;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Nodes.GuideNode;
 import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Utils.Logger;
 
+import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Navigator class, provides navigate ability for related floor
@@ -18,14 +20,14 @@ public class FloorNavigator
     /**
      * Listener which will be invoked when navigation is finished
      */
-    public interface OnNavigationFinishedListener
+    public interface OnBuildFailedListener
     {
         //region Methods
 
         /**
-         * Invoked when the navigation is finished
+         * Invoked when the navigation is failed
          */
-        void onFinished();
+        void onFailed();
 
         //endregion
     }
@@ -38,15 +40,16 @@ public class FloorNavigator
     {
         //region Constants
 
-        private final Object SYNC_LOCK = new Object();
+        private static final String LOGGER_TAG = "TableBuilder";
+
+        private static final int MAX_ERROR_COUNT = 3; // Max error count
 
         //endregion
 
         //region Fields
 
-        private boolean                 mIsBuilding; // Whether the builder is building
-        private NodeBase                mStartNode;  // Start node
-        private HashMap<NodeBase, Path> mTable;      // Built table
+        private int       mErrorCount; // Error count
+        private GuideNode mStartNode;  // Start node
 
         //endregion
 
@@ -57,33 +60,9 @@ public class FloorNavigator
          *
          * @param startNode Start node
          */
-        public TableBuilder(final @NonNull NodeBase startNode)
+        public TableBuilder(final @NonNull GuideNode startNode)
         {
             mStartNode = startNode;
-        }
-
-        //endregion
-
-        //region Methods
-
-        /**
-         * Start building the table
-         *
-         * @return Built table, or null if the building isn't finished yet
-         */
-        public HashMap<NodeBase, Path> build()
-        {
-            // Build already done, return result
-            if (mTable != null || mIsBuilding) return mTable;
-            synchronized (SYNC_LOCK)
-            {
-                // The builder isn't building now, double-check for thread-safety
-                if (mIsBuilding) return mTable;
-                // Launch builder to build table
-                new Thread(this).start();
-                mIsBuilding = true;
-            }
-            return mTable;
         }
 
         //endregion
@@ -93,12 +72,107 @@ public class FloorNavigator
         @Override
         public void run()
         {
-            Path path = new Path(mStartNode);
-            HashSet<NodeBase> closeTable = new HashSet<>();
-            HashMap<NodeBase, Path> table = new HashMap<>();
-            // TODO: Finish Dijkstra algorithm here
-            mTable = table;
-            if (mOnNavigationFinishedListener != null) mOnNavigationFinishedListener.onFinished();
+            try
+            {
+                GuideNode current = mStartNode;
+
+                long startTime = new Date().getTime();
+                Logger.info(LOGGER_TAG, "Started building table.");
+
+                // Dijkstra algorithm started
+                Path path = new Path(null);
+
+                // Create open table, put all nodes into it
+                HashMap<GuideNode, Path> openTable = new HashMap<>();
+                for (GuideNode guideNode : mPathTable.get(current).keySet()) openTable.put(guideNode, null);
+
+                // Create close table
+                HashMap<GuideNode, Path> closeTable = new HashMap<>();
+
+                // Pick node from open table and update open table
+                while (!openTable.isEmpty())
+                {
+                    // Append current node to path tail
+                    path.appendTail(current);
+                    // Remove current node from open table
+                    openTable.remove(current);
+                    // Put current node and path to close table
+                    closeTable.put(current, path.fork());
+                    // Walk through adjacent nodes, and find next node
+                    GuideNode nearestNode = null;
+                    double distance = Double.MAX_VALUE;
+                    for (NodeBase.Link link : current.getLinks())
+                    {
+                        // Only support guide node
+                        if (!(link.getTarget() instanceof GuideNode)) continue;
+                        GuideNode target = (GuideNode) link.getTarget();
+                        // Must not in close table
+                        if (closeTable.containsKey(target)) continue;
+                        // Must in open table
+                        if (!openTable.containsKey(target)) continue;
+                        // No path, this means the node used to be unreachable, so create a new path for it
+                        if (openTable.get(target) == null) openTable.put(target, path.fork().appendTail(target));
+                        else
+                        {
+                            // Calc new distance and compare to old distance
+                            double newDistance = path.getLength() + link.getDistance();
+                            // New shortest path to target found, update open table
+                            if (openTable.get(target).getLength() > newDistance) openTable.put(target, path.fork()
+                                                                                                           .appendTail(target));
+                        }
+                        if (link.getDistance() < distance)
+                        {
+                            distance = link.getDistance();
+                            nearestNode = (GuideNode) link.getTarget();
+                        }
+                    }
+                    // Meet corner, find nearest node in open table
+                    if (nearestNode == null && !openTable.isEmpty())
+                    {
+                        distance = Double.MAX_VALUE;
+                        Path newPath = null;
+                        for (Map.Entry<GuideNode, Path> entry : openTable.entrySet())
+                        {
+                            if (entry.getValue() == null) continue;
+                            if (entry.getValue().getLength() < distance)
+                            {
+                                distance = entry.getValue().getLength();
+                                nearestNode = entry.getKey();
+                                newPath = entry.getValue();
+                            }
+                        }
+                        if (newPath == null)
+                        {
+                            Logger.error(LOGGER_TAG, "No nearest node found, error occurred.");
+                            if (mOnBuildFailedListener != null) mOnBuildFailedListener.onFailed();
+                            return;
+                        }
+                        path = newPath.fork().removeTail();
+                    }
+                    if (nearestNode == null) break;
+                    // Move to nearest node
+                    current = nearestNode;
+                }
+                // Dijkstra algorithm finished
+
+                long totalTime = new Date().getTime() - startTime;
+                Logger.info(LOGGER_TAG, "Finished building table. Total time: " + totalTime + " ms.");
+
+                for (Map.Entry<GuideNode, Path> entry : closeTable.entrySet())
+                    mPathTable.get(mStartNode).get(entry.getKey()).setPath(entry.getValue());
+
+            }
+            catch (Throwable t)
+            {
+                Logger.error(LOGGER_TAG, "Error occurred when building table. Error count: " + mErrorCount++ + ".", t);
+                if (mErrorCount < MAX_ERROR_COUNT)
+                {
+                    Logger.info(LOGGER_TAG, "Trying to restart update task.");
+                    new Thread(this).start();
+                }
+                else
+                    Logger.error(LOGGER_TAG, "Table builder's crash count reaches its limit. Build process will be stopped.");
+            }
         }
 
         //endregion
@@ -107,44 +181,64 @@ public class FloorNavigator
     /**
      * Path builder
      */
-    public class PathBuilder
+    private class PathBuilder
     {
         //region Fields
 
-        GuideNode    mEndNode;      // Related end node
-        TableBuilder mTableBuilder; // Related start node's table builder
+        private boolean mBuilding; // Indicates whether the path is building or not
+        private Path    mPath;       // Built path
 
         //endregion
 
         //region Constructors
 
-        /**
-         * Initialize new instance of class {@link PathBuilder}
-         *
-         * @param endNode      Related end node
-         * @param tableBuilder Related start node's table builder
-         */
-        public PathBuilder(final @NonNull GuideNode endNode, final @NonNull TableBuilder tableBuilder)
+        public PathBuilder()
         {
-            mEndNode = endNode;
-            mTableBuilder = tableBuilder;
+
         }
 
         //endregion
 
-        //region Methods
+        //region Accessors
 
         /**
-         * Gets the shortest path from start node to end node in related floor
+         * Gets built path
          *
-         * @return The shortest path, or null if the navigate table isn't built yet
+         * @return Built path, or null if the build process isn't finished yet
          */
-        public Path build()
+        public Path getPath()
         {
-            if (mTableBuilder.mTable == null) return null;
-            Path path = mTableBuilder.mTable.get(mEndNode);
-            if (path == null) throw new IllegalArgumentException("End node doesn't belong to this navigator.");
-            return path.fork();
+            return mPath;
+        }
+
+        /**
+         * Gets whether the path is building or not
+         *
+         * @return Whether the path is building or not
+         */
+        public boolean isBuilding()
+        {
+            return mBuilding;
+        }
+
+        /**
+         * Sets whether the path is building or not
+         *
+         * @param value Whether the path is building or not
+         */
+        public void setBuilding(boolean value)
+        {
+            mBuilding = value;
+        }
+
+        /**
+         * Sets built path
+         *
+         * @param value Built path
+         */
+        public void setPath(final @NonNull Path value)
+        {
+            mPath = value;
         }
 
         //endregion
@@ -154,9 +248,9 @@ public class FloorNavigator
 
     //region Fields
 
-    private OnNavigationFinishedListener mOnNavigationFinishedListener; // Listener for navigation finished event
+    private OnBuildFailedListener mOnBuildFailedListener; // Listener for navigation finished event
 
-    private HashMap<NodeBase, TableBuilder> mBuilderTable = new HashMap<>(); // TableBuilder table to get built table or start building table
+    private HashMap<GuideNode, HashMap<GuideNode, PathBuilder>> mPathTable = new HashMap<>(); // TableBuilder table to get built table or start building table
 
     //endregion
 
@@ -169,7 +263,11 @@ public class FloorNavigator
      */
     public FloorNavigator(final @NonNull Floor floor)
     {
-        for (GuideNode guideNode : floor.getGuideNodes()) mBuilderTable.put(guideNode, new TableBuilder(guideNode));
+        for (GuideNode startNode : floor.getGuideNodes())
+        {
+            mPathTable.put(startNode, new HashMap<GuideNode, PathBuilder>());
+            for (GuideNode endNode : floor.getGuideNodes()) mPathTable.get(startNode).put(endNode, new PathBuilder());
+        }
     }
 
     //endregion
@@ -177,31 +275,49 @@ public class FloorNavigator
     //region Accessors
 
     /**
-     * Sets {@link OnNavigationFinishedListener} for this navigator
+     * Gets path builder from start node to end node
+     *
+     * @param startNode Start node
+     * @param endNode   End node
+     * @return Path builder from start node to end node
+     */
+    private PathBuilder getBuilder(final @NonNull GuideNode startNode, final @NonNull GuideNode endNode)
+    {
+        return mPathTable.get(startNode).get(endNode);
+    }
+
+    /**
+     * Sets {@link OnBuildFailedListener} for this navigator
      *
      * @param value Listener to set
      */
-    public void setOnNavigationFinishedListener(OnNavigationFinishedListener value)
+    public void setOnBuildFailedListener(OnBuildFailedListener value)
     {
-        mOnNavigationFinishedListener = value;
+        mOnBuildFailedListener = value;
     }
 
     //endregion
 
     //region Methods
 
-    /**
-     * Gets path builder for building the shortest path from start node to end node in related floor
-     *
-     * @param start Start node
-     * @param end   End node
-     * @return Path builder
-     */
-    public PathBuilder navigate(final @NonNull GuideNode start, final @NonNull GuideNode end)
+    public void buildPathAsync(final @NonNull GuideNode startNode, final @NonNull GuideNode endNode)
     {
-        TableBuilder tableBuilder = mBuilderTable.get(start);
-        if (tableBuilder == null) throw new IllegalArgumentException("Start node doesn't belong to this navigator.");
-        return new PathBuilder(end, tableBuilder);
+        if (getBuilder(startNode, endNode).isBuilding()) return;
+        new Thread(new TableBuilder(startNode)).start();
+    }
+
+    /**
+     * Gets path from start node to end node in related floor
+     *
+     * @param startNode Start node
+     * @param endNode   End node
+     * @return Path's fork, or null if the build process isn't finished yet
+     */
+    public Path getPath(final @NonNull GuideNode startNode, final @NonNull GuideNode endNode)
+    {
+        PathBuilder builder = mPathTable.get(startNode).get(endNode);
+        if (builder == null) return null;
+        return builder.getPath();
     }
 
     //endregion
