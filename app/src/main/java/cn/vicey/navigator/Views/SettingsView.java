@@ -165,7 +165,13 @@ public class SettingsView
         @Override
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
-            mUseRandomLocationCheckBox.setChecked(!b);
+            DebugManager.setUseRandomLocationEnabled(!b);
+            if (!b) mDebugPathPanel.setVisibility(View.GONE);
+            else
+            {
+                mDebugPathPanel.setVisibility(View.VISIBLE);
+                mUseRandomLocationCheckBox.setChecked(false);
+            }
         }
     };
     private final CompoundButton.OnCheckedChangeListener mOnUseFakeLocationCheckedChangeListener   = new CompoundButton.OnCheckedChangeListener() // Listener for check box checked change event
@@ -184,9 +190,9 @@ public class SettingsView
         public void onCheckedChanged(CompoundButton compoundButton, boolean b)
         {
             DebugManager.setUseRandomLocationEnabled(b);
-            mUseDebugPathCheckBox.setChecked(!b);
-            if (b) mDebugPathPanel.setVisibility(View.GONE);
-            else mDebugPathPanel.setVisibility(View.VISIBLE);
+            if (!b) return;
+            mDebugPathPanel.setVisibility(View.GONE);
+            mUseDebugPathCheckBox.setChecked(false);
         }
     };
 

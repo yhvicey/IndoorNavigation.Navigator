@@ -57,6 +57,11 @@ public class DebugPath
 
     //region Methods
 
+    /**
+     * Add node to debug path
+     *
+     * @param node Node to add
+     */
     public void addNode(final @NonNull DebugPathNode node)
     {
         mPath.appendTail(node);

@@ -3,6 +3,7 @@ package cn.vicey.navigator.Share;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import cn.vicey.navigator.Debug.DebugManager;
 import cn.vicey.navigator.Utils.Logger;
 
 /**
@@ -48,7 +49,14 @@ public final class SettingsManager
     {
         mDebugModeEnabled = value;
         if (value) Logger.debug(LOGGER_TAG, "Debug mode enabled.");
-        else Logger.debug(LOGGER_TAG, "Debug mode disabled.");
+        else
+        {
+            DebugManager.setTrackPathEnabled(false);
+            DebugManager.setUseFakeLocationEnabled(false);
+            DebugManager.setUseRandomLocationEnabled(false);
+            Logger.debug(LOGGER_TAG, "Debug mode disabled.");
+        }
+
     }
 
     //endregion

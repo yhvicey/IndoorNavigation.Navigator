@@ -54,8 +54,7 @@
                         android:id="@+id/sv_debug_use_random_location"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/middle_item_height"
-                        app:text="@string/use_random_location"
-                        app:checked="true"/>
+                        app:text="@string/use_random_location"/>
 
                 <cn.vicey.navigator.Components.SettingsCheckBox
                         android:id="@+id/sv_debug_use_debug_path"
