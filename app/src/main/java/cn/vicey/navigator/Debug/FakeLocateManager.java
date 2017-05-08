@@ -126,7 +126,7 @@ public final class FakeLocateManager
     {
         try
         {
-            NavigateManager.addOnUpdateListener(NavigateManager.HIGHER_PRIORITY, new NavigateManager.OnUpdateListener()
+            NavigateManager.addOnUpdateListener(NavigateManager.HIGHEST_PRIORITY, new NavigateManager.OnUpdateListener()
             {
                 @Override
                 public void onUpdate()

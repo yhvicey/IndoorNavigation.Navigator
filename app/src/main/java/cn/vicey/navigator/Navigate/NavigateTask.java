@@ -24,7 +24,7 @@ public class NavigateTask
 
     private int                        mErrorCount;       // Task's error count
     private boolean                    mFinished;         // Whether the task has been finished yet
-    private FloorNavigator.PathBuilder mPathBuilder;             // Task's guide path
+    private FloorNavigator.PathBuilder mPathBuilder;      // Task's guide path
     private GuideNode                  mTarget;           // Task's target node
     private int                        mTargetFloorIndex; // Task's target floor index
 
@@ -91,8 +91,8 @@ public class NavigateTask
             mFinished = true;
             return;
         }
-        int x = UserNode.getInstance().getX();
-        int y = UserNode.getInstance().getY();
+        int x = NavigateManager.getCurrentLocation().x;
+        int y = NavigateManager.getCurrentLocation().y;
         int diff = newFloorIndex - mTargetFloorIndex;
         if (diff < 0)
         {

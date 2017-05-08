@@ -1,5 +1,6 @@
 package cn.vicey.navigator.Navigate;
 
+import android.graphics.Point;
 import android.support.annotation.NonNull;
 import android.util.SparseArray;
 import cn.vicey.navigator.Debug.DebugManager;
@@ -44,9 +45,19 @@ public final class NavigateManager
     public static final int HIGHER_PRIORITY = 1;
 
     /**
+     * Highest priority
+     */
+    public static final int HIGHEST_PRIORITY = 2;
+
+    /**
      * Lower priority
      */
     public static final int LOWER_PRIORITY = -1;
+
+    /**
+     * Lowest priority
+     */
+    public static final int LOWEST_PRIORITY = -2;
 
     /**
      * Normal priority
@@ -62,18 +73,35 @@ public final class NavigateManager
 
     //region Static fields
 
-    private static Path         mCurrentGuidePath; // Current guide path
-    private static Map          mCurrentMap;       // Current map object
-    private static NavigateTask mCurrentTask;      // Current navigate task
-    private static Path         mCurrentUserPath;  // Current user path
-    private static int          mErrorCount;       // Error count
-    private static boolean      mIsNavigating;     // Indicates whether the manager is navigating
-    private static int          mLastFloorIndex;   // Last floor index used for notifying floor changed event
-    private static GuideNode    mNearestNode;      // Nearest node to user node
+    private static int          mCurrentFloorIndex; // Current floor index
+    private static Path         mCurrentGuidePath;  // Current guide path
+    private static Point        mCurrentLocation;   // Current location
+    private static Map          mCurrentMap;        // Current map object
+    private static NavigateTask mCurrentTask;       // Current navigate task
+    private static Path         mCurrentUserPath;   // Current user path
+    private static int          mErrorCount;        // Error count
+    private static boolean      mIsNavigating;      // Indicates whether the manager is navigating
+    private static int          mLastFloorIndex;    // Last floor index used for notifying floor changed event
+    private static GuideNode    mNearestNode;       // Nearest node to user node
 
-    private static SparseArray<FloorNavigator>         mFloorNavigators   = new SparseArray<>(); // Floor navigators
-    private static SparseArray<List<OnUpdateListener>> mOnUpdateListeners = new SparseArray<>(); // Listeners for update event
-    private static Runnable                            mUpdateTask        = new Runnable()       // Update task
+    private static SparseArray<FloorNavigator>            mFloorNavigators         = new SparseArray<>();                         // Floor navigators
+    private static FloorNavigator.OnBuildFinishedListener mOnBuildFinishedListener = new FloorNavigator.OnBuildFinishedListener() // Listener for build finished event
+    {
+        @Override
+        public void onFailed()
+        {
+            AlertManager.alert(R.string.failed_to_build_path);
+            cancelNavigate();
+        }
+
+        @Override
+        public void onSucceed()
+        {
+
+        }
+    };
+    private static SparseArray<List<OnUpdateListener>>    mOnUpdateListeners       = new SparseArray<>();                         // Listeners for update event
+    private static Runnable                               mUpdateTask              = new Runnable()                               // Update task
     {
         @Override
         public void run()
@@ -86,13 +114,14 @@ public final class NavigateManager
                     Thread.sleep(UPDATE_INTERNAL);
 
                     // Check whether floor changed
-                    int floorIndex = UserNode.getInstance().getCurrentFloorIndex();
-                    if (mLastFloorIndex != floorIndex) onFloorChanged(floorIndex);
+                    if (mLastFloorIndex != mCurrentFloorIndex) onFloorChanged(mCurrentFloorIndex);
 
                     // Notify all listeners
+                    for (OnUpdateListener listener : mOnUpdateListeners.get(HIGHEST_PRIORITY)) listener.onUpdate();
                     for (OnUpdateListener listener : mOnUpdateListeners.get(HIGHER_PRIORITY)) listener.onUpdate();
                     for (OnUpdateListener listener : mOnUpdateListeners.get(NORMAL_PRIORITY)) listener.onUpdate();
                     for (OnUpdateListener listener : mOnUpdateListeners.get(LOWER_PRIORITY)) listener.onUpdate();
+                    for (OnUpdateListener listener : mOnUpdateListeners.get(LOWEST_PRIORITY)) listener.onUpdate();
                 }
             }
             catch (Throwable t)
@@ -120,7 +149,17 @@ public final class NavigateManager
      */
     public static Floor getCurrentFloor()
     {
-        return getFloor(UserNode.getInstance().getCurrentFloorIndex());
+        return getFloor(getCurrentFloorIndex());
+    }
+
+    /**
+     * Gets current floor index
+     *
+     * @return Current floor index
+     */
+    public static int getCurrentFloorIndex()
+    {
+        return mCurrentFloorIndex;
     }
 
     /**
@@ -131,6 +170,16 @@ public final class NavigateManager
     public static Path getCurrentGuidePath()
     {
         return mCurrentGuidePath;
+    }
+
+    /**
+     * Gets current location
+     *
+     * @return Current location
+     */
+    public static Point getCurrentLocation()
+    {
+        return mCurrentLocation;
     }
 
     /**
@@ -150,7 +199,7 @@ public final class NavigateManager
      */
     public static FloorNavigator getCurrentNavigator()
     {
-        return getNavigator(UserNode.getInstance().getCurrentFloorIndex());
+        return getNavigator(NavigateManager.getCurrentFloorIndex());
     }
 
     /**
@@ -193,7 +242,12 @@ public final class NavigateManager
         Floor floor = getFloor(floorIndex);
         if (floor == null) return null;
         // If target floor's navigator didn't exist then create it
-        if (mFloorNavigators.get(floorIndex) == null) mFloorNavigators.put(floorIndex, new FloorNavigator(floor));
+        if (mFloorNavigators.get(floorIndex) == null)
+        {
+            FloorNavigator navigator = new FloorNavigator(floor);
+            navigator.setOnBuildFinishedListener(mOnBuildFinishedListener);
+            mFloorNavigators.put(floorIndex, navigator);
+        }
         return mFloorNavigators.get(floorIndex);
     }
 
@@ -204,7 +258,6 @@ public final class NavigateManager
      */
     public static GuideNode getNearestNode()
     {
-        if (getCurrentFloor() == null) return null;
         return mNearestNode;
     }
 
@@ -251,6 +304,15 @@ public final class NavigateManager
         mLastFloorIndex = newFloorIndex;
     }
 
+    private static void updateLocation()
+    {
+        mCurrentFloorIndex = UserNode.getInstance().getCurrentFloorIndex();
+        mCurrentLocation = new Point(UserNode.getInstance().getX(), UserNode.getInstance().getY());
+    }
+
+    /**
+     * Update navigation
+     */
     private static void updateNavigation()
     {
         // If is navigating then update the task
@@ -297,6 +359,9 @@ public final class NavigateManager
         mNearestNode = floor.findNearestGuideNode(x, y);
     }
 
+    /**
+     * Update user path
+     */
     private static void updateUserPath()
     {
         // Track user path if it's enabled
@@ -359,9 +424,20 @@ public final class NavigateManager
         {
             new Thread(mUpdateTask).start();
 
+            mOnUpdateListeners.put(HIGHEST_PRIORITY, new ArrayList<OnUpdateListener>());
             mOnUpdateListeners.put(HIGHER_PRIORITY, new ArrayList<OnUpdateListener>());
             mOnUpdateListeners.put(NORMAL_PRIORITY, new ArrayList<OnUpdateListener>());
             mOnUpdateListeners.put(LOWER_PRIORITY, new ArrayList<OnUpdateListener>());
+            mOnUpdateListeners.put(LOWEST_PRIORITY, new ArrayList<OnUpdateListener>());
+
+            addOnUpdateListener(HIGHER_PRIORITY, new OnUpdateListener()
+            {
+                @Override
+                public void onUpdate()
+                {
+                    updateLocation();
+                }
+            });
 
             addOnUpdateListener(NORMAL_PRIORITY, new OnUpdateListener()
             {
@@ -403,6 +479,7 @@ public final class NavigateManager
         synchronized (SYNC_LOCK_TASK)
         {
             mCurrentTask = new NavigateTask(endFloor, endNode);
+            onFloorChanged(NavigateManager.getCurrentFloorIndex());
         }
         AlertManager.alert(R.string.starting_navigation);
     }

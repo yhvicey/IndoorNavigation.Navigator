@@ -8,7 +8,6 @@ import android.widget.RelativeLayout;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Activities.MainActivity;
 import cn.vicey.navigator.Components.MapRenderer;
-import cn.vicey.navigator.Models.Nodes.UserNode;
 import cn.vicey.navigator.Navigate.NavigateManager;
 import cn.vicey.navigator.Navigator;
 import cn.vicey.navigator.R;
@@ -53,10 +52,10 @@ public class NavigateView
                 AlertManager.alert(R.string.no_loaded_map);
                 return;
             }
-            int floorIndex = UserNode.getInstance().getCurrentFloorIndex();
+            int floorIndex = NavigateManager.getCurrentFloorIndex();
             if (mMapRenderer.getCurrentDisplayingFloorIndex() != floorIndex)
                 mMapRenderer.setCurrentDisplayingFloorIndex(floorIndex);
-            mMapRenderer.lookAt(UserNode.getInstance().getX(), UserNode.getInstance().getY());
+            mMapRenderer.lookAt(NavigateManager.getCurrentLocation().x, NavigateManager.getCurrentLocation().y);
             mMapRenderer.flush();
         }
     };

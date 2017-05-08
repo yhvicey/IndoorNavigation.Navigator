@@ -17,7 +17,10 @@ import android.widget.SearchView;
 import cn.vicey.navigator.Debug.DebugManager;
 import cn.vicey.navigator.Models.Floor;
 import cn.vicey.navigator.Models.Map;
-import cn.vicey.navigator.Models.Nodes.*;
+import cn.vicey.navigator.Models.Nodes.GuideNode;
+import cn.vicey.navigator.Models.Nodes.NodeBase;
+import cn.vicey.navigator.Models.Nodes.PathNode;
+import cn.vicey.navigator.Models.Nodes.WallNode;
 import cn.vicey.navigator.Navigate.NavigateManager;
 import cn.vicey.navigator.Navigate.Path;
 import cn.vicey.navigator.Navigator;
@@ -247,8 +250,9 @@ public class MapRenderer
     {
         for (WallNode wallNode : floor.getWallNodes())
             drawNode(canvas, mWallPaint, NODE_RADIUS, wallNode);
-        if (UserNode.getInstance().getCurrentFloorIndex() == mCurrentDisplayingFloorIndex)
-            drawNode(canvas, mUserPaint, NODE_RADIUS * 2, UserNode.getInstance());
+        if (NavigateManager.getCurrentFloorIndex() == mCurrentDisplayingFloorIndex)
+            drawNode(canvas, mUserPaint, NODE_RADIUS * 2, new PathNode(NavigateManager.getCurrentLocation().x, NavigateManager
+                    .getCurrentLocation().y));
         if (!SettingsManager.isDebugModeEnabled()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
             drawNode(canvas, mGuidePaint, NODE_RADIUS, guideNode);
@@ -390,7 +394,7 @@ public class MapRenderer
             // mLookAt
             mLookAt = new Point();
 
-            NavigateManager.addOnUpdateListener(NavigateManager.LOWER_PRIORITY, new NavigateManager.OnUpdateListener()
+            NavigateManager.addOnUpdateListener(NavigateManager.LOWEST_PRIORITY, new NavigateManager.OnUpdateListener()
             {
                 @Override
                 public void onUpdate()
