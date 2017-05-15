@@ -10,9 +10,8 @@ public class Link
     //region Fields
 
     private int      mEndIndex;   // Link's end index
-    private NodeType mEndType;    // Link's end type
     private int      mStartIndex; // Link's start index
-    private NodeType mStartType;  // Link's start type
+    private NodeType mType;       // Link's type
 
     //endregion
 
@@ -21,17 +20,15 @@ public class Link
     /**
      * Initialize new instance of class {@link Link}
      *
-     * @param startType  Link's start type
+     * @param type       Link's type
      * @param startIndex Link's start index
-     * @param endType    Link's end type
      * @param endIndex   Link's end index
      */
-    public Link(NodeType startType, int startIndex, NodeType endType, int endIndex)
+    public Link(NodeType type, int startIndex, int endIndex)
     {
-        mStartType = startType;
-        mStartIndex = startIndex;
-        mEndType = endType;
         mEndIndex = endIndex;
+        mStartIndex = startIndex;
+        mType = type;
     }
 
     //endregion
@@ -49,16 +46,6 @@ public class Link
     }
 
     /**
-     * Gets link's end type
-     *
-     * @return Link's end type
-     */
-    public NodeType getEndType()
-    {
-        return mEndType;
-    }
-
-    /**
      * Gets link's start index
      *
      * @return Link's start index
@@ -69,13 +56,13 @@ public class Link
     }
 
     /**
-     * Gets link's start type
+     * Gets link's type
      *
-     * @return Link's start type
+     * @return Link's type
      */
-    public NodeType getStartType()
+    public NodeType getType()
     {
-        return mStartType;
+        return mType;
     }
 
     //endregion
@@ -88,23 +75,22 @@ public class Link
         if (obj == null) return false;
         if (!(obj instanceof Link)) return false;
         Link link = (Link) obj;
-        return mStartType == link.mStartType && mStartIndex == link.mStartIndex && mEndType == link.mEndType && mEndIndex == link.mEndIndex || mStartType == link.mEndType && mStartIndex == link.mEndIndex && mEndType == link.mStartType && mEndIndex == link.mStartIndex;
+        return mType == link.mType && (mStartIndex == link.mStartIndex && mEndIndex == link.mEndIndex || mStartIndex == link.mEndIndex && mEndIndex == link.mStartIndex);
     }
 
     @Override
     public int hashCode()
     {
-        int leftHashCode = mStartIndex;
-        leftHashCode = (leftHashCode * 397) ^ mStartType.getValue();
-        int rightHashCode = mEndIndex;
-        rightHashCode = (rightHashCode * 397) ^ mEndType.getValue();
-        return leftHashCode ^ rightHashCode;
+        int hashCode = mEndIndex;
+        hashCode = (hashCode * 397) ^ mStartIndex;
+        hashCode = (hashCode * 397) ^ mType.getValue();
+        return hashCode;
     }
 
     @Override
     public String toString()
     {
-        return "Link Start(" + mStartType.toString() + ", " + mStartIndex + ") End(" + mEndType.toString() + ", " + mEndIndex + ")";
+        return "Link Type = " + mType.toString() + " (" + mStartIndex + ", " + mEndIndex + ")";
     }
 
     //endregion

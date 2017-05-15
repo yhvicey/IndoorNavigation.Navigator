@@ -123,7 +123,7 @@ public class FloorNavigator
                         if (link.getDistance() < distance)
                         {
                             distance = link.getDistance();
-                            nearestNode = (GuideNode) link.getTarget();
+                            nearestNode = target;
                         }
                     }
                     // Meet corner, find nearest node in open table

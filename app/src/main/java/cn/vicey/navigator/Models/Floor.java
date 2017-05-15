@@ -132,8 +132,8 @@ public class Floor
      */
     public void addLink(final @NonNull Link link)
     {
-        NodeBase start = getNode(link.getStartType(), link.getStartIndex());
-        NodeBase end = getNode(link.getEndType(), link.getEndIndex());
+        NodeBase start = getNode(link.getType(), link.getStartIndex());
+        NodeBase end = getNode(link.getType(), link.getEndIndex());
         start.link(end);
         end.link(start);
     }

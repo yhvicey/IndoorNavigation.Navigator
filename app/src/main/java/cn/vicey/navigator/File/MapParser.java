@@ -29,21 +29,19 @@ public final class MapParser
     private static final String LOGGER_TAG = "MapParser";
 
     private static final String ATTR_END_INDEX    = "EndIndex";   // EndIndex attribute name
-    private static final String ATTR_END_TYPE     = "EndType";    // End type attribute name
     private static final String ATTR_NAME         = "Name";       // Name attribute name
     private static final String ATTR_NEXT         = "Next";       // Next attribute name
     private static final String ATTR_PREV         = "Prev";       // Prev attribute name
     private static final String ATTR_START_INDEX  = "StartIndex"; // Start index attribute name
-    private static final String ATTR_START_TYPE   = "StartType";  // Start type attribute name
+    private static final String ATTR_TYPE         = "Type";       // Type attribute name
     private static final String ATTR_VERSION      = "Version";    // Version attribute name
     private static final String ATTR_X            = "X";          // X attribute name
     private static final String ATTR_Y            = "Y";          // Y attribute name
     private static final String DEFAULT_MAP_NAME  = "Untitled";   // Default map name
     private static final String ELEMENT_FLOOR     = "Floor";      // Floor element name
-    private static final String ELEMENT_GUIDE     = "GuideNode";  // GuideNode element name
     private static final String ELEMENT_LINK      = "Link";       // Link element name
     private static final String ELEMENT_MAP       = "Map";        // Map element name
-    private static final String ELEMENT_WALL      = "WallNode";   // WallNode element name
+    private static final String ELEMENT_NODE      = "Node";       // Node element name
     private static final String SUPPORTED_VERSION = "1.1";        // Supported version of this parser
 
     //endregion
@@ -60,11 +58,10 @@ public final class MapParser
     {
         try
         {
-            NodeType startType = NodeType.parse(parser.getAttributeValue(null, ATTR_START_TYPE));
+            NodeType type = NodeType.parse(parser.getAttributeValue(null, ATTR_TYPE));
             int startIndex = Integer.parseInt(parser.getAttributeValue(null, ATTR_START_INDEX));
-            NodeType endType = NodeType.parse(parser.getAttributeValue(null, ATTR_END_TYPE));
             int endIndex = Integer.parseInt(parser.getAttributeValue(null, ATTR_END_INDEX));
-            return new Link(startType, startIndex, endType, endIndex);
+            return new Link(type, startIndex, endIndex);
         }
         catch (Throwable t)
         {
@@ -84,7 +81,7 @@ public final class MapParser
         NodeType type;
         try
         {
-            type = NodeType.parse(parser.getName());
+            type = NodeType.parse(parser.getAttributeValue(null, ATTR_TYPE));
         }
         catch (Throwable t)
         {
@@ -204,8 +201,7 @@ public final class MapParser
                             //endregion
                             // Meet node element, if is parsing a floor, then add the node to the floor, else break the parsing
                             //region Node element
-                            case ELEMENT_GUIDE:
-                            case ELEMENT_WALL:
+                            case ELEMENT_NODE:
                             {
                                 if (currentFloor == null)
                                 {
