@@ -1,7 +1,6 @@
 package cn.vicey.navigator.Models;
 
 import android.support.annotation.NonNull;
-import cn.vicey.navigator.Utils.Logger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,81 +63,9 @@ public class Map
         return mName;
     }
 
-    /**
-     * Gets all tags
-     *
-     * @return Tags
-     */
-    public List<Tag> getTags()
-    {
-        List<Tag> tags = new ArrayList<>();
-        int index = 0;
-        for (Floor floor : mFloors)
-        {
-            tags.addAll(floor.getTags(index));
-            index++;
-        }
-        return tags;
-    }
-
-    /**
-     * Sets tags
-     *
-     * @param tags Tags to set
-     * @return Whether the setting is succeed or not
-     */
-    public boolean setTags(List<Tag> tags)
-    {
-        clearTags();
-        try
-        {
-            for (Tag tag : tags)
-            {
-                int floor = tag.getFloorIndex();
-                int index = tag.getNodeIndex();
-                String value = tag.getValue();
-                switch (tag.getNodeType())
-                {
-                    case GUIDE_NODE:
-                    {
-                        mFloors.get(floor).getGuideNodes().get(index).setTag(value);
-                        continue;
-                    }
-                    case WALL_NODE:
-                    {
-                        mFloors.get(floor).getWallNodes().get(index).setTag(value);
-                        continue;
-                    }
-                    default:
-                    {
-                        Logger.error(LOGGER_TAG, "Unexpected tag type.");
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-        catch (Throwable t)
-        {
-            Logger.error(LOGGER_TAG, "Failed to set tag.", t);
-            return false;
-        }
-    }
-
     //endregion
 
     //region Methods
-
-    /**
-     * Clear all tags
-     */
-    public void clearTags()
-    {
-        for (Floor floor : mFloors)
-        {
-            floor.clearTags();
-        }
-    }
 
     //endregion
 

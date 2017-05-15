@@ -28,13 +28,6 @@
             app:text="@string/maps"/>
 
     <cn.vicey.navigator.Components.MenuItem
-            android:id="@+id/mm_tags"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:icon="@drawable/ic_menu_tags"
-            app:text="@string/tags"/>
-
-    <cn.vicey.navigator.Components.MenuItem
             android:id="@+id/mm_settings"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

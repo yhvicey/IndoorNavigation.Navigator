@@ -9,7 +9,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 import android.widget.ViewFlipper;
 import cn.vicey.navigator.Components.MenuItem;
 import cn.vicey.navigator.Navigator;
@@ -17,7 +16,10 @@ import cn.vicey.navigator.R;
 import cn.vicey.navigator.Share.AlertManager;
 import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Utils.Logger;
-import cn.vicey.navigator.Views.*;
+import cn.vicey.navigator.Views.LogView;
+import cn.vicey.navigator.Views.MapsView;
+import cn.vicey.navigator.Views.NavigateView;
+import cn.vicey.navigator.Views.SettingsView;
 import com.yalantis.guillotine.animation.GuillotineAnimation;
 import com.yalantis.guillotine.interfaces.GuillotineListener;
 
@@ -33,8 +35,7 @@ public class MainActivity
 
     private static final String LOGGER_TAG = "MainActivity";
 
-    private static final long   RIPPLE_DURATION = 250;           // Guillotine animation duration
-    private static final Object SYNC_LOCK       = new Object();  // Sync lock
+    private static final long RIPPLE_DURATION = 250; // Guillotine animation duration
 
     /**
      * Request code for storage
@@ -43,7 +44,7 @@ public class MainActivity
     /**
      * Log view index
      */
-    public static final int VIEW_LOG      = 4;
+    public static final int VIEW_LOG      = 3;
     /**
      * Maps view index
      */
@@ -55,11 +56,7 @@ public class MainActivity
     /**
      * Settings view index
      */
-    public static final int VIEW_SETTINGS = 3;
-    /**
-     * Tags view index
-     */
-    public static final int VIEW_TAGS     = 2;
+    public static final int VIEW_SETTINGS = 2;
 
     //endregion
 
@@ -104,11 +101,6 @@ public class MainActivity
                     case R.id.mm_maps:
                     {
                         switchView(VIEW_MAPS);
-                        break;
-                    }
-                    case R.id.mm_tags:
-                    {
-                        switchView(VIEW_TAGS);
                         break;
                     }
                     case R.id.mm_settings:
@@ -165,7 +157,6 @@ public class MainActivity
     //region Fields
 
     private int                                   mClickCount;          // Click count to enable debug mode
-    private Toast                                 mCurrentToast;        // Current toast object
     private GuillotineAnimation                   mGuillotineAnimation; // Guillotine menu animation
     private boolean                               mIsMenuOpened;        // Is the guillotine menu opened
     private long                                  mLastBackPressedTime; // Last time the back is pressed
@@ -175,7 +166,6 @@ public class MainActivity
     private MapsView                              mMapsView;            // Maps view
     private NavigateView                          mNavigateView;        // Navigate view
     private SettingsView                          mSettingsView;        // Settings view
-    private TagsView                              mTagsView;            // Tags view
     private cn.vicey.navigator.Components.Toolbar mToolbar;             // Tool bar object
     private ViewFlipper                           mViewFlipper;         // View flipper to switch views
 
@@ -227,11 +217,6 @@ public class MainActivity
             case VIEW_MAPS:
             {
                 mMapsView.flush();
-                break;
-            }
-            case VIEW_TAGS:
-            {
-                mTagsView.flush();
                 break;
             }
             case VIEW_SETTINGS:
@@ -338,14 +323,12 @@ public class MainActivity
             mLogView = new LogView(this);
             mMapsView = new MapsView(this);
             mNavigateView = new NavigateView(this);
-            mTagsView = new TagsView(this);
             mSettingsView = new SettingsView(this);
 
             // Add views to flipper
             mViewFlipper = (ViewFlipper) findViewById(R.id.view_flipper);
             mViewFlipper.addView(mNavigateView);
             mViewFlipper.addView(mMapsView);
-            mViewFlipper.addView(mTagsView);
             mViewFlipper.addView(mSettingsView);
             mViewFlipper.addView(mLogView);
         }

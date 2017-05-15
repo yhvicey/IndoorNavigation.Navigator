@@ -69,9 +69,8 @@ public abstract class NodeBase
 
     //region Fields
 
-    private String mTag; // Node's tag
-    private int    mX;   // Node's x axis
-    private int    mY;   // Node's y axis
+    private int mX;   // Node's x axis
+    private int mY;   // Node's y axis
 
     private List<Link> mLinks = new ArrayList<>(); // Node's links
 
@@ -106,16 +105,6 @@ public abstract class NodeBase
     }
 
     /**
-     * Get node's tag
-     *
-     * @return Node's tag, or null if node didn't have a tag
-     */
-    public String getTag()
-    {
-        return mTag;
-    }
-
-    /**
      * Gets node's type
      *
      * @return Node's type
@@ -140,16 +129,6 @@ public abstract class NodeBase
     public int getY()
     {
         return mY;
-    }
-
-    /**
-     * Set node's tag
-     *
-     * @param tag Node's tag
-     */
-    public void setTag(@NonNull String tag)
-    {
-        mTag = tag;
     }
 
     //endregion
@@ -177,14 +156,6 @@ public abstract class NodeBase
     public double calcDistance(final @NonNull NodeBase target)
     {
         return calcDistance(target.mX, target.mY);
-    }
-
-    /**
-     * Clear node's tag
-     */
-    public void clearTag()
-    {
-        mTag = null;
     }
 
     /**

@@ -183,21 +183,6 @@ public class Floor
     }
 
     /**
-     * Clear all tags
-     */
-    public void clearTags()
-    {
-        for (NodeBase node : mGuideNodes)
-        {
-            node.clearTag();
-        }
-        for (NodeBase node : mWallNodes)
-        {
-            node.clearTag();
-        }
-    }
-
-    /**
      * Find guide nodes by pattern
      *
      * @param pattern Search pattern
@@ -324,31 +309,6 @@ public class Floor
                 return -1;
             }
         }
-    }
-
-    /**
-     * Gets all tags
-     *
-     * @param floorIndex Current floor index
-     * @return Tags
-     */
-    public List<Tag> getTags(int floorIndex)
-    {
-        List<Tag> tags = new ArrayList<>();
-        int index = 0;
-        for (NodeBase node : mGuideNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floorIndex, index, NodeType.GUIDE_NODE, tagValue));
-            index++;
-        }
-        for (NodeBase node : mWallNodes)
-        {
-            String tagValue = node.getTag();
-            if (tagValue != null) tags.add(new Tag(floorIndex, index, NodeType.WALL_NODE, tagValue));
-            index++;
-        }
-        return tags;
     }
 
     /**

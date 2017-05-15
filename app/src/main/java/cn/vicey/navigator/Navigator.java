@@ -3,7 +3,6 @@ package cn.vicey.navigator;
 import android.app.Application;
 import cn.vicey.navigator.Debug.FakeLocateManager;
 import cn.vicey.navigator.File.MapManager;
-import cn.vicey.navigator.File.TagManager;
 import cn.vicey.navigator.Navigate.NavigateManager;
 import cn.vicey.navigator.Share.SettingsManager;
 import cn.vicey.navigator.Share.TypefaceManager;
@@ -152,11 +151,6 @@ public class Navigator
             if (!MapManager.init())
             {
                 Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init MapManager.");
-                exitWithError(ERR_INIT);
-            }
-            if (!TagManager.init())
-            {
-                Logger.error(LOGGER_TAG, "FATAL ERROR: Can not init TagManager.");
                 exitWithError(ERR_INIT);
             }
             if (!NavigateManager.init())
