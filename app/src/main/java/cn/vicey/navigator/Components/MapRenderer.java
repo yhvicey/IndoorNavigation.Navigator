@@ -42,6 +42,7 @@ public class MapRenderer
 
     private static final int LINE_WIDTH     = 8;   // Line width
     private static final int NODE_RADIUS    = 4;   // Node radius
+    private static final int TEXT_SIZE      = 16;  // Text size
     private static final int ZOOM_LEVEL_MAX = 10;  // Max zoom level
     private static final int ZOOM_LEVEL_MIN = 1;   // Min zoom level
     private static final int ZOOM_SPEED     = 200; // Zoom speed
@@ -103,6 +104,7 @@ public class MapRenderer
     //region Fields
 
     private Paint                      mBackgroundPaint;      // Paint for background
+    private Paint                      mTextPaint;            // Paint for text
     private Paint                      mGuidePaint;           // Paint for guide nodes and lines
     private int                        mHalfHeight;           // Half of the component height
     private int                        mHalfWidth;            // Half of the component width
@@ -226,6 +228,24 @@ public class MapRenderer
     }
 
     /**
+     * Draw target node's name
+     *
+     * @param canvas   Canvas to draw
+     * @param paint    Paint to use
+     * @param textSize Text size
+     * @param node     Target node
+     */
+    private void drawName(final @NonNull Canvas canvas, final @NonNull Paint paint, float textSize, final @NonNull GuideNode node)
+    {
+        if (node.getName() == null) return;
+        float x = getRelativeX(node.getX());
+        float y = getRelativeY(node.getY());
+        float width = paint.measureText(node.getName());
+        paint.setTextSize(textSize);
+        canvas.drawText(node.getName(), x - width / 2, y - textSize / 2, paint);
+    }
+
+    /**
      * Draw a node
      *
      * @param canvas Canvas to draw
@@ -252,9 +272,11 @@ public class MapRenderer
         if (NavigateManager.getCurrentFloorIndex() == mCurrentDisplayingFloorIndex)
             drawNode(canvas, mUserPaint, NODE_RADIUS * 2, new PathNode(NavigateManager.getCurrentLocation().x, NavigateManager
                     .getCurrentLocation().y));
-        if (!DebugManager.isDisplayAllGuidePaths()) return;
         for (GuideNode guideNode : floor.getGuideNodes())
-            drawNode(canvas, mGuidePaint, NODE_RADIUS, guideNode);
+        {
+            if (DebugManager.isDisplayAllGuidePaths()) drawNode(canvas, mGuidePaint, NODE_RADIUS, guideNode);
+            if (guideNode.getName() != null) drawName(canvas, mTextPaint, TEXT_SIZE * mCurrentZoomLevel, guideNode);
+        }
     }
 
     /**
@@ -373,6 +395,10 @@ public class MapRenderer
             mBackgroundPaint = new Paint();
             mBackgroundPaint.setColor(ContextCompat.getColor(getContext(), R.color.renderer_background));
             mBackgroundPaint.setStyle(Paint.Style.FILL);
+
+            // mTextPaint
+            mTextPaint = new Paint();
+            mTextPaint.setColor(ContextCompat.getColor(getContext(), R.color.text_dark));
 
             // mGuidePaint
             mGuidePaint = new Paint();
@@ -523,9 +549,9 @@ public class MapRenderer
             Floor floor = getDisplayingFloor();
             if (floor == null) return;
 
-            drawNodes(canvas, floor);
             drawLinks(canvas, floor);
             drawPaths(canvas);
+            drawNodes(canvas, floor);
         }
         catch (Throwable t)
         {

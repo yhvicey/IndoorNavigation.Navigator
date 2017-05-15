@@ -53,6 +53,11 @@ public class NavigateView
                 return;
             }
             int floorIndex = NavigateManager.getCurrentFloorIndex();
+            if (floorIndex == NavigateManager.NO_SELECTED_FLOOR)
+            {
+                AlertManager.alert(R.string.no_current_floor);
+                return;
+            }
             if (mMapRenderer.getCurrentDisplayingFloorIndex() != floorIndex)
                 mMapRenderer.setCurrentDisplayingFloorIndex(floorIndex);
             mMapRenderer.lookAt(NavigateManager.getCurrentLocation().x, NavigateManager.getCurrentLocation().y);

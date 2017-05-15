@@ -161,8 +161,9 @@ public final class NavigateManager
      */
     public static Path getCurrentGuidePath()
     {
-        if (mCurrentGuidePath == null) return null;
-        return mCurrentGuidePath.fork();
+        Path guidePath = mCurrentGuidePath;
+        if (guidePath == null) return null;
+        return guidePath.fork();
     }
 
     /**
@@ -396,6 +397,7 @@ public final class NavigateManager
         {
             mCurrentTask = null;
         }
+        mCurrentGuidePath = null;
     }
 
     /**

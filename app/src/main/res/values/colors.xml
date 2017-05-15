@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="text">#DCDCDC</color>
+    <color name="text_dark">#141414</color>
     <color name="background">#444153</color>
     <color name="background_dark">#383547</color>
     <color name="highlighted">#30d1d5</color>
