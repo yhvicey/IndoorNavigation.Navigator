@@ -381,8 +381,8 @@ public final class NavigateManager
      */
     public static void addOnUpdateListener(int priority, final @NonNull OnUpdateListener listener)
     {
-        if (priority > 0) mOnUpdateListeners.get(HIGHER_PRIORITY).add(listener);
-        else if (priority < 0) mOnUpdateListeners.get(LOWER_PRIORITY).add(listener);
+        if (priority > HIGHEST_PRIORITY) mOnUpdateListeners.get(HIGHEST_PRIORITY).add(listener);
+        else if (priority < LOWEST_PRIORITY) mOnUpdateListeners.get(LOWEST_PRIORITY).add(listener);
         else mOnUpdateListeners.get(NORMAL_PRIORITY).add(listener);
     }
 

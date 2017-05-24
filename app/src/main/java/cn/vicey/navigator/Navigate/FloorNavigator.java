@@ -143,6 +143,7 @@ public class FloorNavigator
                         }
                         if (newPath == null)
                         {
+                            // No nearest node found, error occurred
                             Logger.error(LOGGER_TAG, "No nearest node found, error occurred.");
                             if (mOnBuildFailedListener != null) mOnBuildFailedListener.onFailed();
                             return;
