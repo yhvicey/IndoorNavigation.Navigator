@@ -66,7 +66,7 @@ public final class DebugPathParser
      * @param lines Lines to parse
      * @return Debug path object, or null if error occurred
      */
-    public static DebugPath parse(final @NonNull String[] lines)
+    public static DebugPath parse(@NonNull String[] lines)
     {
         try
         {
